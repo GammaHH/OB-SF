@@ -6,7 +6,7 @@
 5. [[大地 (Terra)]]
 6. [[沙礫 (Gravel)]]
 7. [[深板岩 (Deepslate)]]
-8. [[煤炭 (Coal)]]
+8. [[煤碳 (Coal)]]
 9. [[粗鐵 (Raw Iron)]]
 10. [[粗銅 (Raw Copper)]]
 11. [[紫水晶 (Amethyst)]]
@@ -21,7 +21,7 @@
 5. [[彩虹 (Rainbow)]]
 6. [[圓石 (Cobblestone)]]
 7. [[火 (Fire)]]
-8. [[煤炭 (Coal)]]
+8. [[煤碳 (Coal)]]
 9. [[光譜 (Spectrum)]]
 10. [[黑暗 (Darkness)]]
 #可偷10

@@ -5,7 +5,7 @@
 4. [[黑石 (Blackstone)]]
 5. [[下界岩 (Netherrack)]]
 6. [[玻璃 (Glass)]]
-7. [[煤炭 (Coal)]]
+7. [[煤碳 (Coal)]]
 8. [[苦力怕 (Creeper)]]
 9. [[岩漿怪 (Magma Cube)]]
 10. [[女巫 (Witch)]]
