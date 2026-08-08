@@ -1,5 +1,5 @@
 
-````markdown
+
 # OB-SF — Slimefun Obsidian Database
 
 一套以 **Obsidian** 為核心建立的 Slimefun 配方資料庫系統。
