@@ -1,4 +1,3 @@
-可以，這版可以直接貼進 GitHub 的 `README.md`。我會把重點放在「**使用 Obsidian 模板 + Regex 解析插件原始碼，自動建立 Slimefun BIO 資料庫**」這件事上。
 
 ````markdown
 # OB-SF — Slimefun Obsidian Database
