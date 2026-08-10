@@ -565,321 +565,127 @@ const environmentDict = {
 
 
 // ====================================
-// 7. Biome 翻譯 + 所屬世界
+// 7. 從 Obsidian MD 載入 Biome Dictionary
 // ====================================
-const biomeDict = {
 
-    // ----------------------------------
-    // 主世界
-    // ----------------------------------
-    "minecraft:plains": {
-        name: "平原",
-        environment: "normal"
-    },
+async function loadBiomeDict() {
 
-    "minecraft:sunflower_plains": {
-        name: "向日葵平原",
-        environment: "normal"
-    },
+    const dictPath =
+        "參考資料/biome ID-中文.md";
 
-    "minecraft:snowy_plains": {
-        name: "雪原",
-        environment: "normal"
-    },
+    const file =
+        app.vault.getAbstractFileByPath(
+            dictPath
+        );
 
-    "minecraft:ice_spikes": {
-        name: "冰刺平原",
-        environment: "normal"
-    },
+    if (!file) {
 
-    "minecraft:desert": {
-        name: "沙漠",
-        environment: "normal"
-    },
+        new Notice(
+            `⚠️ 找不到 Biome Dictionary：${dictPath}`
+        );
 
-    "minecraft:swamp": {
-        name: "沼澤",
-        environment: "normal"
-    },
-
-    "minecraft:forest": {
-        name: "森林",
-        environment: "normal"
-    },
-
-    "minecraft:flower_forest": {
-        name: "繁花森林",
-        environment: "normal"
-    },
-
-    "minecraft:birch_forest": {
-        name: "樺木森林",
-        environment: "normal"
-    },
-
-    "minecraft:dark_forest": {
-        name: "黑森林",
-        environment: "normal"
-    },
-
-    "minecraft:old_growth_birch_forest": {
-        name: "原始樺木森林",
-        environment: "normal"
-    },
-
-    "minecraft:old_growth_pine_taiga": {
-        name: "原始松木針葉林",
-        environment: "normal"
-    },
-
-    "minecraft:old_growth_spruce_taiga": {
-        name: "原始杉木針葉林",
-        environment: "normal"
-    },
-
-    "minecraft:taiga": {
-        name: "針葉林",
-        environment: "normal"
-    },
-
-    "minecraft:snowy_taiga": {
-        name: "雪地針葉林",
-        environment: "normal"
-    },
-
-    "minecraft:savanna": {
-        name: "莽原",
-        environment: "normal"
-    },
-
-    "minecraft:savanna_plateau": {
-        name: "莽原高地",
-        environment: "normal"
-    },
-
-    "minecraft:windswept_hills": {
-        name: "風襲丘陵",
-        environment: "normal"
-    },
-
-    "minecraft:windswept_gravelly_hills": {
-        name: "風襲礫質丘陵",
-        environment: "normal"
-    },
-
-    "minecraft:windswept_forest": {
-        name: "風襲森林",
-        environment: "normal"
-    },
-
-    "minecraft:windswept_savanna": {
-        name: "風襲莽原",
-        environment: "normal"
-    },
-
-    "minecraft:jungle": {
-        name: "叢林",
-        environment: "normal"
-    },
-
-    "minecraft:sparse_jungle": {
-        name: "稀疏叢林",
-        environment: "normal"
-    },
-
-    "minecraft:bamboo_jungle": {
-        name: "竹林",
-        environment: "normal"
-    },
-
-    "minecraft:badlands": {
-        name: "惡地",
-        environment: "normal"
-    },
-
-    "minecraft:eroded_badlands": {
-        name: "侵蝕惡地",
-        environment: "normal"
-    },
-
-    "minecraft:wooded_badlands": {
-        name: "樹林惡地",
-        environment: "normal"
-    },
-
-    "minecraft:meadow": {
-        name: "草甸",
-        environment: "normal"
-    },
-
-    "minecraft:grove": {
-        name: "雪林",
-        environment: "normal"
-    },
-
-    "minecraft:snowy_slopes": {
-        name: "積雪山坡",
-        environment: "normal"
-    },
-
-    "minecraft:frozen_peaks": {
-        name: "冰封山峰",
-        environment: "normal"
-    },
-
-    "minecraft:jagged_peaks": {
-        name: "尖峭山峰",
-        environment: "normal"
-    },
-
-    "minecraft:stony_peaks": {
-        name: "石峰",
-        environment: "normal"
-    },
-
-    "minecraft:river": {
-        name: "河流",
-        environment: "normal"
-    },
-
-    "minecraft:frozen_river": {
-        name: "凍河",
-        environment: "normal"
-    },
-
-    "minecraft:beach": {
-        name: "海灘",
-        environment: "normal"
-    },
-
-    "minecraft:snowy_beach": {
-        name: "積雪沙灘",
-        environment: "normal"
-    },
-
-    "minecraft:stony_shore": {
-        name: "石岸",
-        environment: "normal"
-    },
-
-    "minecraft:ocean": {
-        name: "海洋",
-        environment: "normal"
-    },
-
-    "minecraft:deep_ocean": {
-        name: "深海",
-        environment: "normal"
-    },
-
-    "minecraft:warm_ocean": {
-        name: "溫暖海洋",
-        environment: "normal"
-    },
-
-    "minecraft:lukewarm_ocean": {
-        name: "溫海",
-        environment: "normal"
-    },
-
-    "minecraft:deep_lukewarm_ocean": {
-        name: "溫暖深海",
-        environment: "normal"
-    },
-
-    "minecraft:cold_ocean": {
-        name: "冷海",
-        environment: "normal"
-    },
-
-    "minecraft:deep_cold_ocean": {
-        name: "冷水深海",
-        environment: "normal"
-    },
-
-    "minecraft:frozen_ocean": {
-        name: "凍洋",
-        environment: "normal"
-    },
-
-    "minecraft:deep_frozen_ocean": {
-        name: "冰凍深海",
-        environment: "normal"
-    },
-
-    "minecraft:mushroom_fields": {
-        name: "蘑菇原野",
-        environment: "normal"
-    },
-
-    "minecraft:dripstone_caves": {
-        name: "鐘乳石洞窟",
-        environment: "normal"
-    },
-
-    "minecraft:lush_caves": {
-        name: "蒼鬱洞窟",
-        environment: "normal"
-    },
-
-
-    // ----------------------------------
-    // 地獄
-    // ----------------------------------
-    "minecraft:nether_wastes": {
-        name: "地獄荒地",
-        environment: "nether"
-    },
-
-    "minecraft:soul_sand_valley": {
-        name: "靈魂砂谷",
-        environment: "nether"
-    },
-
-    "minecraft:crimson_forest": {
-        name: "緋紅森林",
-        environment: "nether"
-    },
-
-    "minecraft:warped_forest": {
-        name: "扭曲森林",
-        environment: "nether"
-    },
-
-    "minecraft:basalt_deltas": {
-        name: "玄武岩三角洲",
-        environment: "nether"
-    },
-
-
-    // ----------------------------------
-    // 終界
-    // ----------------------------------
-    "minecraft:the_end": {
-        name: "終界",
-        environment: "the_end"
-    },
-
-    "minecraft:end_highlands": {
-        name: "終界高地",
-        environment: "the_end"
-    },
-
-    "minecraft:end_midlands": {
-        name: "終界中地",
-        environment: "the_end"
-    },
-
-    "minecraft:small_end_islands": {
-        name: "終界小島",
-        environment: "the_end"
-    },
-
-    "minecraft:end_barrens": {
-        name: "終界荒地",
-        environment: "the_end"
+        return {};
     }
-};
+
+
+    const text =
+        await app.vault.read(file);
+
+
+    // Markdown 標題 → Minecraft Environment
+    const sectionEnvironmentDict = {
+        "主世界": "normal",
+        "地獄": "nether",
+        "終界": "the_end"
+    };
+
+
+    const biomeDict = {};
+
+    let currentEnvironment =
+        "";
+
+    const lines =
+        text.split(/\r?\n/);
+
+
+    for (let line of lines) {
+
+        // --------------------------------
+        // 讀取 ### 主世界 / 地獄 / 終界
+        // --------------------------------
+        const headingMatch =
+            line.match(
+                /^###\s+(.+?)\s*$/
+            );
+
+        if (headingMatch) {
+
+            const sectionName =
+                headingMatch[1].trim();
+
+            currentEnvironment =
+                sectionEnvironmentDict[
+                    sectionName
+                ] || "";
+
+            continue;
+        }
+
+
+        // --------------------------------
+        // 只解析 Markdown Table
+        //
+        // | `minecraft:plains` | 平原 |
+        // --------------------------------
+        const rowMatch =
+            line.match(
+                /^\|\s*`?(minecraft:[^|`\s]+)`?\s*\|\s*([^|]+?)\s*\|/
+            );
+
+        if (!rowMatch) {
+            continue;
+        }
+
+
+        const biomeId =
+            rowMatch[1].trim();
+
+        let biomeName =
+            rowMatch[2]
+                .replace(
+                    /<br\s*\/?>/gi,
+                    ""
+                )
+                .trim();
+
+
+        if (
+            !biomeId ||
+            !biomeName
+        ) {
+            continue;
+        }
+
+
+        biomeDict[biomeId] = {
+
+            name:
+                biomeName,
+
+            environment:
+                currentEnvironment
+        };
+    }
+
+
+    return biomeDict;
+}
+
+
+// 真正載入 Dictionary
+const biomeDict =
+    await loadBiomeDict();
 
 
 // ====================================
