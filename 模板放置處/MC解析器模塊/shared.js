@@ -42,6 +42,16 @@ const RECIPE_TYPE_INFO = {
     "minecraft:stonecutting": {
         section: "切石",
         machine: "切石機"
+    },
+
+    "minecraft:smithing_transform": {
+        section: "鍛造",
+        machine: "鍛造台"
+    },
+
+    "minecraft:crafting_transmute": {
+        section: "常規",
+        machine: "工作台"
     }
 };
 
@@ -277,17 +287,6 @@ function collectIngredientWarnings(
 
     if (
         ingredient.kind ===
-        "alternatives"
-    ) {
-
-        warnings.push(
-            `${label} 含替代材料，需要人工確認`
-        );
-    }
-
-
-    if (
-        ingredient.kind ===
         "unknown"
     ) {
 
@@ -298,6 +297,46 @@ function collectIngredientWarnings(
 
 
     return warnings;
+}
+
+
+// ============================================================
+// Legal Branch Semantics
+// ============================================================
+
+function ingredientHasChoices(ingredient) {
+
+    if (!ingredient) {
+        return false;
+    }
+
+    if (
+        ingredient.kind === "tag" ||
+        ingredient.kind === "alternatives"
+    ) {
+        return true;
+    }
+
+
+    return false;
+}
+
+
+function getNormalizedStatus(
+    ingredients,
+    warnings = []
+) {
+
+    if (warnings.length > 0) {
+        return "REVIEW";
+    }
+
+
+    return (ingredients ?? []).some(
+        ingredientHasChoices
+    )
+        ? "OK_BRANCH"
+        : "OK";
 }
 
 
@@ -326,6 +365,8 @@ module.exports = {
 
     ingredientToText,
     collectIngredientWarnings,
+    ingredientHasChoices,
+    getNormalizedStatus,
 
     getRecipeTypeInfo
 };

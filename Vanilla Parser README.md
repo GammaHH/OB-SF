@@ -1,49 +1,121 @@
 ---
 created: 2026-08-12 17:37
-updated: 2026-08-12 17:39
+updated: 2026-08-21 15:06
 ---
 
-```text
-MC解析器模塊/
-└─ README.md
-```
-
-可以先寫成這麼短：
-
-````md
-# OB-SF Minecraft Vanilla Parser
+# OB-SF Minecraft Vanilla Pipeline
 
 ## Purpose
 
-將 Minecraft Vanilla Recipe JSON 轉換成統一的 Normalized Recipe Object，
-供後續：
+將 Minecraft Vanilla recipe/tag JSON 正規化並留在同一個 JavaScript process，供遞迴 dependency analysis、BIO 建立順序，以及未來 BIO Generator 使用。
 
-- BIO 自動建立
-- Recipe Dependency Analysis
-- V3 遞迴材料計算
+正式資料流：
 
-使用。
+```text
+Minecraft Raw Recipe / Tag JSON objects
+        ↓
+Parser Modules + Tag Resolver
+        ↓
+NormalizedItemRegistry (Map, in memory)
+        ↓
+Recursive Dependency Resolver
+        ↓
+Dependency Generation Order
+        ↓
+Future BIO Generator
+```
 
----
+`Minecraft Normalized Recipes.json`、`Minecraft Tag Registry.json`、`Minecraft Recipe Manifest.md` 是可選的 generated/debug artifacts，不是 pipeline 階段間的必要輸入。正式流程不應先寫 JSON 再重新讀取。
 
-# Normalized Item
+## Modules
+
+```text
+模板放置處/MC解析器模塊/
+├─ index.js
+├─ pipeline.js
+├─ shared.js
+├─ normalized/
+│  └─ item_registry.js
+├─ dependencies/
+│  ├─ dependency_resolver.js
+│  └─ generation_planner.js
+├─ bio/
+│  └─ bio_scanner.js
+├─ recipes/
+│  ├─ crafting_shaped.js
+│  ├─ crafting_shapeless.js
+│  ├─ smelting.js
+│  └─ stonecutting.js
+└─ tags/
+   ├─ tag_parser.js
+   └─ tag_registry.js
+```
+
+`index.js` 是 public entry point。
+
+## In-memory API
+
+```js
+const vanilla = require("./模板放置處/MC解析器模塊");
+
+const pipeline = vanilla.createVanillaPipeline({
+    tagEntries: [
+        {
+            tagId: "minecraft:planks",
+            registryType: "item",
+            sourceFile: ".../planks.json",
+            json: rawPlanksTag
+        }
+    ],
+    recipeEntries: [
+        {
+            sourceFile: ".../barrel.json",
+            json: rawBarrelRecipe
+        }
+    ]
+});
+
+const barrel =
+    pipeline.itemRegistry.get("minecraft:barrel");
+
+const dependencyResult =
+    pipeline.resolveDependencies("minecraft:barrel");
+
+const generationPlan =
+    pipeline.createGenerationPlan(dependencyResult);
+
+console.log(generationPlan.generationOrder);
+```
+
+`recipeEntries` 也接受直接傳入 raw JSON object。Wrapper 形式只用來保留 `sourceFile` diagnostics。
+
+## Normalized Item Registry
+
+Registry 使用 `Map` 保存 item，不需要 serialization round-trip。
+
+每個 item 的 contract：
 
 ```json
 {
   "id": "minecraft:barrel",
-  "name": "木桶",
+  "name": null,
   "recipes": [],
   "warnings": []
 }
-````
+```
 
-同一 Minecraft Item 可以擁有多條 recipes。
+同一 item 可以有多條 recipes。`recipes[]` 是不同製作方式，互相替代，不可相加。
 
-`recipes[]` 之間為不同製作方式，不代表全部都需要執行。
+Registry API：
 
----
+- `get(id)`
+- `has(id)`
+- `addRecipe(id, recipe, warnings)`
+- `values()` / `entries()`
+- `toArray()`
+- `toJSON()`：只供 debug artifact export，不是正式 pipeline 必要步驟
 
-# Normalized Recipe
+## Normalized Recipe
 
 ```json
 {
@@ -52,29 +124,31 @@ MC解析器模塊/
   "machine": "工作台",
   "output": 1,
   "ingredients": [],
-  "meta": {}
+  "meta": {
+    "sourceFile": "recipe/barrel.json"
+  }
 }
 ```
 
-## output
+`recipe.output` 是執行一次 recipe 的成品數量；`ingredient.qty` 是執行一次 recipe 所需的材料數量。
 
-單次 Recipe 執行所產生的物品數量。
+目前註冊的 recipe types：
 
-例如：
+- `minecraft:crafting_shaped`
+- `minecraft:crafting_shapeless`
+- `minecraft:smelting`
+- `minecraft:blasting`
+- `minecraft:smoking`
+- `minecraft:campfire_cooking`
+- `minecraft:stonecutting`
+- `minecraft:smithing_transform`
+- `minecraft:crafting_transmute`
 
-```json
-"output": 4
-```
+已知不能表示為固定 ingredient → output recipe 的 Minecraft dynamic recipes 分類為 `SPECIAL`；未知且尚未實作的 type 分類為 `UNSUPPORTED`。兩者都不進入 item registry，也不會讓整批 pipeline 中止。
 
-表示一次配方產生 4 個成品。
+## Ingredient Contract
 
----
-
-# Ingredient Types
-
-## item
-
-固定材料。
+固定材料：
 
 ```json
 {
@@ -84,15 +158,7 @@ MC解析器模塊/
 }
 ```
 
-表示需要：
-
-3 × Iron Ingot
-
----
-
-## tag
-
-Minecraft Item Tag。
+Tag 材料：
 
 ```json
 {
@@ -107,336 +173,163 @@ Minecraft Item Tag。
 }
 ```
 
-語意：
+`values` 是可接受材料，不是全部同時需要。
 
-需要 6 個屬於 `#minecraft:planks` 的物品。
+Tag 的長期用途包含建立「任意木材」這類索引 BIO。索引 BIO 格式尚未定案；Parser 只保留 canonical tag ID 與 resolved values，不把 values 展開成同時需要的材料。
 
-`values` 中的物品為「可接受的材料」，
-不是全部都需要。
-
-例如：
-
-oak_planks ×6
-
-或
-
-spruce_planks ×6
-
-皆可滿足此 Ingredient。
-
-Tag 不應直接轉換成多個同時需要的 Ingredient。
-
----
-
-## alternatives
-
-Recipe JSON 直接定義的替代材料。
+Recipe alternatives：
 
 ```json
 {
   "kind": "alternatives",
+  "qty": 1,
   "alternatives": [
-    {
-      "kind": "item",
-      "id": "minecraft:a"
-    },
-    {
-      "kind": "item",
-      "id": "minecraft:b"
-    }
-  ],
-  "qty": 1
-}
-```
-
-語意：
-
-A 或 B 擇一。
-
-與 `kind: "tag"` 不同：
-
-* tag = Minecraft Tag membership
-* alternatives = Recipe 本身直接提供多個替代 Ingredient
-
-兩者都具有「擇一」性質，但來源與資料結構不同。
-
----
-
-# Tag System
-
-Tag Registry 由：
-
-```text
-參考資料/Minecraft/tags/item/
-參考資料/Minecraft/tags/block/
-```
-
-自動建立。
-
-Recipe Ingredient 使用 Item Tag，因此 Recipe Resolution 使用：
-
-```text
-registryType = "item"
-```
-
-Tag Resolver 支援：
-
-```text
-Tag
-→ Item
-
-Tag
-→ Nested Tag
-→ Item
-```
-
-並具有：
-
-* Nested Tag Resolution
-* Cycle Detection
-* required:false
-* Duplicate Removal
-
-````
-
-Tag 成功解析後保留原始 Tag：
-
-```json
-{
-  "kind": "tag",
-  "id": "minecraft:planks",
-  "resolved": true,
-  "values": [...]
-}
-````
-
-不直接改寫成 alternatives。
-
----
-
-# Multiple Recipes
-
-例如：
-
-```json
-{
-  "id": "minecraft:example",
-  "recipes": [
-    { "sourceType": "..." },
-    { "sourceType": "..." }
+    { "kind": "item", "id": "minecraft:a" },
+    { "kind": "item", "id": "minecraft:b" }
   ]
 }
 ```
 
-代表同一物品具有多種製作方法。
+Tag 與 alternatives 都是擇一語意，但來源與結構不同。Normalization 保留完整 branch，不把候選材料相加。
 
-後續 V3 / BIO Dependency Calculation 必須選擇其中一條 Recipe，
-不可將不同 Recipe 的 Ingredients 相加。
+## Tag Registry
 
----
+Pure Node pipeline 使用：
 
-# qty vs output
+```js
+vanilla.tags.buildRegistryFromEntries(tagEntries)
+```
+
+原有 Obsidian adapter 入口仍保留：
+
+```js
+await vanilla.tags.buildRegistry(app, config)
+```
+
+Tag resolver 支援：
+
+- item tag
+- nested tag
+- cycle detection
+- `required: false`
+- duplicate removal
+- ordered entries 的 `replace` / merge 語意
+
+Recipe ingredient 使用 `registryType: "item"`。解析成功後仍保留原始 `kind: "tag"` 和 tag ID，只在 `values` 中附上解析結果。
+
+## Recursive Dependency Resolver
+
+```js
+const dependencyResult = pipeline.resolveDependencies(
+    ["minecraft:barrel"]
+);
+```
+
+結果包含：
+
+- `target` / `targets`
+- `dependencyTree`: root references
+- `graph`: canonical item nodes 的 `Map`
+- `leafMaterials`: registry 中沒有 recipe 的 base items
+- `recipeBranches`: 每個 item 的所有互斥 production routes
+- `tagBranches`: tag 的所有 acceptable candidates
+- `alternativeBranches`: recipe alternatives 的所有 mutually-exclusive choices
+- `cycles`: recipe dependency cycles
+- `warnings`
+
+Resolver 不選擇 branch：
+
+- `recipes[]` 全部保留為互斥 routes。
+- `kind:tag` 保留一個 tag ingredient 與全部 acceptable candidates。
+- `kind:alternatives` 保留全部 choices。
+- branches 只代表可能性，不代表同時消耗，不進行數量加總。
+- `recipe.output` 保留在每個 recipe branch。
+- 沒有 recipe 的 item 標記為 leaf。
+
+## Generation Planner
+
+```js
+const generationPlan =
+    pipeline.createGenerationPlan(
+        dependencyResult,
+        { bioRegistry }
+    );
+```
+
+Planner 對所有可達 branch 中的 item ID 聯集建立 dependencies-first order；同一 ID 只排序一次。這是 BIO 建立順序，不是材料需求計算，因此不會把 tag values、alternatives 或多條 recipes 的 qty 相加。
+
+結果包含：
+
+- `generationOrder`: cycle-free nodes 的 bottom-up order
+- `missingGenerationOrder`: 排除 existing BIO 後的建立順序
+- `existingBIO` / `missingBIO`
+- `blockedByCycle`: cycle 本身及依賴 cycle、無法排序的 nodes
+- `cycles` / `warnings`
+- `canGenerateInOrder`
+
+Planner 使用 dependency-count topological ordering；所有 leaf 會先於依賴它們的 items。存在循環時仍回傳可安全排序的部分，並將剩餘 nodes 放入 `blockedByCycle`。
+
+## BIO Scanner
+
+```js
+const bioRegistry = vanilla.bio.scanMinecraftBIOs(
+    "MC-物品資料庫",
+    { vaultRoot }
+);
+```
+
+Scanner 只讀每份 Markdown 開頭最多 64 KiB，以第一段 frontmatter 建立：
+
+- normalized ID index
+- legacy ID index
+- BIO path/name/aliases/type
+- collision 與 type warnings（預設接受 `mc-item`、`mc-drop`）
+
+`PISTON` 會正規化為 `minecraft:piston`；若未來加入 `minecraft_id` frontmatter，Scanner 優先使用該欄位。
+
+## BIO Boundary
+
+正式 BIO ID policy：去除 `minecraft:` namespace 後使用原 ID 的大寫版本。
 
 ```text
-ingredient.qty
+minecraft:iron_ingot
+→ BIO id: IRON_INGOT
+→ aliases 包含 minecraft:iron_ingot
 ```
 
-= 單次 Recipe 所需材料數量。
+Normalized registry 仍使用 Minecraft canonical ID。BIO Generator 負責 deterministic mapping，不以中文檔名反推 ID。
 
-```text
-recipe.output
+Tag 索引 BIO（例如 `PLANKS`／任意木材）會使用獨立格式，尚未在本階段定案。
+
+## Status
+
+- `OK`: recipe 完整正規化，沒有 warning。
+- `OK_BRANCH`: recipe 已完整正規化，但包含合法的 tag／alternatives 選擇語意。Multiple recipes 在 item-level summary 另行標示；不是 failure。
+- `UNSUPPORTED`: recipe type 尚未有 parser。
+- `SPECIAL`: Minecraft dynamic/special recipe，不適合固定 dependency schema。
+- `REVIEW`: Parser 已取得部分資料，但語意仍真的無法確定，或必要 tag 無法解析。
+- `ERROR`: raw structure 或 parser execution 無法產生 normalized recipe。
+
+`OK_BRANCH` 不進入 failure diagnostics。其他非成功狀態會進入 `pipeline.diagnostics`，但不會中止整批處理。
+
+## Tests
+
+```powershell
+node --test tests/minecraft-vanilla-pipeline/vanilla-pipeline.test.cjs
 ```
 
-= 單次 Recipe 產生成品數量。
+測試只讀取少量 raw recipe/tag fixtures，直接驗證 in-memory registry 和 resolver；不讀取三個大型 generated/debug artifacts。
 
-例如：
+全部 raw source 的本地 smoke test（只輸出摘要與前 10 筆 diagnostics）：
 
-```text
-2 Iron Ingot
-→
-4 Example Item
+```powershell
+node tests/minecraft-vanilla-pipeline/smoke-all-raw.cjs
 ```
 
-則：
+Dependency CLI dry-run：
 
-```json
-{
-  "output": 4,
-  "ingredients": [
-    {
-      "id": "minecraft:iron_ingot",
-      "qty": 2
-    }
-  ]
-}
+```powershell
+node scripts/minecraft-vanilla-dependency-plan.cjs minecraft:piston
 ```
 
-後續需求換算必須考慮 output。
-
----
-
-# Status
-
-OK
-
-Parser 已能正常理解資料。
-
-REVIEW
-
-資料已解析，但存在需要後續處理的語意，例如 alternatives，
-或 Recipe Type 尚未支援。
-
-ERROR
-
-JSON 或 Parser 結構錯誤。
-
----
-
-# Current Parser Architecture
-
-```text
-Minecraft Recipe JSON
-        ↓
-Recipe Parser
-        ↓
-Normalized Ingredient
-        ↓
-Tag Resolver
-        ↓
-Normalized Recipe
-        ↓
-Normalized Item Registry
-        ↓
-Minecraft Normalized Recipes.json
-```
-
-Tag：
-
-```text
-Minecraft Tag JSON
-        ↓
-Tag Parser
-        ↓
-Tag Registry
-        ↓
-Tag Resolver
-```
-
----
-
-# Important Rules for BIO Generation
-
-BIO Generator should treat:
-
-```text
-kind:item
-```
-
-as fixed material.
-
-```text
-kind:tag
-```
-
-as one Ingredient with multiple acceptable Item IDs.
-
-```text
-kind:alternatives
-```
-
-as mutually exclusive Ingredient alternatives.
-
-Multiple `recipes[]` are also mutually exclusive production methods.
-
-Never sum all Tag values together.
-
-Never sum all Alternative values together.
-
-Never sum multiple Recipes together unless explicitly requested.
-
-````
-
----
-
-這份 README 的價值其實不是「讓我現在看懂」，而是建立一個 **Schema Contract**：
-
-```text
-Parser 說：
-「我保證輸出的資料代表這個意思。」
-
-BIO Generator 說：
-「我按照這個意思讀。」
-````
-
-這樣後面 Parser 和 BIO Generator 才不會彼此耦合得亂七八糟。
-
-### 到 BIO 自動生成階段要給我什麼？
-
-那時候我最希望拿到的是：
-
-```text
-README.md
-Minecraft Normalized Recipes.json
-1～3 個你目前正式使用的 BIO.md 範例
-```
-
-然後我就可以直接做：
-
-```text
-Normalized Recipe
-        ↓
-判斷 output item 是否已有 BIO
-        ↓
-判斷 ingredient 是否已有 BIO
-        ↓
-Tag / Alternatives 處理
-        ↓
-Dependency ordering
-        ↓
-建立缺失 BIO
-        ↓
-寫入 recipes[]
-```
-
-**`Minecraft Tag Registry.json` 到時候不一定需要給。**
-
-因為現在 Normalized Recipe 已經有：
-
-```json
-{
-  "kind": "tag",
-  "id": "minecraft:planks",
-  "resolved": true,
-  "values": [...]
-}
-```
-
-也就是 BIO Generator 所需要的 Tag 結果已經內嵌進去了。
-
-Tag Registry 比較像是：
-
-> Parser 的基礎資料 / Debug / 重新解析來源。
-
-而不是 BIO Generator 的必要輸入。
-
-所以長期來看會是很漂亮的分層：
-
-```text
-原始 Minecraft JSON
-        ↓
-[ Vanilla Parser ]
-        ↓
-Normalized Recipes.json
-        ↓
-========================
-        ↑ 這裡是介面邊界
-========================
-        ↓
-[ BIO Generator ]
-        ↓
-BIO/*.md
-```
-
-**README 就是這條介面邊界的說明書。**
-
-我會建議現在就建立，而且保持短小；以後每當我們新增一種真正會影響 BIO 語意的東西，例如 `smithing_transform` 或 `crafting_transmute`，才補 README。不要把它寫成「每支 JS 怎麼運作」的程式文件，那樣很快就會過時。
+CLI 不建立或覆寫 BIO，並對 tree、lists、warnings 設有輸出上限。

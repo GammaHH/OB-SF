@@ -20,6 +20,7 @@ module.exports = {
             normalizeResult,
             normalizeSingleIngredient,
             collectIngredientWarnings,
+            getNormalizedStatus,
             getRecipeTypeInfo
         } = shared;
 
@@ -231,9 +232,10 @@ module.exports = {
             success: true,
 
             status:
-                warnings.length > 0
-                    ? "REVIEW"
-                    : "OK",
+                getNormalizedStatus(
+                    ingredients,
+                    warnings
+                ),
 
             resultId:
                 result.id,

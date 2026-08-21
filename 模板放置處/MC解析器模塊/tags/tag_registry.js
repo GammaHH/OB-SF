@@ -6,6 +6,157 @@ const tagParser =
     require("./tag_parser");
 
 
+function createRegistry() {
+
+    return {
+        item: {},
+        block: {},
+        errors: [],
+        warnings: [],
+        stats: {
+            itemTags: 0,
+            blockTags: 0,
+            errors: 0
+        }
+    };
+}
+
+
+function storeParsedTag(
+    registry,
+    registryType,
+    tag
+) {
+
+    const bucket =
+        registry?.[registryType];
+
+
+    if (!bucket) {
+        throw new Error(
+            `不支援的 Tag Registry Type：${registryType}`
+        );
+    }
+
+
+    const existing =
+        bucket[tag.id];
+
+
+    if (
+        existing &&
+        tag.replace !== true
+    ) {
+
+        bucket[tag.id] = {
+            ...tag,
+            values: [
+                ...existing.values,
+                ...tag.values
+            ]
+        };
+
+    } else {
+
+        bucket[tag.id] = tag;
+    }
+
+
+    registry.stats.itemTags =
+        Object.keys(registry.item).length;
+
+    registry.stats.blockTags =
+        Object.keys(registry.block).length;
+}
+
+
+function buildRegistryFromEntries(entries = []) {
+
+    const registry =
+        createRegistry();
+
+
+    for (
+        let index = 0;
+        index < entries.length;
+        index++
+    ) {
+
+        const entry =
+            entries[index] ?? {};
+
+        const registryType =
+            entry.registryType ?? "item";
+
+        const sourceFile =
+            entry.sourceFile ??
+            `<memory:tag:${index}>`;
+
+
+        if (
+            !entry.tagId ||
+            !registry[registryType]
+        ) {
+
+            registry.errors.push({
+                registryType,
+                tagId: entry.tagId ?? null,
+                sourceFile,
+                warning: "Tag entry 缺少 tagId 或 registryType 無效"
+            });
+
+            registry.stats.errors++;
+            continue;
+        }
+
+
+        const parsed =
+            tagParser.parseTag(
+                entry.json,
+                {
+                    tagId: entry.tagId,
+                    registryType,
+                    sourceFile
+                }
+            );
+
+
+        if (!parsed.success) {
+
+            registry.errors.push({
+                registryType,
+                tagId: entry.tagId,
+                sourceFile,
+                warning: parsed.warnings.join("; ")
+            });
+
+            registry.stats.errors++;
+            continue;
+        }
+
+
+        storeParsedTag(
+            registry,
+            registryType,
+            parsed.tag
+        );
+
+
+        for (const warning of parsed.warnings) {
+            registry.warnings.push({
+                registryType,
+                tagId: entry.tagId,
+                sourceFile,
+                warning
+            });
+        }
+    }
+
+
+    return registry;
+}
+
+
 // ============================================================
 // Path
 // ============================================================
@@ -89,19 +240,8 @@ async function buildRegistry(
     } = config;
 
 
-    const registry = {
-
-        item: {},
-        block: {},
-
-        errors: [],
-
-        stats: {
-            itemTags: 0,
-            blockTags: 0,
-            errors: 0
-        }
-    };
+    const registry =
+        createRegistry();
 
 
     const registryConfigs = [
@@ -254,21 +394,20 @@ async function buildRegistry(
             }
 
 
-            registry[type][tagId] =
-                parsed.tag;
+            storeParsedTag(
+                registry,
+                type,
+                parsed.tag
+            );
 
 
-            if (type === "item") {
-
-                registry.stats
-                    .itemTags++;
-
-            } else if (
-                type === "block"
-            ) {
-
-                registry.stats
-                    .blockTags++;
+            for (const warning of parsed.warnings) {
+                registry.warnings.push({
+                    registryType: type,
+                    tagId,
+                    sourceFile: file.path,
+                    warning
+                });
             }
         }
     }
@@ -630,7 +769,10 @@ function resolveIngredients(
 
 
 module.exports = {
+    createRegistry,
+    buildRegistryFromEntries,
     buildRegistry,
+    getTagId,
     resolveTag,
     resolveIngredient,
     resolveIngredients

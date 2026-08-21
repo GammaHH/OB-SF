@@ -1,6 +1,6 @@
 {
   "schema": "OB-SF Minecraft Tag Registry V1",
-  "generatedAt": "2026-08-12T09:25:50.219Z",
+  "generatedAt": "2026-08-21T07:13:23.206Z",
   "stats": {
     "itemTags": 207,
     "blockTags": 248,
@@ -878,6 +878,44 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/warped_stems.json"
     },
+    "minecraft:villager_plantable_seeds": {
+      "id": "minecraft:villager_plantable_seeds",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:wheat_seeds",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:potato",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:carrot",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:beetroot_seeds",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:torchflower_seeds",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:pitcher_pod",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/villager_plantable_seeds.json"
+    },
     "minecraft:walls": {
       "id": "minecraft:walls",
       "registryType": "item",
@@ -1016,43 +1054,63 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/walls.json"
     },
-    "minecraft:villager_plantable_seeds": {
-      "id": "minecraft:villager_plantable_seeds",
+    "minecraft:trapdoors": {
+      "id": "minecraft:trapdoors",
       "registryType": "item",
       "replace": false,
       "values": [
         {
-          "kind": "entry",
-          "id": "minecraft:wheat_seeds",
+          "kind": "tag",
+          "id": "minecraft:wooden_trapdoors",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:potato",
+          "id": "minecraft:iron_trapdoor",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:carrot",
+          "id": "minecraft:copper_trapdoor",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:beetroot_seeds",
+          "id": "minecraft:exposed_copper_trapdoor",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:torchflower_seeds",
+          "id": "minecraft:weathered_copper_trapdoor",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:pitcher_pod",
+          "id": "minecraft:oxidized_copper_trapdoor",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_copper_trapdoor",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_exposed_copper_trapdoor",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_weathered_copper_trapdoor",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_oxidized_copper_trapdoor",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/item/villager_plantable_seeds.json"
+      "sourceFile": "參考資料/Minecraft/tags/item/trapdoors.json"
     },
     "minecraft:villager_picks_up": {
       "id": "minecraft:villager_picks_up",
@@ -1186,64 +1244,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/trimmable_armor.json"
     },
-    "minecraft:trapdoors": {
-      "id": "minecraft:trapdoors",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:wooden_trapdoors",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:iron_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:copper_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:exposed_copper_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:weathered_copper_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:oxidized_copper_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_copper_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_exposed_copper_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_weathered_copper_trapdoor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_oxidized_copper_trapdoor",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/trapdoors.json"
-    },
     "minecraft:terracotta": {
       "id": "minecraft:terracotta",
       "registryType": "item",
@@ -1336,6 +1336,29 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/terracotta.json"
+    },
+    "minecraft:stone_crafting_materials": {
+      "id": "minecraft:stone_crafting_materials",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:cobblestone",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:blackstone",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cobbled_deepslate",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/stone_crafting_materials.json"
     },
     "minecraft:swords": {
       "id": "minecraft:swords",
@@ -1433,75 +1456,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/stone_tool_materials.json"
-    },
-    "minecraft:stone_crafting_materials": {
-      "id": "minecraft:stone_crafting_materials",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:cobblestone",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:blackstone",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cobbled_deepslate",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/stone_crafting_materials.json"
-    },
-    "minecraft:stone_buttons": {
-      "id": "minecraft:stone_buttons",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:stone_button",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:polished_blackstone_button",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/stone_buttons.json"
-    },
-    "minecraft:stone_bricks": {
-      "id": "minecraft:stone_bricks",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:stone_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mossy_stone_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cracked_stone_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:chiseled_stone_bricks",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/stone_bricks.json"
     },
     "minecraft:stairs": {
       "id": "minecraft:stairs",
@@ -1746,6 +1700,145 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/stairs.json"
     },
+    "minecraft:stone_buttons": {
+      "id": "minecraft:stone_buttons",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:stone_button",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:polished_blackstone_button",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/stone_buttons.json"
+    },
+    "minecraft:stone_bricks": {
+      "id": "minecraft:stone_bricks",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:stone_bricks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:mossy_stone_bricks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cracked_stone_bricks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:chiseled_stone_bricks",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/stone_bricks.json"
+    },
+    "minecraft:small_flowers": {
+      "id": "minecraft:small_flowers",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:dandelion",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:open_eyeblossom",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:poppy",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:blue_orchid",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:allium",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:azure_bluet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_tulip",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:orange_tulip",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:white_tulip",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:pink_tulip",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:oxeye_daisy",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cornflower",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:lily_of_the_valley",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:wither_rose",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:torchflower",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:closed_eyeblossom",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:golden_dandelion",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/small_flowers.json"
+    },
     "minecraft:spruce_logs": {
       "id": "minecraft:spruce_logs",
       "registryType": "item",
@@ -1865,142 +1958,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/smelts_to_glass.json"
-    },
-    "minecraft:skulls": {
-      "id": "minecraft:skulls",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:player_head",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:creeper_head",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:zombie_head",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:skeleton_skull",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:wither_skeleton_skull",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:dragon_head",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:piglin_head",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/skulls.json"
-    },
-    "minecraft:small_flowers": {
-      "id": "minecraft:small_flowers",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:dandelion",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:open_eyeblossom",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:poppy",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:blue_orchid",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:allium",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:azure_bluet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_tulip",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:orange_tulip",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:white_tulip",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:pink_tulip",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:oxeye_daisy",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cornflower",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:lily_of_the_valley",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:wither_rose",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:torchflower",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:closed_eyeblossom",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:golden_dandelion",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/small_flowers.json"
     },
     "minecraft:slabs": {
       "id": "minecraft:slabs",
@@ -2265,19 +2222,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/slabs.json"
     },
-    "minecraft:skeleton_preferred_weapons": {
-      "id": "minecraft:skeleton_preferred_weapons",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:bow",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/skeleton_preferred_weapons.json"
-    },
     "minecraft:signs": {
       "id": "minecraft:signs",
       "registryType": "item",
@@ -2345,6 +2289,62 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/signs.json"
+    },
+    "minecraft:skulls": {
+      "id": "minecraft:skulls",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:player_head",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:creeper_head",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:zombie_head",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:skeleton_skull",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:wither_skeleton_skull",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:dragon_head",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:piglin_head",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/skulls.json"
+    },
+    "minecraft:skeleton_preferred_weapons": {
+      "id": "minecraft:skeleton_preferred_weapons",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:bow",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/skeleton_preferred_weapons.json"
     },
     "minecraft:shulker_boxes": {
       "id": "minecraft:shulker_boxes",
@@ -4257,6 +4257,29 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/ignored_by_piglin_babies.json"
     },
+    "minecraft:horse_tempt_items": {
+      "id": "minecraft:horse_tempt_items",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:golden_carrot",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:golden_apple",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:enchanted_golden_apple",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/horse_tempt_items.json"
+    },
     "minecraft:horse_food": {
       "id": "minecraft:horse_food",
       "registryType": "item",
@@ -4304,29 +4327,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/horse_food.json"
-    },
-    "minecraft:horse_tempt_items": {
-      "id": "minecraft:horse_tempt_items",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:golden_carrot",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:golden_apple",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:enchanted_golden_apple",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/horse_tempt_items.json"
     },
     "minecraft:hoglin_food": {
       "id": "minecraft:hoglin_food",
@@ -4619,19 +4619,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/hanging_signs.json"
     },
-    "minecraft:gold_tool_materials": {
-      "id": "minecraft:gold_tool_materials",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:gold_ingot",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/gold_tool_materials.json"
-    },
     "minecraft:grass_blocks": {
       "id": "minecraft:grass_blocks",
       "registryType": "item",
@@ -4654,6 +4641,19 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/grass_blocks.json"
+    },
+    "minecraft:gold_tool_materials": {
+      "id": "minecraft:gold_tool_materials",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:gold_ingot",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/gold_tool_materials.json"
     },
     "minecraft:gold_ores": {
       "id": "minecraft:gold_ores",
@@ -4691,19 +4691,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/goat_food.json"
     },
-    "minecraft:gaze_disguise_equipment": {
-      "id": "minecraft:gaze_disguise_equipment",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:carved_pumpkin",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/gaze_disguise_equipment.json"
-    },
     "minecraft:furnace_minecart_fuel": {
       "id": "minecraft:furnace_minecart_fuel",
       "registryType": "item",
@@ -4721,6 +4708,19 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/furnace_minecart_fuel.json"
+    },
+    "minecraft:gaze_disguise_equipment": {
+      "id": "minecraft:gaze_disguise_equipment",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:carved_pumpkin",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/gaze_disguise_equipment.json"
     },
     "minecraft:frog_food": {
       "id": "minecraft:frog_food",
@@ -5036,6 +5036,37 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/fences.json"
     },
+    "minecraft:enchantable/weapon": {
+      "id": "minecraft:enchantable/weapon",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:enchantable/sharp_weapon",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:mace",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/weapon.json"
+    },
+    "minecraft:enchantable/sweeping": {
+      "id": "minecraft:enchantable/sweeping",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:swords",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/sweeping.json"
+    },
     "minecraft:enchantable/vanishing": {
       "id": "minecraft:enchantable/vanishing",
       "registryType": "item",
@@ -5064,23 +5095,36 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/vanishing.json"
     },
-    "minecraft:enchantable/weapon": {
-      "id": "minecraft:enchantable/weapon",
+    "minecraft:enchantable/trident": {
+      "id": "minecraft:enchantable/trident",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:trident",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/trident.json"
+    },
+    "minecraft:enchantable/sharp_weapon": {
+      "id": "minecraft:enchantable/sharp_weapon",
       "registryType": "item",
       "replace": false,
       "values": [
         {
           "kind": "tag",
-          "id": "minecraft:enchantable/sharp_weapon",
+          "id": "minecraft:enchantable/melee_weapon",
           "required": true
         },
         {
-          "kind": "entry",
-          "id": "minecraft:mace",
+          "kind": "tag",
+          "id": "minecraft:axes",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/weapon.json"
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/sharp_weapon.json"
     },
     "minecraft:enchantable/mining_loot": {
       "id": "minecraft:enchantable/mining_loot",
@@ -5109,63 +5153,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/mining_loot.json"
-    },
-    "minecraft:enchantable/trident": {
-      "id": "minecraft:enchantable/trident",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:trident",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/trident.json"
-    },
-    "minecraft:enchantable/sweeping": {
-      "id": "minecraft:enchantable/sweeping",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:swords",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/sweeping.json"
-    },
-    "minecraft:enchantable/sharp_weapon": {
-      "id": "minecraft:enchantable/sharp_weapon",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:enchantable/melee_weapon",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:axes",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/sharp_weapon.json"
-    },
-    "minecraft:enchantable/mace": {
-      "id": "minecraft:enchantable/mace",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:mace",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/mace.json"
     },
     "minecraft:enchantable/mining": {
       "id": "minecraft:enchantable/mining",
@@ -5200,6 +5187,19 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/mining.json"
     },
+    "minecraft:enchantable/lunge": {
+      "id": "minecraft:enchantable/lunge",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:spears",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/lunge.json"
+    },
     "minecraft:enchantable/melee_weapon": {
       "id": "minecraft:enchantable/melee_weapon",
       "registryType": "item",
@@ -5218,31 +5218,18 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/melee_weapon.json"
     },
-    "minecraft:enchantable/head_armor": {
-      "id": "minecraft:enchantable/head_armor",
+    "minecraft:enchantable/mace": {
+      "id": "minecraft:enchantable/mace",
       "registryType": "item",
       "replace": false,
       "values": [
         {
-          "kind": "tag",
-          "id": "minecraft:head_armor",
+          "kind": "entry",
+          "id": "minecraft:mace",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/head_armor.json"
-    },
-    "minecraft:enchantable/lunge": {
-      "id": "minecraft:enchantable/lunge",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:spears",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/lunge.json"
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/mace.json"
     },
     "minecraft:enchantable/leg_armor": {
       "id": "minecraft:enchantable/leg_armor",
@@ -5257,23 +5244,18 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/leg_armor.json"
     },
-    "minecraft:enchantable/fire_aspect": {
-      "id": "minecraft:enchantable/fire_aspect",
+    "minecraft:enchantable/head_armor": {
+      "id": "minecraft:enchantable/head_armor",
       "registryType": "item",
       "replace": false,
       "values": [
         {
           "kind": "tag",
-          "id": "minecraft:enchantable/melee_weapon",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mace",
+          "id": "minecraft:head_armor",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/fire_aspect.json"
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/head_armor.json"
     },
     "minecraft:enchantable/foot_armor": {
       "id": "minecraft:enchantable/foot_armor",
@@ -5301,18 +5283,23 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/fishing.json"
     },
-    "minecraft:enchantable/crossbow": {
-      "id": "minecraft:enchantable/crossbow",
+    "minecraft:enchantable/fire_aspect": {
+      "id": "minecraft:enchantable/fire_aspect",
       "registryType": "item",
       "replace": false,
       "values": [
         {
+          "kind": "tag",
+          "id": "minecraft:enchantable/melee_weapon",
+          "required": true
+        },
+        {
           "kind": "entry",
-          "id": "minecraft:crossbow",
+          "id": "minecraft:mace",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/crossbow.json"
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/fire_aspect.json"
     },
     "minecraft:enchantable/equippable": {
       "id": "minecraft:enchantable/equippable",
@@ -5475,18 +5462,18 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/durability.json"
     },
-    "minecraft:enchantable/bow": {
-      "id": "minecraft:enchantable/bow",
+    "minecraft:enchantable/crossbow": {
+      "id": "minecraft:enchantable/crossbow",
       "registryType": "item",
       "replace": false,
       "values": [
         {
           "kind": "entry",
-          "id": "minecraft:bow",
+          "id": "minecraft:crossbow",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/bow.json"
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/crossbow.json"
     },
     "minecraft:enchantable/chest_armor": {
       "id": "minecraft:enchantable/chest_armor",
@@ -5500,6 +5487,19 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/enchantable/chest_armor.json"
+    },
+    "minecraft:enchantable/bow": {
+      "id": "minecraft:enchantable/bow",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:bow",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/enchantable/bow.json"
     },
     "minecraft:enchantable/armor": {
       "id": "minecraft:enchantable/armor",
@@ -5684,29 +5684,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/drowned_preferred_weapons.json"
     },
-    "minecraft:dirt": {
-      "id": "minecraft:dirt",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:dirt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:coarse_dirt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:rooted_dirt",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/dirt.json"
-    },
     "minecraft:doors": {
       "id": "minecraft:doors",
       "registryType": "item",
@@ -5764,6 +5741,29 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/doors.json"
+    },
+    "minecraft:dirt": {
+      "id": "minecraft:dirt",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:dirt",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:coarse_dirt",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:rooted_dirt",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/dirt.json"
     },
     "minecraft:diamond_tool_materials": {
       "id": "minecraft:diamond_tool_materials",
@@ -6501,6 +6501,34 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/chest_boats.json"
     },
+    "minecraft:cherry_logs": {
+      "id": "minecraft:cherry_logs",
+      "registryType": "item",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:cherry_log",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cherry_wood",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_cherry_log",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_cherry_wood",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/item/cherry_logs.json"
+    },
     "minecraft:chest_armor": {
       "id": "minecraft:chest_armor",
       "registryType": "item",
@@ -6544,33 +6572,43 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/chest_armor.json"
     },
-    "minecraft:cherry_logs": {
-      "id": "minecraft:cherry_logs",
+    "minecraft:cauldron_can_remove_dye": {
+      "id": "minecraft:cauldron_can_remove_dye",
       "registryType": "item",
       "replace": false,
       "values": [
         {
           "kind": "entry",
-          "id": "minecraft:cherry_log",
+          "id": "minecraft:leather_helmet",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:cherry_wood",
+          "id": "minecraft:leather_chestplate",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:stripped_cherry_log",
+          "id": "minecraft:leather_leggings",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:stripped_cherry_wood",
+          "id": "minecraft:leather_boots",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:leather_horse_armor",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:wolf_armor",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/item/cherry_logs.json"
+      "sourceFile": "參考資料/Minecraft/tags/item/cauldron_can_remove_dye.json"
     },
     "minecraft:chains": {
       "id": "minecraft:chains",
@@ -6624,44 +6662,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/item/chains.json"
-    },
-    "minecraft:cauldron_can_remove_dye": {
-      "id": "minecraft:cauldron_can_remove_dye",
-      "registryType": "item",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:leather_helmet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:leather_chestplate",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:leather_leggings",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:leather_boots",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:leather_horse_armor",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:wolf_armor",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/item/cauldron_can_remove_dye.json"
     },
     "minecraft:cat_food": {
       "id": "minecraft:cat_food",
@@ -7695,94 +7695,6 @@
     }
   },
   "block": {
-    "minecraft:wool_carpets": {
-      "id": "minecraft:wool_carpets",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:white_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:orange_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:magenta_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:light_blue_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:yellow_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:lime_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:pink_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:gray_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:light_gray_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cyan_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:purple_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:blue_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:brown_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:green_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_carpet",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:black_carpet",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/wool_carpets.json"
-    },
     "minecraft:wool": {
       "id": "minecraft:wool",
       "registryType": "block",
@@ -7870,6 +7782,94 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/wool.json"
+    },
+    "minecraft:wool_carpets": {
+      "id": "minecraft:wool_carpets",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:white_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:orange_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:magenta_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:light_blue_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:yellow_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:lime_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:pink_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:gray_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:light_gray_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cyan_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:purple_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:blue_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:brown_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:green_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_carpet",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:black_carpet",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/wool_carpets.json"
     },
     "minecraft:wooden_trapdoors": {
       "id": "minecraft:wooden_trapdoors",
@@ -8448,6 +8448,24 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/wolves_spawnable_on.json"
     },
+    "minecraft:wart_blocks": {
+      "id": "minecraft:wart_blocks",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:nether_wart_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:warped_wart_block",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/wart_blocks.json"
+    },
     "minecraft:wither_summon_base_blocks": {
       "id": "minecraft:wither_summon_base_blocks",
       "registryType": "block",
@@ -8549,52 +8567,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/wither_immune.json"
     },
-    "minecraft:wart_blocks": {
-      "id": "minecraft:wart_blocks",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:nether_wart_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:warped_wart_block",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/wart_blocks.json"
-    },
-    "minecraft:warped_stems": {
-      "id": "minecraft:warped_stems",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:warped_stem",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_warped_stem",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:warped_hyphae",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_warped_hyphae",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/warped_stems.json"
-    },
     "minecraft:wall_signs": {
       "id": "minecraft:wall_signs",
       "registryType": "block",
@@ -8662,6 +8634,34 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/wall_signs.json"
+    },
+    "minecraft:warped_stems": {
+      "id": "minecraft:warped_stems",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:warped_stem",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_warped_stem",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:warped_hyphae",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_warped_hyphae",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/warped_stems.json"
     },
     "minecraft:wall_post_override": {
       "id": "minecraft:wall_post_override",
@@ -9022,6 +9022,29 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/underwater_bonemeals.json"
     },
+    "minecraft:triggers_ambient_desert_dry_vegetation_block_sounds": {
+      "id": "minecraft:triggers_ambient_desert_dry_vegetation_block_sounds",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:terracotta",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_sand",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/triggers_ambient_desert_dry_vegetation_block_sounds.json"
+    },
     "minecraft:triggers_ambient_dried_ghast_block_sounds": {
       "id": "minecraft:triggers_ambient_dried_ghast_block_sounds",
       "registryType": "block",
@@ -9057,29 +9080,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/triggers_ambient_desert_sand_block_sounds.json"
-    },
-    "minecraft:triggers_ambient_desert_dry_vegetation_block_sounds": {
-      "id": "minecraft:triggers_ambient_desert_dry_vegetation_block_sounds",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:terracotta",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_sand",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/triggers_ambient_desert_dry_vegetation_block_sounds.json"
     },
     "minecraft:trapdoors": {
       "id": "minecraft:trapdoors",
@@ -9151,6 +9151,47 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/trail_ruins_replaceable.json"
+    },
+    "minecraft:sword_instantly_mines": {
+      "id": "minecraft:sword_instantly_mines",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:bamboo",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:bamboo_sapling",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/sword_instantly_mines.json"
+    },
+    "minecraft:support_override_snow_layer": {
+      "id": "minecraft:support_override_snow_layer",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:honey_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:soul_sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:mud",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/support_override_snow_layer.json"
     },
     "minecraft:terracotta": {
       "id": "minecraft:terracotta",
@@ -9245,24 +9286,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/terracotta.json"
     },
-    "minecraft:sword_instantly_mines": {
-      "id": "minecraft:sword_instantly_mines",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:bamboo",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:bamboo_sapling",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/sword_instantly_mines.json"
-    },
     "minecraft:sword_efficient": {
       "id": "minecraft:sword_efficient",
       "registryType": "block",
@@ -9330,29 +9353,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/sword_efficient.json"
-    },
-    "minecraft:support_override_snow_layer": {
-      "id": "minecraft:support_override_snow_layer",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:honey_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mud",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/support_override_snow_layer.json"
     },
     "minecraft:support_override_cactus_flower": {
       "id": "minecraft:support_override_cactus_flower",
@@ -9423,6 +9423,19 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_warped_roots.json"
     },
+    "minecraft:supports_stem_fruit": {
+      "id": "minecraft:supports_stem_fruit",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:supports_vegetation",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/supports_stem_fruit.json"
+    },
     "minecraft:supports_warped_fungus": {
       "id": "minecraft:supports_warped_fungus",
       "registryType": "block",
@@ -9451,6 +9464,19 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_warped_fungus.json"
     },
+    "minecraft:supports_sugar_cane_adjacently": {
+      "id": "minecraft:supports_sugar_cane_adjacently",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:frosted_ice",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/supports_sugar_cane_adjacently.json"
+    },
     "minecraft:supports_vegetation": {
       "id": "minecraft:supports_vegetation",
       "registryType": "block",
@@ -9468,19 +9494,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_vegetation.json"
-    },
-    "minecraft:supports_sugar_cane_adjacently": {
-      "id": "minecraft:supports_sugar_cane_adjacently",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:frosted_ice",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/supports_sugar_cane_adjacently.json"
     },
     "minecraft:supports_sugar_cane": {
       "id": "minecraft:supports_sugar_cane",
@@ -9500,18 +9513,18 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_sugar_cane.json"
     },
-    "minecraft:supports_stem_fruit": {
-      "id": "minecraft:supports_stem_fruit",
+    "minecraft:supports_pumpkin_stem_fruit": {
+      "id": "minecraft:supports_pumpkin_stem_fruit",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "tag",
-          "id": "minecraft:supports_vegetation",
+          "id": "minecraft:supports_stem_fruit",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/supports_stem_fruit.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/supports_pumpkin_stem_fruit.json"
     },
     "minecraft:supports_stem_crops": {
       "id": "minecraft:supports_stem_crops",
@@ -9544,18 +9557,18 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_small_dripleaf.json"
     },
-    "minecraft:supports_pumpkin_stem_fruit": {
-      "id": "minecraft:supports_pumpkin_stem_fruit",
+    "minecraft:supports_nether_wart": {
+      "id": "minecraft:supports_nether_wart",
       "registryType": "block",
       "replace": false,
       "values": [
         {
-          "kind": "tag",
-          "id": "minecraft:supports_stem_fruit",
+          "kind": "entry",
+          "id": "minecraft:soul_sand",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/supports_pumpkin_stem_fruit.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/supports_nether_wart.json"
     },
     "minecraft:supports_pumpkin_stem": {
       "id": "minecraft:supports_pumpkin_stem",
@@ -9569,19 +9582,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_pumpkin_stem.json"
-    },
-    "minecraft:supports_nether_wart": {
-      "id": "minecraft:supports_nether_wart",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_sand",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/supports_nether_wart.json"
     },
     "minecraft:supports_nether_sprouts": {
       "id": "minecraft:supports_nether_sprouts",
@@ -9650,6 +9650,19 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_mangrove_propagule.json"
     },
+    "minecraft:supports_hanging_mangrove_propagule": {
+      "id": "minecraft:supports_hanging_mangrove_propagule",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:mangrove_leaves",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/supports_hanging_mangrove_propagule.json"
+    },
     "minecraft:supports_lily_pad": {
       "id": "minecraft:supports_lily_pad",
       "registryType": "block",
@@ -9667,19 +9680,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_lily_pad.json"
-    },
-    "minecraft:supports_hanging_mangrove_propagule": {
-      "id": "minecraft:supports_hanging_mangrove_propagule",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:mangrove_leaves",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/supports_hanging_mangrove_propagule.json"
     },
     "minecraft:supports_frogspawn": {
       "id": "minecraft:supports_frogspawn",
@@ -9711,6 +9711,19 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_dry_vegetation.json"
     },
+    "minecraft:supports_cocoa": {
+      "id": "minecraft:supports_cocoa",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:jungle_logs",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/supports_cocoa.json"
+    },
     "minecraft:supports_crops": {
       "id": "minecraft:supports_crops",
       "registryType": "block",
@@ -9723,19 +9736,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_crops.json"
-    },
-    "minecraft:supports_crimson_roots": {
-      "id": "minecraft:supports_crimson_roots",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:supports_warped_roots",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/supports_crimson_roots.json"
     },
     "minecraft:supports_crimson_fungus": {
       "id": "minecraft:supports_crimson_fungus",
@@ -9750,18 +9750,18 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/supports_crimson_fungus.json"
     },
-    "minecraft:supports_cocoa": {
-      "id": "minecraft:supports_cocoa",
+    "minecraft:supports_crimson_roots": {
+      "id": "minecraft:supports_crimson_roots",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "tag",
-          "id": "minecraft:jungle_logs",
+          "id": "minecraft:supports_warped_roots",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/supports_cocoa.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/supports_crimson_roots.json"
     },
     "minecraft:supports_chorus_plant": {
       "id": "minecraft:supports_chorus_plant",
@@ -9980,80 +9980,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/stone_pressure_plates.json"
     },
-    "minecraft:stone_ore_replaceables": {
-      "id": "minecraft:stone_ore_replaceables",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:stone",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:granite",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:diorite",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:andesite",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/stone_ore_replaceables.json"
-    },
-    "minecraft:stone_bricks": {
-      "id": "minecraft:stone_bricks",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:stone_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mossy_stone_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cracked_stone_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:chiseled_stone_bricks",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/stone_bricks.json"
-    },
-    "minecraft:stone_buttons": {
-      "id": "minecraft:stone_buttons",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:stone_button",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:polished_blackstone_button",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/stone_buttons.json"
-    },
     "minecraft:standing_signs": {
       "id": "minecraft:standing_signs",
       "registryType": "block",
@@ -10121,6 +10047,80 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/standing_signs.json"
+    },
+    "minecraft:stone_ore_replaceables": {
+      "id": "minecraft:stone_ore_replaceables",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:stone",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:granite",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:diorite",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:andesite",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/stone_ore_replaceables.json"
+    },
+    "minecraft:stone_buttons": {
+      "id": "minecraft:stone_buttons",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:stone_button",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:polished_blackstone_button",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/stone_buttons.json"
+    },
+    "minecraft:stone_bricks": {
+      "id": "minecraft:stone_bricks",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:stone_bricks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:mossy_stone_bricks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cracked_stone_bricks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:chiseled_stone_bricks",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/stone_bricks.json"
     },
     "minecraft:stairs": {
       "id": "minecraft:stairs",
@@ -10411,6 +10411,39 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/soul_speed_blocks.json"
     },
+    "minecraft:sniffer_diggable_block": {
+      "id": "minecraft:sniffer_diggable_block",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:dirt",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:mud",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:moss_blocks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:grass_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:podzol",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/sniffer_diggable_block.json"
+    },
     "minecraft:soul_fire_base_blocks": {
       "id": "minecraft:soul_fire_base_blocks",
       "registryType": "block",
@@ -10464,82 +10497,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/sniffer_egg_hatch_boost.json"
-    },
-    "minecraft:sniffer_diggable_block": {
-      "id": "minecraft:sniffer_diggable_block",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:dirt",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:mud",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:moss_blocks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:grass_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:podzol",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/sniffer_diggable_block.json"
-    },
-    "minecraft:snaps_goat_horn": {
-      "id": "minecraft:snaps_goat_horn",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:overworld_natural_logs",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stone",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:packed_ice",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:iron_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:coal_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:copper_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:emerald_ore",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/snaps_goat_horn.json"
     },
     "minecraft:small_flowers": {
       "id": "minecraft:small_flowers",
@@ -10634,6 +10591,49 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/small_flowers.json"
     },
+    "minecraft:snaps_goat_horn": {
+      "id": "minecraft:snaps_goat_horn",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:overworld_natural_logs",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stone",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:packed_ice",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:iron_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:coal_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:copper_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:emerald_ore",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/snaps_goat_horn.json"
+    },
     "minecraft:smelts_to_glass": {
       "id": "minecraft:smelts_to_glass",
       "registryType": "block",
@@ -10651,6 +10651,99 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/smelts_to_glass.json"
+    },
+    "minecraft:shulker_boxes": {
+      "id": "minecraft:shulker_boxes",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:black_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:blue_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:brown_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cyan_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:gray_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:green_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:light_blue_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:light_gray_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:lime_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:magenta_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:orange_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:pink_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:purple_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:white_shulker_box",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:yellow_shulker_box",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/shulker_boxes.json"
     },
     "minecraft:slabs": {
       "id": "minecraft:slabs",
@@ -10933,235 +11026,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/signs.json"
     },
-    "minecraft:shulker_boxes": {
-      "id": "minecraft:shulker_boxes",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:black_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:blue_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:brown_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cyan_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:gray_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:green_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:light_blue_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:light_gray_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:lime_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:magenta_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:orange_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:pink_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:purple_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:white_shulker_box",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:yellow_shulker_box",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/shulker_boxes.json"
-    },
-    "minecraft:sculk_replaceable_world_gen": {
-      "id": "minecraft:sculk_replaceable_world_gen",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:sculk_replaceable",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:deepslate_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:deepslate_tiles",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cobbled_deepslate",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cracked_deepslate_bricks",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cracked_deepslate_tiles",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:polished_deepslate",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/sculk_replaceable_world_gen.json"
-    },
-    "minecraft:sculk_replaceable": {
-      "id": "minecraft:sculk_replaceable",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:base_stone_overworld",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:substrate_overworld",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:terracotta",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:nylium",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:base_stone_nether",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:gravel",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_soil",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:calcite",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:smooth_basalt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:clay",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:dripstone_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:end_stone",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_sandstone",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:sandstone",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/sculk_replaceable.json"
-    },
     "minecraft:saplings": {
       "id": "minecraft:saplings",
       "registryType": "block",
@@ -11225,28 +11089,61 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/saplings.json"
     },
-    "minecraft:sand": {
-      "id": "minecraft:sand",
+    "minecraft:sculk_replaceable_world_gen": {
+      "id": "minecraft:sculk_replaceable_world_gen",
       "registryType": "block",
       "replace": false,
       "values": [
         {
-          "kind": "entry",
-          "id": "minecraft:sand",
+          "kind": "tag",
+          "id": "minecraft:sculk_replaceable",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:red_sand",
+          "id": "minecraft:deepslate_bricks",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:suspicious_sand",
+          "id": "minecraft:deepslate_tiles",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cobbled_deepslate",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cracked_deepslate_bricks",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cracked_deepslate_tiles",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:polished_deepslate",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/sand.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/sculk_replaceable_world_gen.json"
+    },
+    "minecraft:prevents_nearby_leaf_decay": {
+      "id": "minecraft:prevents_nearby_leaf_decay",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:logs",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/prevents_nearby_leaf_decay.json"
     },
     "minecraft:replaceable_by_trees": {
       "id": "minecraft:replaceable_by_trees",
@@ -11390,6 +11287,150 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/replaceable_by_trees.json"
+    },
+    "minecraft:sculk_replaceable": {
+      "id": "minecraft:sculk_replaceable",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:base_stone_overworld",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:substrate_overworld",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:terracotta",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:nylium",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:base_stone_nether",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:gravel",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:soul_sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:soul_soil",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:calcite",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:smooth_basalt",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:clay",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:dripstone_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:end_stone",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_sandstone",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:sandstone",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/sculk_replaceable.json"
+    },
+    "minecraft:sand": {
+      "id": "minecraft:sand",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:suspicious_sand",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/sand.json"
+    },
+    "minecraft:rails": {
+      "id": "minecraft:rails",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:rail",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:powered_rail",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:detector_rail",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:activator_rail",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/rails.json"
     },
     "minecraft:replaceable_by_mushrooms": {
       "id": "minecraft:replaceable_by_mushrooms",
@@ -11553,6 +11594,34 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/replaceable_by_mushrooms.json"
+    },
+    "minecraft:rabbits_spawnable_on": {
+      "id": "minecraft:rabbits_spawnable_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:grass_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:snow",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:snow_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:sand",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/rabbits_spawnable_on.json"
     },
     "minecraft:replaceable": {
       "id": "minecraft:replaceable",
@@ -11725,62 +11794,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/redstone_ores.json"
     },
-    "minecraft:rails": {
-      "id": "minecraft:rails",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:rail",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:powered_rail",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:detector_rail",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:activator_rail",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/rails.json"
-    },
-    "minecraft:rabbits_spawnable_on": {
-      "id": "minecraft:rabbits_spawnable_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:grass_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:sand",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/rabbits_spawnable_on.json"
-    },
     "minecraft:prevent_mob_spawning_inside": {
       "id": "minecraft:prevent_mob_spawning_inside",
       "registryType": "block",
@@ -11793,19 +11806,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/prevent_mob_spawning_inside.json"
-    },
-    "minecraft:prevents_nearby_leaf_decay": {
-      "id": "minecraft:prevents_nearby_leaf_decay",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:logs",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/prevents_nearby_leaf_decay.json"
     },
     "minecraft:pressure_plates": {
       "id": "minecraft:pressure_plates",
@@ -12692,246 +12692,118 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/needs_stone_tool.json"
     },
-    "minecraft:needs_iron_tool": {
-      "id": "minecraft:needs_iron_tool",
+    "minecraft:mineable/shovel": {
+      "id": "minecraft:mineable/shovel",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "entry",
-          "id": "minecraft:diamond_block",
+          "id": "minecraft:clay",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:diamond_ore",
+          "id": "minecraft:dirt",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:deepslate_diamond_ore",
+          "id": "minecraft:coarse_dirt",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:emerald_ore",
+          "id": "minecraft:podzol",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:deepslate_emerald_ore",
+          "id": "minecraft:farmland",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:emerald_block",
+          "id": "minecraft:grass_block",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:gold_block",
+          "id": "minecraft:gravel",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:raw_gold_block",
+          "id": "minecraft:mycelium",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:gold_ore",
+          "id": "minecraft:sand",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:deepslate_gold_ore",
+          "id": "minecraft:red_sand",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:redstone_ore",
+          "id": "minecraft:snow_block",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:deepslate_redstone_ore",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/needs_iron_tool.json"
-    },
-    "minecraft:needs_diamond_tool": {
-      "id": "minecraft:needs_diamond_tool",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:obsidian",
+          "id": "minecraft:snow",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:crying_obsidian",
+          "id": "minecraft:soul_sand",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:netherite_block",
+          "id": "minecraft:dirt_path",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:respawn_anchor",
+          "id": "minecraft:soul_soil",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:ancient_debris",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/needs_diamond_tool.json"
-    },
-    "minecraft:mud": {
-      "id": "minecraft:mud",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:mud",
+          "id": "minecraft:rooted_dirt",
           "required": true
         },
         {
           "kind": "entry",
           "id": "minecraft:muddy_mangrove_roots",
           "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/mud.json"
-    },
-    "minecraft:moss_replaceable": {
-      "id": "minecraft:moss_replaceable",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:base_stone_overworld",
-          "required": true
         },
         {
-          "kind": "tag",
-          "id": "minecraft:cave_vines",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:dirt",
-          "required": true
-        },
-        {
-          "kind": "tag",
+          "kind": "entry",
           "id": "minecraft:mud",
           "required": true
         },
         {
-          "kind": "tag",
-          "id": "minecraft:moss_blocks",
+          "kind": "entry",
+          "id": "minecraft:suspicious_sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:suspicious_gravel",
           "required": true
         },
         {
           "kind": "tag",
-          "id": "minecraft:grass_blocks",
+          "id": "minecraft:concrete_powder",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/moss_replaceable.json"
-    },
-    "minecraft:moss_blocks": {
-      "id": "minecraft:moss_blocks",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:moss_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:pale_moss_block",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/moss_blocks.json"
-    },
-    "minecraft:mooshrooms_spawnable_on": {
-      "id": "minecraft:mooshrooms_spawnable_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:mycelium",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/mooshrooms_spawnable_on.json"
-    },
-    "minecraft:mob_interactable_doors": {
-      "id": "minecraft:mob_interactable_doors",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:wooden_doors",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:exposed_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:weathered_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:oxidized_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_exposed_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_weathered_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_oxidized_copper_door",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/mob_interactable_doors.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/mineable/shovel.json"
     },
     "minecraft:mineable/pickaxe": {
       "id": "minecraft:mineable/pickaxe",
@@ -14891,119 +14763,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/mineable/pickaxe.json"
     },
-    "minecraft:mineable/shovel": {
-      "id": "minecraft:mineable/shovel",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:clay",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:dirt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:coarse_dirt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:podzol",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:farmland",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:grass_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:gravel",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mycelium",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:dirt_path",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_soil",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:rooted_dirt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:muddy_mangrove_roots",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mud",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:suspicious_sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:suspicious_gravel",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:concrete_powder",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/mineable/shovel.json"
-    },
     "minecraft:mineable/hoe": {
       "id": "minecraft:mineable/hoe",
       "registryType": "block",
@@ -15390,6 +15149,247 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/mineable/axe.json"
     },
+    "minecraft:needs_iron_tool": {
+      "id": "minecraft:needs_iron_tool",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:diamond_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:diamond_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_diamond_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:emerald_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_emerald_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:emerald_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:gold_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:raw_gold_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:gold_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_gold_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:redstone_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_redstone_ore",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/needs_iron_tool.json"
+    },
+    "minecraft:needs_diamond_tool": {
+      "id": "minecraft:needs_diamond_tool",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:obsidian",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:crying_obsidian",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:netherite_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:respawn_anchor",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:ancient_debris",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/needs_diamond_tool.json"
+    },
+    "minecraft:mud": {
+      "id": "minecraft:mud",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:mud",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:muddy_mangrove_roots",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/mud.json"
+    },
+    "minecraft:moss_replaceable": {
+      "id": "minecraft:moss_replaceable",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:base_stone_overworld",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:cave_vines",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:dirt",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:mud",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:moss_blocks",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:grass_blocks",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/moss_replaceable.json"
+    },
+    "minecraft:moss_blocks": {
+      "id": "minecraft:moss_blocks",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:moss_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:pale_moss_block",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/moss_blocks.json"
+    },
+    "minecraft:mooshrooms_spawnable_on": {
+      "id": "minecraft:mooshrooms_spawnable_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:mycelium",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/mooshrooms_spawnable_on.json"
+    },
+    "minecraft:mob_interactable_doors": {
+      "id": "minecraft:mob_interactable_doors",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:wooden_doors",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:exposed_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:weathered_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:oxidized_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_exposed_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_weathered_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_oxidized_copper_door",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/mob_interactable_doors.json"
+    },
     "minecraft:mangrove_roots_can_grow_through": {
       "id": "minecraft:mangrove_roots_can_grow_through",
       "registryType": "block",
@@ -15432,6 +15432,34 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/mangrove_roots_can_grow_through.json"
+    },
+    "minecraft:mangrove_logs": {
+      "id": "minecraft:mangrove_logs",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:mangrove_log",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:mangrove_wood",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_mangrove_log",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_mangrove_wood",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/mangrove_logs.json"
     },
     "minecraft:mangrove_logs_can_grow_through": {
       "id": "minecraft:mangrove_logs_can_grow_through",
@@ -15480,34 +15508,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/mangrove_logs_can_grow_through.json"
-    },
-    "minecraft:mangrove_logs": {
-      "id": "minecraft:mangrove_logs",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:mangrove_log",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mangrove_wood",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_mangrove_log",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_mangrove_wood",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/mangrove_logs.json"
     },
     "minecraft:maintains_farmland": {
       "id": "minecraft:maintains_farmland",
@@ -15820,6 +15820,24 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/lava_pool_stone_cannot_replace.json"
     },
+    "minecraft:lapis_ores": {
+      "id": "minecraft:lapis_ores",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:lapis_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_lapis_ore",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/lapis_ores.json"
+    },
     "minecraft:lanterns": {
       "id": "minecraft:lanterns",
       "registryType": "block",
@@ -15878,42 +15896,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/lanterns.json"
     },
-    "minecraft:lapis_ores": {
-      "id": "minecraft:lapis_ores",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:lapis_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:deepslate_lapis_ore",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/lapis_ores.json"
-    },
-    "minecraft:iron_ores": {
-      "id": "minecraft:iron_ores",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:iron_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:deepslate_iron_ore",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/iron_ores.json"
-    },
     "minecraft:jungle_logs": {
       "id": "minecraft:jungle_logs",
       "registryType": "block",
@@ -15941,6 +15923,24 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/jungle_logs.json"
+    },
+    "minecraft:iron_ores": {
+      "id": "minecraft:iron_ores",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:iron_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_iron_ore",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/iron_ores.json"
     },
     "minecraft:invalid_spawn_inside": {
       "id": "minecraft:invalid_spawn_inside",
@@ -16057,6 +16057,29 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/infiniburn_end.json"
     },
+    "minecraft:ice_spike_replaceable": {
+      "id": "minecraft:ice_spike_replaceable",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:substrate_overworld",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:snow_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:ice",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/ice_spike_replaceable.json"
+    },
     "minecraft:incorrect_for_wooden_tool": {
       "id": "minecraft:incorrect_for_wooden_tool",
       "registryType": "block",
@@ -16098,29 +16121,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/incorrect_for_stone_tool.json"
     },
-    "minecraft:incorrect_for_gold_tool": {
-      "id": "minecraft:incorrect_for_gold_tool",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:needs_diamond_tool",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:needs_iron_tool",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:needs_stone_tool",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/incorrect_for_gold_tool.json"
-    },
     "minecraft:incorrect_for_netherite_tool": {
       "id": "minecraft:incorrect_for_netherite_tool",
       "registryType": "block",
@@ -16147,6 +16147,29 @@
       "replace": false,
       "values": [],
       "sourceFile": "參考資料/Minecraft/tags/block/incorrect_for_diamond_tool.json"
+    },
+    "minecraft:incorrect_for_gold_tool": {
+      "id": "minecraft:incorrect_for_gold_tool",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:needs_diamond_tool",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:needs_iron_tool",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:needs_stone_tool",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/incorrect_for_gold_tool.json"
     },
     "minecraft:incorrect_for_copper_tool": {
       "id": "minecraft:incorrect_for_copper_tool",
@@ -16269,90 +16292,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/impermeable.json"
     },
-    "minecraft:ice_spike_replaceable": {
-      "id": "minecraft:ice_spike_replaceable",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:substrate_overworld",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:ice",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/ice_spike_replaceable.json"
-    },
-    "minecraft:ice": {
-      "id": "minecraft:ice",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:ice",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:packed_ice",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:blue_ice",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:frosted_ice",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/ice.json"
-    },
-    "minecraft:huge_red_mushroom_can_place_on": {
-      "id": "minecraft:huge_red_mushroom_can_place_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:substrate_overworld",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mycelium",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:podzol",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:crimson_nylium",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:warped_nylium",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/huge_red_mushroom_can_place_on.json"
-    },
     "minecraft:huge_brown_mushroom_can_place_on": {
       "id": "minecraft:huge_brown_mushroom_can_place_on",
       "registryType": "block",
@@ -16413,6 +16352,67 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/hoglin_repellents.json"
+    },
+    "minecraft:huge_red_mushroom_can_place_on": {
+      "id": "minecraft:huge_red_mushroom_can_place_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:substrate_overworld",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:mycelium",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:podzol",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:crimson_nylium",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:warped_nylium",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/huge_red_mushroom_can_place_on.json"
+    },
+    "minecraft:ice": {
+      "id": "minecraft:ice",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:ice",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:packed_ice",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:blue_ice",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:frosted_ice",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/ice.json"
     },
     "minecraft:happy_ghast_avoids": {
       "id": "minecraft:happy_ghast_avoids",
@@ -16510,6 +16510,47 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/guarded_by_piglins.json"
     },
+    "minecraft:gold_ores": {
+      "id": "minecraft:gold_ores",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:gold_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:nether_gold_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_gold_ore",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/gold_ores.json"
+    },
+    "minecraft:frog_prefer_jump_to": {
+      "id": "minecraft:frog_prefer_jump_to",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:lily_pad",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:big_dripleaf",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/frog_prefer_jump_to.json"
+    },
     "minecraft:grows_crops": {
       "id": "minecraft:grows_crops",
       "registryType": "block",
@@ -16545,29 +16586,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/grass_blocks.json"
-    },
-    "minecraft:gold_ores": {
-      "id": "minecraft:gold_ores",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:gold_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:nether_gold_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:deepslate_gold_ore",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/gold_ores.json"
     },
     "minecraft:goats_spawnable_on": {
       "id": "minecraft:goats_spawnable_on",
@@ -16607,57 +16625,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/goats_spawnable_on.json"
     },
-    "minecraft:foxes_spawnable_on": {
-      "id": "minecraft:foxes_spawnable_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:grass_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:podzol",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:coarse_dirt",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/foxes_spawnable_on.json"
-    },
-    "minecraft:frog_prefer_jump_to": {
-      "id": "minecraft:frog_prefer_jump_to",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:lily_pad",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:big_dripleaf",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/frog_prefer_jump_to.json"
-    },
     "minecraft:geode_invalid_blocks": {
       "id": "minecraft:geode_invalid_blocks",
       "registryType": "block",
@@ -16696,6 +16663,57 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/geode_invalid_blocks.json"
     },
+    "minecraft:foxes_spawnable_on": {
+      "id": "minecraft:foxes_spawnable_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:grass_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:snow",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:snow_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:podzol",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:coarse_dirt",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/foxes_spawnable_on.json"
+    },
+    "minecraft:forest_rock_can_place_on": {
+      "id": "minecraft:forest_rock_can_place_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:substrate_overworld",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:base_stone_overworld",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/forest_rock_can_place_on.json"
+    },
     "minecraft:frogs_spawnable_on": {
       "id": "minecraft:frogs_spawnable_on",
       "registryType": "block",
@@ -16724,23 +16742,88 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/frogs_spawnable_on.json"
     },
-    "minecraft:forest_rock_can_place_on": {
-      "id": "minecraft:forest_rock_can_place_on",
+    "minecraft:flowers": {
+      "id": "minecraft:flowers",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "tag",
-          "id": "minecraft:substrate_overworld",
+          "id": "minecraft:small_flowers",
           "required": true
         },
         {
-          "kind": "tag",
-          "id": "minecraft:base_stone_overworld",
+          "kind": "entry",
+          "id": "minecraft:sunflower",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:lilac",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:peony",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:rose_bush",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:pitcher_plant",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:flowering_azalea_leaves",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:flowering_azalea",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:mangrove_propagule",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cherry_leaves",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:pink_petals",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:wildflowers",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:chorus_flower",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:spore_blossom",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cactus_flower",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/forest_rock_can_place_on.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/flowers.json"
     },
     "minecraft:flower_pots": {
       "id": "minecraft:flower_pots",
@@ -16945,88 +17028,23 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/flower_pots.json"
     },
-    "minecraft:flowers": {
-      "id": "minecraft:flowers",
+    "minecraft:fences": {
+      "id": "minecraft:fences",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "tag",
-          "id": "minecraft:small_flowers",
+          "id": "minecraft:wooden_fences",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:sunflower",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:lilac",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:peony",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:rose_bush",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:pitcher_plant",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:flowering_azalea_leaves",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:flowering_azalea",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:mangrove_propagule",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cherry_leaves",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:pink_petals",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:wildflowers",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:chorus_flower",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:spore_blossom",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cactus_flower",
+          "id": "minecraft:nether_brick_fence",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/flowers.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/fences.json"
     },
     "minecraft:fire": {
       "id": "minecraft:fire",
@@ -17113,103 +17131,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/fence_gates.json"
-    },
-    "minecraft:fences": {
-      "id": "minecraft:fences",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:wooden_fences",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:nether_brick_fence",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/fences.json"
-    },
-    "minecraft:features_cannot_replace": {
-      "id": "minecraft:features_cannot_replace",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:bedrock",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:spawner",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:chest",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:end_portal_frame",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:reinforced_deepslate",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:trial_spawner",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:vault",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/features_cannot_replace.json"
-    },
-    "minecraft:fall_damage_resetting": {
-      "id": "minecraft:fall_damage_resetting",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:climbable",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:sweet_berry_bush",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cobweb",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/fall_damage_resetting.json"
-    },
-    "minecraft:enables_bubble_column_push_up": {
-      "id": "minecraft:enables_bubble_column_push_up",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_sand",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/enables_bubble_column_push_up.json"
     },
     "minecraft:enderman_holdable": {
       "id": "minecraft:enderman_holdable",
@@ -17334,6 +17255,85 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/enderman_holdable.json"
     },
+    "minecraft:features_cannot_replace": {
+      "id": "minecraft:features_cannot_replace",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:bedrock",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:spawner",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:chest",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:end_portal_frame",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:reinforced_deepslate",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:trial_spawner",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:vault",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/features_cannot_replace.json"
+    },
+    "minecraft:fall_damage_resetting": {
+      "id": "minecraft:fall_damage_resetting",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:climbable",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:sweet_berry_bush",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cobweb",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/fall_damage_resetting.json"
+    },
+    "minecraft:enables_bubble_column_drag_down": {
+      "id": "minecraft:enables_bubble_column_drag_down",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:magma_block",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/enables_bubble_column_drag_down.json"
+    },
     "minecraft:enchantment_power_transmitter": {
       "id": "minecraft:enchantment_power_transmitter",
       "registryType": "block",
@@ -17360,18 +17360,31 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/enchantment_power_provider.json"
     },
-    "minecraft:enables_bubble_column_drag_down": {
-      "id": "minecraft:enables_bubble_column_drag_down",
+    "minecraft:dripstone_replaceable_blocks": {
+      "id": "minecraft:dripstone_replaceable_blocks",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:base_stone_overworld",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/dripstone_replaceable_blocks.json"
+    },
+    "minecraft:enables_bubble_column_push_up": {
+      "id": "minecraft:enables_bubble_column_push_up",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "entry",
-          "id": "minecraft:magma_block",
+          "id": "minecraft:soul_sand",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/enables_bubble_column_drag_down.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/enables_bubble_column_push_up.json"
     },
     "minecraft:emerald_ores": {
       "id": "minecraft:emerald_ores",
@@ -17419,18 +17432,63 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/edible_for_sheep.json"
     },
-    "minecraft:dripstone_replaceable_blocks": {
-      "id": "minecraft:dripstone_replaceable_blocks",
+    "minecraft:doors": {
+      "id": "minecraft:doors",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "tag",
-          "id": "minecraft:base_stone_overworld",
+          "id": "minecraft:wooden_doors",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:exposed_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:weathered_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:oxidized_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_exposed_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_weathered_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_oxidized_copper_door",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:iron_door",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/dripstone_replaceable_blocks.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/doors.json"
     },
     "minecraft:dragon_transparent": {
       "id": "minecraft:dragon_transparent",
@@ -17553,77 +17611,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/dragon_immune.json"
     },
-    "minecraft:doors": {
-      "id": "minecraft:doors",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:wooden_doors",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:exposed_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:weathered_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:oxidized_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_exposed_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_weathered_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_oxidized_copper_door",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:iron_door",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/doors.json"
-    },
-    "minecraft:does_not_block_hoppers": {
-      "id": "minecraft:does_not_block_hoppers",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:beehives",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/does_not_block_hoppers.json"
-    },
     "minecraft:dirt": {
       "id": "minecraft:dirt",
       "registryType": "block",
@@ -17647,23 +17634,18 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/dirt.json"
     },
-    "minecraft:diamond_ores": {
-      "id": "minecraft:diamond_ores",
+    "minecraft:does_not_block_hoppers": {
+      "id": "minecraft:does_not_block_hoppers",
       "registryType": "block",
       "replace": false,
       "values": [
         {
-          "kind": "entry",
-          "id": "minecraft:diamond_ore",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:deepslate_diamond_ore",
+          "kind": "tag",
+          "id": "minecraft:beehives",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/diamond_ores.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/does_not_block_hoppers.json"
     },
     "minecraft:deepslate_ore_replaceables": {
       "id": "minecraft:deepslate_ore_replaceables",
@@ -17682,6 +17664,60 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/deepslate_ore_replaceables.json"
+    },
+    "minecraft:dampens_vibrations": {
+      "id": "minecraft:dampens_vibrations",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:wool",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:wool_carpets",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/dampens_vibrations.json"
+    },
+    "minecraft:diamond_ores": {
+      "id": "minecraft:diamond_ores",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:diamond_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_diamond_ore",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/diamond_ores.json"
+    },
+    "minecraft:crystal_sound_blocks": {
+      "id": "minecraft:crystal_sound_blocks",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:amethyst_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:budding_amethyst",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/crystal_sound_blocks.json"
     },
     "minecraft:dark_oak_logs": {
       "id": "minecraft:dark_oak_logs",
@@ -17711,41 +17747,33 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/dark_oak_logs.json"
     },
-    "minecraft:dampens_vibrations": {
-      "id": "minecraft:dampens_vibrations",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:wool",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:wool_carpets",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/dampens_vibrations.json"
-    },
-    "minecraft:crystal_sound_blocks": {
-      "id": "minecraft:crystal_sound_blocks",
+    "minecraft:crimson_stems": {
+      "id": "minecraft:crimson_stems",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "entry",
-          "id": "minecraft:amethyst_block",
+          "id": "minecraft:crimson_stem",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:budding_amethyst",
+          "id": "minecraft:stripped_crimson_stem",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:crimson_hyphae",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_crimson_hyphae",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/crystal_sound_blocks.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/crimson_stems.json"
     },
     "minecraft:crops": {
       "id": "minecraft:crops",
@@ -17795,67 +17823,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/crops.json"
     },
-    "minecraft:crimson_stems": {
-      "id": "minecraft:crimson_stems",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:crimson_stem",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_crimson_stem",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:crimson_hyphae",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_crimson_hyphae",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/crimson_stems.json"
-    },
-    "minecraft:coral_plants": {
-      "id": "minecraft:coral_plants",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:tube_coral",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:brain_coral",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:bubble_coral",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:fire_coral",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:horn_coral",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/coral_plants.json"
-    },
     "minecraft:coral_blocks": {
       "id": "minecraft:coral_blocks",
       "registryType": "block",
@@ -17889,61 +17856,61 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/coral_blocks.json"
     },
-    "minecraft:corals": {
-      "id": "minecraft:corals",
+    "minecraft:convertable_to_mud": {
+      "id": "minecraft:convertable_to_mud",
       "registryType": "block",
       "replace": false,
       "values": [
         {
-          "kind": "tag",
-          "id": "minecraft:coral_plants",
+          "kind": "entry",
+          "id": "minecraft:dirt",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:tube_coral_fan",
+          "id": "minecraft:coarse_dirt",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:brain_coral_fan",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:bubble_coral_fan",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:fire_coral_fan",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:horn_coral_fan",
+          "id": "minecraft:rooted_dirt",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/corals.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/convertable_to_mud.json"
     },
-    "minecraft:copper_ores": {
-      "id": "minecraft:copper_ores",
+    "minecraft:coral_plants": {
+      "id": "minecraft:coral_plants",
       "registryType": "block",
       "replace": false,
       "values": [
         {
           "kind": "entry",
-          "id": "minecraft:copper_ore",
+          "id": "minecraft:tube_coral",
           "required": true
         },
         {
           "kind": "entry",
-          "id": "minecraft:deepslate_copper_ore",
+          "id": "minecraft:brain_coral",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:bubble_coral",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:fire_coral",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:horn_coral",
           "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/copper_ores.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/coral_plants.json"
     },
     "minecraft:copper_golem_statues": {
       "id": "minecraft:copper_golem_statues",
@@ -17993,6 +17960,44 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/copper_golem_statues.json"
     },
+    "minecraft:corals": {
+      "id": "minecraft:corals",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:coral_plants",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:tube_coral_fan",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:brain_coral_fan",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:bubble_coral_fan",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:fire_coral_fan",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:horn_coral_fan",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/corals.json"
+    },
     "minecraft:copper_chests": {
       "id": "minecraft:copper_chests",
       "registryType": "block",
@@ -18041,6 +18046,24 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/copper_chests.json"
     },
+    "minecraft:copper_ores": {
+      "id": "minecraft:copper_ores",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:copper_ore",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:deepslate_copper_ore",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/copper_ores.json"
+    },
     "minecraft:copper": {
       "id": "minecraft:copper",
       "registryType": "block",
@@ -18088,29 +18111,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/copper.json"
-    },
-    "minecraft:convertable_to_mud": {
-      "id": "minecraft:convertable_to_mud",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:dirt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:coarse_dirt",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:rooted_dirt",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/convertable_to_mud.json"
     },
     "minecraft:concrete_powder": {
       "id": "minecraft:concrete_powder",
@@ -18200,29 +18200,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/concrete_powder.json"
     },
-    "minecraft:completes_find_tree_tutorial": {
-      "id": "minecraft:completes_find_tree_tutorial",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:logs",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:leaves",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:wart_blocks",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/completes_find_tree_tutorial.json"
-    },
     "minecraft:combination_step_sound_blocks": {
       "id": "minecraft:combination_step_sound_blocks",
       "registryType": "block",
@@ -18271,6 +18248,29 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/combination_step_sound_blocks.json"
     },
+    "minecraft:completes_find_tree_tutorial": {
+      "id": "minecraft:completes_find_tree_tutorial",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:logs",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:leaves",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:wart_blocks",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/completes_find_tree_tutorial.json"
+    },
     "minecraft:coal_ores": {
       "id": "minecraft:coal_ores",
       "registryType": "block",
@@ -18288,6 +18288,34 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/coal_ores.json"
+    },
+    "minecraft:cherry_logs": {
+      "id": "minecraft:cherry_logs",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:cherry_log",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:cherry_wood",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_cherry_log",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:stripped_cherry_wood",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/cherry_logs.json"
     },
     "minecraft:climbable": {
       "id": "minecraft:climbable",
@@ -18341,87 +18369,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/climbable.json"
-    },
-    "minecraft:cherry_logs": {
-      "id": "minecraft:cherry_logs",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:cherry_log",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:cherry_wood",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_cherry_log",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:stripped_cherry_wood",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/cherry_logs.json"
-    },
-    "minecraft:chains": {
-      "id": "minecraft:chains",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:iron_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:copper_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_copper_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:exposed_copper_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_exposed_copper_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:weathered_copper_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_weathered_copper_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:oxidized_copper_chain",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:waxed_oxidized_copper_chain",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/chains.json"
     },
     "minecraft:ceiling_hanging_signs": {
       "id": "minecraft:ceiling_hanging_signs",
@@ -18509,6 +18456,82 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/cave_vines.json"
     },
+    "minecraft:chains": {
+      "id": "minecraft:chains",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:iron_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:copper_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_copper_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:exposed_copper_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_exposed_copper_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:weathered_copper_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_weathered_copper_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:oxidized_copper_chain",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:waxed_oxidized_copper_chain",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/chains.json"
+    },
+    "minecraft:cannot_support_snow_layer": {
+      "id": "minecraft:cannot_support_snow_layer",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:ice",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:packed_ice",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:barrier",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/cannot_support_snow_layer.json"
+    },
     "minecraft:cauldrons": {
       "id": "minecraft:cauldrons",
       "registryType": "block",
@@ -18536,80 +18559,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/cauldrons.json"
-    },
-    "minecraft:can_glide_through": {
-      "id": "minecraft:can_glide_through",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:vine",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:twisting_vines",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:twisting_vines_plant",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:weeping_vines",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:weeping_vines_plant",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:cave_vines",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/can_glide_through.json"
-    },
-    "minecraft:cannot_support_snow_layer": {
-      "id": "minecraft:cannot_support_snow_layer",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:ice",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:packed_ice",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:barrier",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/cannot_support_snow_layer.json"
-    },
-    "minecraft:cannot_support_seagrass": {
-      "id": "minecraft:cannot_support_seagrass",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:magma_block",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/cannot_support_seagrass.json"
     },
     "minecraft:cannot_support_kelp": {
       "id": "minecraft:cannot_support_kelp",
@@ -18651,6 +18600,75 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/cannot_replace_below_tree_trunk.json"
+    },
+    "minecraft:can_glide_through": {
+      "id": "minecraft:can_glide_through",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:vine",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:twisting_vines",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:twisting_vines_plant",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:weeping_vines",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:weeping_vines_plant",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:cave_vines",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/can_glide_through.json"
+    },
+    "minecraft:cannot_support_seagrass": {
+      "id": "minecraft:cannot_support_seagrass",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:magma_block",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/cannot_support_seagrass.json"
+    },
+    "minecraft:camel_sand_step_sound_blocks": {
+      "id": "minecraft:camel_sand_step_sound_blocks",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:sand",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:concrete_powder",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/camel_sand_step_sound_blocks.json"
     },
     "minecraft:candle_cakes": {
       "id": "minecraft:candle_cakes",
@@ -18745,6 +18763,42 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/candle_cakes.json"
     },
+    "minecraft:campfires": {
+      "id": "minecraft:campfires",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:campfire",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:soul_campfire",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/campfires.json"
+    },
+    "minecraft:buttons": {
+      "id": "minecraft:buttons",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:wooden_buttons",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:stone_buttons",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/buttons.json"
+    },
     "minecraft:candles": {
       "id": "minecraft:candles",
       "registryType": "block",
@@ -18838,26 +18892,8 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/candles.json"
     },
-    "minecraft:campfires": {
-      "id": "minecraft:campfires",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:campfire",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:soul_campfire",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/campfires.json"
-    },
-    "minecraft:camel_sand_step_sound_blocks": {
-      "id": "minecraft:camel_sand_step_sound_blocks",
+    "minecraft:camels_spawnable_on": {
+      "id": "minecraft:camels_spawnable_on",
       "registryType": "block",
       "replace": false,
       "values": [
@@ -18865,14 +18901,9 @@
           "kind": "tag",
           "id": "minecraft:sand",
           "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:concrete_powder",
-          "required": true
         }
       ],
-      "sourceFile": "參考資料/Minecraft/tags/block/camel_sand_step_sound_blocks.json"
+      "sourceFile": "參考資料/Minecraft/tags/block/camels_spawnable_on.json"
     },
     "minecraft:birch_logs": {
       "id": "minecraft:birch_logs",
@@ -18901,37 +18932,6 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/birch_logs.json"
-    },
-    "minecraft:camels_spawnable_on": {
-      "id": "minecraft:camels_spawnable_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:sand",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/camels_spawnable_on.json"
-    },
-    "minecraft:buttons": {
-      "id": "minecraft:buttons",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:wooden_buttons",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:stone_buttons",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/buttons.json"
     },
     "minecraft:blocks_wind_charge_explosions": {
       "id": "minecraft:blocks_wind_charge_explosions",
@@ -19004,6 +19004,39 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/bee_growables.json"
+    },
+    "minecraft:beacon_base_blocks": {
+      "id": "minecraft:beacon_base_blocks",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:netherite_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:emerald_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:diamond_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:gold_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:iron_block",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/beacon_base_blocks.json"
     },
     "minecraft:bee_attractive": {
       "id": "minecraft:bee_attractive",
@@ -19264,39 +19297,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/beds.json"
     },
-    "minecraft:beacon_base_blocks": {
-      "id": "minecraft:beacon_base_blocks",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:netherite_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:emerald_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:diamond_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:gold_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:iron_block",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/beacon_base_blocks.json"
-    },
     "minecraft:bats_spawnable_on": {
       "id": "minecraft:bats_spawnable_on",
       "registryType": "block",
@@ -19370,6 +19370,34 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/base_stone_nether.json"
+    },
+    "minecraft:armadillo_spawnable_on": {
+      "id": "minecraft:armadillo_spawnable_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:animals_spawnable_on",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:badlands_terracotta",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:red_sand",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:coarse_dirt",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/armadillo_spawnable_on.json"
     },
     "minecraft:bars": {
       "id": "minecraft:bars",
@@ -19610,6 +19638,39 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/bamboo_blocks.json"
     },
+    "minecraft:azalea_grows_on": {
+      "id": "minecraft:azalea_grows_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:substrate_overworld",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:sand",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:terracotta",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:snow_block",
+          "required": true
+        },
+        {
+          "kind": "entry",
+          "id": "minecraft:powder_snow",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/azalea_grows_on.json"
+    },
     "minecraft:badlands_terracotta": {
       "id": "minecraft:badlands_terracotta",
       "registryType": "block",
@@ -19706,80 +19767,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/azalea_root_replaceable.json"
     },
-    "minecraft:azalea_grows_on": {
-      "id": "minecraft:azalea_grows_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:substrate_overworld",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:sand",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:terracotta",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:snow_block",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:powder_snow",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/azalea_grows_on.json"
-    },
-    "minecraft:axolotls_spawnable_on": {
-      "id": "minecraft:axolotls_spawnable_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "entry",
-          "id": "minecraft:clay",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/axolotls_spawnable_on.json"
-    },
-    "minecraft:armadillo_spawnable_on": {
-      "id": "minecraft:armadillo_spawnable_on",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:animals_spawnable_on",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:badlands_terracotta",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:red_sand",
-          "required": true
-        },
-        {
-          "kind": "entry",
-          "id": "minecraft:coarse_dirt",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/armadillo_spawnable_on.json"
-    },
     "minecraft:anvil": {
       "id": "minecraft:anvil",
       "registryType": "block",
@@ -19802,6 +19789,19 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/anvil.json"
+    },
+    "minecraft:axolotls_spawnable_on": {
+      "id": "minecraft:axolotls_spawnable_on",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "entry",
+          "id": "minecraft:clay",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/axolotls_spawnable_on.json"
     },
     "minecraft:animals_spawnable_on": {
       "id": "minecraft:animals_spawnable_on",
@@ -19884,24 +19884,6 @@
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/ancient_city_replaceable.json"
     },
-    "minecraft:all_signs": {
-      "id": "minecraft:all_signs",
-      "registryType": "block",
-      "replace": false,
-      "values": [
-        {
-          "kind": "tag",
-          "id": "minecraft:signs",
-          "required": true
-        },
-        {
-          "kind": "tag",
-          "id": "minecraft:all_hanging_signs",
-          "required": true
-        }
-      ],
-      "sourceFile": "參考資料/Minecraft/tags/block/all_signs.json"
-    },
     "minecraft:all_hanging_signs": {
       "id": "minecraft:all_hanging_signs",
       "registryType": "block",
@@ -19919,6 +19901,24 @@
         }
       ],
       "sourceFile": "參考資料/Minecraft/tags/block/all_hanging_signs.json"
+    },
+    "minecraft:all_signs": {
+      "id": "minecraft:all_signs",
+      "registryType": "block",
+      "replace": false,
+      "values": [
+        {
+          "kind": "tag",
+          "id": "minecraft:signs",
+          "required": true
+        },
+        {
+          "kind": "tag",
+          "id": "minecraft:all_hanging_signs",
+          "required": true
+        }
+      ],
+      "sourceFile": "參考資料/Minecraft/tags/block/all_signs.json"
     },
     "minecraft:air": {
       "id": "minecraft:air",

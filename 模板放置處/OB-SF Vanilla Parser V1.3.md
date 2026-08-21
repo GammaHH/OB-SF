@@ -43,8 +43,19 @@ const minecraftParserPath =
 const minecraftParserResolved =
     require.resolve(minecraftParserPath);
 
-// 開發期間避免載入舊的 CommonJS cache
-delete require.cache[minecraftParserResolved];
+// 開發期間避免 index.js 已刷新、子模組仍停留在舊 cache。
+const minecraftParserCacheRoot =
+    path.normalize(minecraftParserPath) +
+    path.sep;
+
+for (const cachedPath of Object.keys(require.cache)) {
+    if (
+        cachedPath === minecraftParserResolved ||
+        cachedPath.startsWith(minecraftParserCacheRoot)
+    ) {
+        delete require.cache[cachedPath];
+    }
+}
 
 const minecraftParser =
     require(minecraftParserResolved);
@@ -97,6 +108,15 @@ function getStatusIcon(status) {
     switch (status) {
         case "OK":
             return "✅ OK";
+
+        case "OK_BRANCH":
+            return "✅↗ OK_BRANCH";
+
+        case "UNSUPPORTED":
+            return "⛔ UNSUPPORTED";
+
+        case "SPECIAL":
+            return "🧩 SPECIAL";
 
         case "REVIEW":
             return "⚠ REVIEW";
@@ -406,7 +426,8 @@ if (
 
 
     if (
-        parsed.status === "OK"
+        parsed.status === "OK" ||
+        parsed.status === "OK_BRANCH"
     ) {
 
         parsed.status =
@@ -466,7 +487,10 @@ if (
     manifestRows.push({
         status:
             (
-                parsed.status === "OK" &&
+                (
+                    parsed.status === "OK" ||
+                    parsed.status === "OK_BRANCH"
+                ) &&
                 !name
             )
                 ? "REVIEW"
@@ -570,58 +594,60 @@ const normalizedOutput = {
 // 14. Manifest 統計
 // ============================================================
 
-const statusCount = {
-    OK: 0,
-    REVIEW: 0,
-    ERROR: 0
-};
+const STATUS_ORDER = [
+    "OK",
+    "OK_BRANCH",
+    "UNSUPPORTED",
+    "SPECIAL",
+    "REVIEW",
+    "ERROR"
+];
 
+const statusCount =
+    Object.fromEntries(
+        STATUS_ORDER.map(status => [status, 0])
+    );
 
-for (const row of manifestRows) {
-
-    if (
-        statusCount[row.status] != null
-    ) {
-        statusCount[row.status]++;
-    }
-}
-
-// ============================================================
-// REVIEW 分類統計
-// ============================================================
-
-const reviewTypeCount =
-    new Map();
+const statusTypeCount =
+    Object.fromEntries(
+        STATUS_ORDER.map(status => [status, new Map()])
+    );
 
 const reviewReasonCount =
     new Map();
 
+const multiRecipeItems =
+    normalizedItems.filter(
+        item => item.recipes.length > 1
+    );
+
 
 for (const row of manifestRows) {
+
+    if (statusCount[row.status] == null) {
+        statusCount[row.status] = 0;
+        statusTypeCount[row.status] = new Map();
+    }
+
+    statusCount[row.status]++;
+
+
+    const type =
+        row.type || "UNKNOWN";
+
+    const typeCount =
+        statusTypeCount[row.status];
+
+    typeCount.set(
+        type,
+        (typeCount.get(type) ?? 0) + 1
+    );
+
 
     if (row.status !== "REVIEW") {
         continue;
     }
 
-
-    // --------------------------------------------------------
-    // 依 Recipe Type 統計
-    // --------------------------------------------------------
-
-    const type =
-        row.type ||
-        "UNKNOWN";
-
-
-    reviewTypeCount.set(
-        type,
-        (reviewTypeCount.get(type) ?? 0) + 1
-    );
-
-
-    // --------------------------------------------------------
-    // 依 Warning 原因統計
-    // --------------------------------------------------------
 
     const reasons =
         String(row.warnings ?? "")
@@ -631,18 +657,15 @@ for (const row of manifestRows) {
 
 
     if (reasons.length === 0) {
-
         reviewReasonCount.set(
             "未提供原因",
             (reviewReasonCount.get("未提供原因") ?? 0) + 1
         );
-
         continue;
     }
 
 
     for (const reason of reasons) {
-
         reviewReasonCount.set(
             reason,
             (reviewReasonCount.get(reason) ?? 0) + 1
@@ -674,51 +697,144 @@ manifest +=
     `- ✅ OK：${statusCount.OK}\n`;
 
 manifest +=
+    `- ✅↗ OK_BRANCH：${statusCount.OK_BRANCH}\n`;
+
+manifest +=
+    `- ⛔ UNSUPPORTED：${statusCount.UNSUPPORTED}\n`;
+
+manifest +=
+    `- 🧩 SPECIAL：${statusCount.SPECIAL}\n`;
+
+manifest +=
     `- ⚠ REVIEW：${statusCount.REVIEW}\n`;
 
 manifest +=
-    `- ❌ ERROR：${statusCount.ERROR}\n\n`;
-
-// ============================================================
-// REVIEW Summary
-// ============================================================
+    `- ❌ ERROR：${statusCount.ERROR}\n`;
 
 manifest +=
-    "## REVIEW Summary\n\n";
+    `- Multiple-recipe items：${multiRecipeItems.length}\n\n`;
 
 
-manifest +=
-    "### By Recipe Type\n\n";
-
-manifest +=
-    "| Recipe Type | Count |\n";
-
-manifest +=
-    "| --- | ---: |\n";
-
-
-const sortedReviewTypes =
-    Array.from(
-        reviewTypeCount.entries()
-    )
-    .sort(
-        (a, b) =>
-            b[1] - a[1]
-    );
-
-
-for (
-    const [type, count]
-    of sortedReviewTypes
+function appendTypeSummary(
+    heading,
+    status
 ) {
 
     manifest +=
-        `| \`${escapeMarkdownTable(type)}\` | ${count} |\n`;
+        `### ${heading}\n\n`;
+
+    const entries =
+        Array.from(
+            statusTypeCount[status].entries()
+        )
+        .sort((a, b) => b[1] - a[1]);
+
+
+    if (entries.length === 0) {
+        manifest += "目前沒有。\n\n";
+        return;
+    }
+
+
+    manifest +=
+        "| Recipe Type | Count |\n";
+
+    manifest +=
+        "| --- | ---: |\n";
+
+
+    for (const [type, count] of entries) {
+        manifest +=
+            `| \`${escapeMarkdownTable(type)}\` | ${count} |\n`;
+    }
+
+
+    manifest += "\n";
 }
 
 
+function appendManifestRows(
+    heading,
+    statuses
+) {
+
+    manifest +=
+        `## ${heading}\n\n`;
+
+    const rows =
+        manifestRows.filter(row =>
+            statuses.includes(row.status)
+        );
+
+
+    if (rows.length === 0) {
+        manifest += "目前沒有。\n\n";
+        return;
+    }
+
+
+    manifest +=
+        "| 狀態 | 中文 | Minecraft ID | Type | Section | Machine | Output | Ingredients | Warning | Source |\n";
+
+    manifest +=
+        "| --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |\n";
+
+
+    for (const row of rows) {
+        manifest +=
+            `| ${escapeMarkdownTable(getStatusIcon(row.status))}` +
+            ` | ${escapeMarkdownTable(row.name)}` +
+            ` | \`${escapeMarkdownTable(row.id)}\`` +
+            ` | \`${escapeMarkdownTable(row.type)}\`` +
+            ` | ${escapeMarkdownTable(row.section ?? "")}` +
+            ` | ${escapeMarkdownTable(row.machine ?? "")}` +
+            ` | ${escapeMarkdownTable(row.output)}` +
+            ` | ${escapeMarkdownTable(row.ingredients)}` +
+            ` | ${escapeMarkdownTable(row.warnings)}` +
+            ` | \`${escapeMarkdownTable(row.sourceFile)}\`` +
+            " |\n";
+    }
+
+
+    manifest += "\n";
+}
+
+// ============================================================
+// Status Summary
+// ============================================================
+
 manifest +=
-    "\n### By Reason\n\n";
+    "## Status Summary by Recipe Type\n\n";
+
+
+appendTypeSummary(
+    "OK_BRANCH — legal choices",
+    "OK_BRANCH"
+);
+
+appendTypeSummary(
+    "UNSUPPORTED — parser not implemented",
+    "UNSUPPORTED"
+);
+
+appendTypeSummary(
+    "SPECIAL — dynamic Minecraft semantics",
+    "SPECIAL"
+);
+
+appendTypeSummary(
+    "REVIEW — genuinely uncertain",
+    "REVIEW"
+);
+
+appendTypeSummary(
+    "ERROR — invalid input/parser failure",
+    "ERROR"
+);
+
+
+manifest +=
+    "## REVIEW Reasons\n\n";
 
 manifest +=
     "| Reason | Count |\n";
@@ -748,47 +864,26 @@ for (
 
 
 manifest += "\n";
-manifest +=
-    "## Requires Review\n\n";
 
+appendManifestRows(
+    "Legal Branch Semantics",
+    ["OK_BRANCH"]
+);
 
-manifest +=
-    "| 狀態 | 中文 | Minecraft ID | Type | Section | Machine | Output | Ingredients | Warning | Source |\n";
-
-manifest +=
-    "| --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |\n";
-
-
-for (const row of manifestRows) {
-
-    // ✅ 正常資料不寫入巨大 Markdown 表格
-    if (row.status === "OK") continue;
-
-    manifest +=
-        `| ${escapeMarkdownTable(getStatusIcon(row.status))}` +
-        ` | ${escapeMarkdownTable(row.name)}` +
-        ` | \`${escapeMarkdownTable(row.id)}\`` +
-        ` | \`${escapeMarkdownTable(row.type)}\`` +
-        ` | ${escapeMarkdownTable(row.section ?? "")}` +
-        ` | ${escapeMarkdownTable(row.machine ?? "")}` +
-        ` | ${escapeMarkdownTable(row.output)}` +
-        ` | ${escapeMarkdownTable(row.ingredients)}` +
-        ` | ${escapeMarkdownTable(row.warnings)}` +
-        ` | \`${escapeMarkdownTable(row.sourceFile)}\`` +
-        " |\n";
-}
+appendManifestRows(
+    "Requires Attention",
+    [
+        "UNSUPPORTED",
+        "SPECIAL",
+        "REVIEW",
+        "ERROR"
+    ]
+);
 
 
 // ============================================================
 // 16. Multi-recipe 檢查表
 // ============================================================
-
-const multiRecipeItems =
-    normalizedItems.filter(
-        item =>
-            item.recipes.length > 1
-    );
-
 
 manifest +=
     "\n## Multiple Recipes\n\n";
@@ -936,6 +1031,9 @@ new Notice(
     `Minecraft Recipe Parser 完成\n` +
     `Items: ${normalizedItems.length}\n` +
     `Recipes: ${normalizedOutput.recipeCount}\n` +
+    `OK Branch: ${statusCount.OK_BRANCH}\n` +
+    `Unsupported: ${statusCount.UNSUPPORTED}\n` +
+    `Special: ${statusCount.SPECIAL}\n` +
     `Review: ${statusCount.REVIEW}\n` +
     `Error: ${statusCount.ERROR}`
 );

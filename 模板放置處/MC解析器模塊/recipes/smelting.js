@@ -7,6 +7,13 @@ module.exports = {
     type:
         "minecraft:smelting",
 
+    types: [
+        "minecraft:smelting",
+        "minecraft:blasting",
+        "minecraft:smoking",
+        "minecraft:campfire_cooking"
+    ],
+
 
     parse(json, context) {
 
@@ -20,6 +27,7 @@ module.exports = {
             normalizeResult,
             normalizeSingleIngredient,
             collectIngredientWarnings,
+            getNormalizedStatus,
             getRecipeTypeInfo
         } = shared;
 
@@ -91,7 +99,7 @@ module.exports = {
 
         const info =
             getRecipeTypeInfo(
-                module.exports.type
+                json.type
             );
 
 
@@ -104,9 +112,10 @@ module.exports = {
             success: true,
 
             status:
-                warnings.length > 0
-                    ? "REVIEW"
-                    : "OK",
+                getNormalizedStatus(
+                    [ingredient],
+                    warnings
+                ),
 
             resultId:
                 result.id,
@@ -115,7 +124,7 @@ module.exports = {
             recipe: {
 
                 sourceType:
-                    module.exports.type,
+                    json.type,
 
                 section:
                     info.section,
