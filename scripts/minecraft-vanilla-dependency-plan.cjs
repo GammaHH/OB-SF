@@ -20,6 +20,12 @@ function numericOption(name, fallback) {
         : fallback;
 }
 
+function stringOption(name, fallback) {
+    const prefix = `--${name}=`;
+    const argument = process.argv.find(value => value.startsWith(prefix));
+    return argument ? argument.slice(prefix.length) : fallback;
+}
+
 const limits = {
     maxDepth: numericOption("max-depth", 5),
     maxChoices: numericOption("max-choices", 6),
@@ -137,6 +143,8 @@ function renderDependencyTree(dependency, bioRegistry) {
         const cycle = activePath.includes(itemId);
         const suffix = cycle
             ? " [cycle]"
+            : node?.specialBoundary
+                ? " [SPECIAL boundary]"
             : node?.leaf
                 ? " [leaf]"
                 : ` [${node?.recipes.length ?? 0} recipes]`;
@@ -275,6 +283,32 @@ function main() {
         dependencyResult,
         generationPlan
     } = pipeline.planGeneration(target, { bioRegistry });
+    const basePlan = pipeline.createBaseDependencyPlan(
+        dependencyResult,
+        {
+            legacyBlockedByCycle: generationPlan.blockedByCycle,
+            selectionPolicy: stringOption("base-route-policy", "none"),
+            baseItemIds: stringOption("base-items", "")
+                .split(",")
+                .map(value => value.trim())
+                .filter(Boolean)
+        }
+    );
+    const targetBase = basePlan.baseDependencyMap.get(target);
+    const tagDraft = vanilla.bio.createTagBIOMappingDraft(
+        dependencyResult,
+        {
+            knownMappings: {
+                "minecraft:planks": {
+                    bioId: "PLANKS",
+                    zhName: "任意木材",
+                    filename: "任意木材.md",
+                    generate: false,
+                    note: "既有草稿；Tag BIO frontmatter 格式待確認"
+                }
+            }
+        }
+    );
 
     const targetNode = dependencyResult.graph.get(target);
     const warnings = [
@@ -288,7 +322,11 @@ function main() {
         `- ${target}`,
         `- BIO: ${bioRegistry.get(target)?.path ?? "missing"}`,
         "",
-        "Recipes:",
+        "Status:",
+        `- ${targetNode?.specialBoundary ? "SPECIAL_BOUNDARY" : targetNode?.leaf ? "LEAF" : "NORMALIZED"}`,
+        `- branch-aware: ${generationPlan.hasChoices ? "multiple legal plans" : "single structural plan"}`,
+        "",
+        "Recipe Branches:",
         `- routes: ${targetNode?.recipes.length ?? 0}`,
         ...((targetNode?.recipes ?? []).slice(0, limits.maxListItems).map(recipe =>
             `- [${recipe.recipeIndex}] ${recipe.sourceType}; ` +
@@ -302,7 +340,7 @@ function main() {
         `- count: ${dependencyResult.leafMaterials.length}`,
         ...formatList(dependencyResult.leafMaterials),
         "",
-        "Branches:",
+        "Tag / Alternative Branches:",
         `- recipe branches: ${dependencyResult.recipeBranches.length}`,
         `- tag branches: ${dependencyResult.tagBranches.length}`,
         `- alternative branches: ${dependencyResult.alternativeBranches.length}`,
@@ -315,7 +353,23 @@ function main() {
         `- count: ${generationPlan.missingBIO.length}`,
         ...formatList(generationPlan.missingBIO),
         "",
+        "Base Dependency Planning:",
+        `- selection policy: ${basePlan.selectionPolicy}`,
+        `- explicit base items: ${basePlan.explicitBaseItems.join(", ") || "(none)"}`,
+        `- target safe: ${targetBase?.safe ?? false}`,
+        `- target acyclic routes: ${targetBase?.acyclicRouteIds.length ?? 0}`,
+        `- target blocked routes: ${targetBase?.blockedRouteIds.length ?? 0}`,
+        `- route-aware blocked items: ${basePlan.routeAwareBlockedItems.length}`,
+        `- legacy blocked items resolved by another route: ${basePlan.resolvedFromLegacyCycles.length}`,
+        `- unresolved choices: ${basePlan.unresolvedChoices.length}`,
+        "",
         "Generation Order:",
+        `- mode: base-route ${basePlan.selectionPolicy}`,
+        `- complete: ${basePlan.canPlanTargets}`,
+        `- total: ${basePlan.generationOrder.length}`,
+        ...formatList(basePlan.generationOrder),
+        "",
+        "All-branches Coverage Order (debug):",
         `- total: ${generationPlan.generationOrder.length}`,
         ...formatList(generationPlan.generationOrder),
         "",
@@ -326,6 +380,22 @@ function main() {
         "Blocked by Cycle:",
         `- count: ${generationPlan.blockedByCycle.length}`,
         ...formatList(generationPlan.blockedByCycle),
+        "",
+        "SPECIAL Boundaries:",
+        `- count: ${dependencyResult.specialBoundaries.length}`,
+        ...formatList(
+            dependencyResult.specialBoundaries.map(boundary => ({
+                id: boundary.itemId,
+                path: boundary.recipes
+                    .map(recipe => recipe.sourceType)
+                    .join(", ")
+            }))
+        ),
+        `- unbound SPECIAL recipes: ${pipeline.unboundSpecialRecipes.length}`,
+        "",
+        "Tag BIO Mapping Draft:",
+        `- unique item tags: ${tagDraft.length}`,
+        ...vanilla.bio.renderTagBIOMappingMarkdown(tagDraft).split("\n"),
         "",
         "Warnings:",
         `- pipeline diagnostics: ${JSON.stringify(diagnosticSummary(pipeline.diagnostics))}`,

@@ -48,6 +48,106 @@ function createGenerationPlan(
     }
 
 
+    function buildIngredientPlan(ingredient) {
+
+        if (ingredient?.kind === "item") {
+            return {
+                kind: "item-dependency",
+                qty: ingredient.qty,
+                itemId: ingredient.id
+            };
+        }
+
+        if (ingredient?.kind === "tag") {
+            return {
+                kind: "tag-choice",
+                selectionMode: "one",
+                tagId: ingredient.id,
+                qty: ingredient.qty,
+                choices: (ingredient.candidates ?? []).map(candidate =>
+                    ({
+                        kind: "item-reference",
+                        itemId: candidate.id
+                    })
+                )
+            };
+        }
+
+        if (ingredient?.kind === "alternatives") {
+            return {
+                kind: "alternative-choice",
+                selectionMode: "one",
+                qty: ingredient.qty,
+                choices: (ingredient.choices ?? []).map(choice =>
+                    buildIngredientPlan(choice.ingredient)
+                )
+            };
+        }
+
+        return {
+            kind: "unknown-dependency",
+            ingredient
+        };
+    }
+
+
+    function buildItemPlan(itemId) {
+
+        const node = graph.get(itemId);
+
+        if (!node) {
+            return {
+                kind: "leaf",
+                itemId
+            };
+        }
+
+        return {
+            kind: "item-plan",
+            itemId,
+            leaf: node.leaf === true,
+            specialBoundary: node.specialBoundary === true,
+            specialRecipes: node.specialRecipes ?? [],
+            recipeChoices: (node.recipes ?? []).map(recipe => ({
+                kind: "recipe-choice",
+                dependencyMode: "all",
+                branchId: recipe.branchId,
+                sourceType: recipe.sourceType,
+                output: recipe.output,
+                dependencies: (recipe.ingredients ?? []).map(ingredient =>
+                    buildIngredientPlan(ingredient)
+                )
+            }))
+        };
+    }
+
+
+    function planHasChoices(plan) {
+
+        if (!plan || typeof plan !== "object") return false;
+
+        if (
+            plan.kind === "tag-choice" ||
+            plan.kind === "alternative-choice"
+        ) {
+            return true;
+        }
+
+        if (
+            plan.kind === "item-plan" &&
+            plan.recipeChoices.length > 1
+        ) {
+            return true;
+        }
+
+        return Object.values(plan).some(value =>
+            Array.isArray(value)
+                ? value.some(planHasChoices)
+                : planHasChoices(value)
+        );
+    }
+
+
     const dependencyIds = new Map();
     const dependents = new Map();
 
@@ -169,6 +269,19 @@ function createGenerationPlan(
     const existingSet =
         new Set(existingBIO.map(entry => entry.id));
 
+    const branchPlanGraph =
+        new Map(
+            [...graph.keys()].map(itemId => [
+                itemId,
+                buildItemPlan(itemId)
+            ])
+        );
+
+    const branchPlans =
+        dependencyResult.targets.map(itemId =>
+            branchPlanGraph.get(itemId) ?? buildItemPlan(itemId)
+        );
+
 
     return {
         target:
@@ -176,6 +289,11 @@ function createGenerationPlan(
         targets:
             dependencyResult.targets,
         dependencyIds,
+        branchPlanGraph,
+        branchPlans,
+        hasChoices:
+            [...branchPlanGraph.values()].some(planHasChoices),
+        orderMode: "all-branches-coverage",
         generationOrder,
         missingGenerationOrder:
             generationOrder.filter(itemId =>

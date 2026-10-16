@@ -11,10 +11,13 @@ const {
 } = require("./normalized/item_registry");
 const dependencies = {
     ...require("./dependencies/dependency_resolver"),
-    ...require("./dependencies/generation_planner")
+    ...require("./dependencies/generation_planner"),
+    ...require("./dependencies/base_dependency_planner")
 };
-const bio =
-    require("./bio/bio_scanner");
+const bio = {
+    ...require("./bio/bio_scanner"),
+    ...require("./bio/tag_bio_mapping")
+};
 const parsers = [
     require("./recipes/crafting_shaped"),
     require("./recipes/crafting_shapeless"),

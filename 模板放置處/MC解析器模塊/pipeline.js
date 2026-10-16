@@ -14,6 +14,10 @@ const {
     createGenerationPlan
 } = require("./dependencies/generation_planner");
 
+const {
+    createBaseDependencyPlan
+} = require("./dependencies/base_dependency_planner");
+
 
 function createPipelineTools({
     parseRecipe,
@@ -43,6 +47,8 @@ function createPipelineTools({
 
         const diagnostics = [];
         const recipeStatusesByItem = new Map();
+        const specialRecipesByItem = new Map();
+        const unboundSpecialRecipes = [];
 
         const statusKeys = [
             "OK",
@@ -107,6 +113,31 @@ function createPipelineTools({
 
 
             if (!parsed.success) {
+
+                const fixedResultId =
+                    typeof json?.result === "string"
+                        ? json.result
+                        : json?.result?.id ??
+                            json?.result?.item ??
+                            null;
+
+                if (parsed.special === true) {
+                    const specialRecipe = {
+                        itemId: fixedResultId,
+                        sourceType: json?.type ?? null,
+                        sourceFile,
+                        warning: parsed.warnings?.[0] ?? null
+                    };
+
+                    if (fixedResultId) {
+                        if (!specialRecipesByItem.has(fixedResultId)) {
+                            specialRecipesByItem.set(fixedResultId, []);
+                        }
+                        specialRecipesByItem.get(fixedResultId).push(specialRecipe);
+                    } else {
+                        unboundSpecialRecipes.push(specialRecipe);
+                    }
+                }
 
                 if (stats.statusCounts[parsed.status] != null) {
                     stats.statusCounts[parsed.status]++;
@@ -233,6 +264,8 @@ function createPipelineTools({
         return {
             registry,
             itemStatuses,
+            specialRecipesByItem,
+            unboundSpecialRecipes,
             diagnostics,
             stats
         };
@@ -264,6 +297,10 @@ function createPipelineTools({
                 normalized.registry,
             itemStatuses:
                 normalized.itemStatuses,
+            specialRecipesByItem:
+                normalized.specialRecipesByItem,
+            unboundSpecialRecipes:
+                normalized.unboundSpecialRecipes,
             diagnostics: [
                 ...tagRegistry.errors,
                 ...tagRegistry.warnings,
@@ -282,7 +319,12 @@ function createPipelineTools({
                 return resolveDependencies(
                     normalized.registry,
                     rootItemIds,
-                    resolverOptions
+                    {
+                        ...resolverOptions,
+                        specialRecipesByItem:
+                            resolverOptions.specialRecipesByItem ??
+                            normalized.specialRecipesByItem
+                    }
                 );
             },
             createGenerationPlan(
@@ -290,6 +332,15 @@ function createPipelineTools({
                 plannerOptions = {}
             ) {
                 return createGenerationPlan(
+                    dependencyResult,
+                    plannerOptions
+                );
+            },
+            createBaseDependencyPlan(
+                dependencyResult,
+                plannerOptions = {}
+            ) {
+                return createBaseDependencyPlan(
                     dependencyResult,
                     plannerOptions
                 );
@@ -303,7 +354,12 @@ function createPipelineTools({
                     resolveDependencies(
                         normalized.registry,
                         rootItemIds,
-                        options.resolverOptions ?? {}
+                        {
+                            ...(options.resolverOptions ?? {}),
+                            specialRecipesByItem:
+                                options.resolverOptions?.specialRecipesByItem ??
+                                normalized.specialRecipesByItem
+                        }
                     );
 
 

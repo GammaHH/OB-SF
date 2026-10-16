@@ -47,6 +47,11 @@ function resolveDependencyGraph(
             ? options.maxNodes
             : Infinity;
 
+    const specialRecipesByItem =
+        options.specialRecipesByItem instanceof Map
+            ? options.specialRecipesByItem
+            : new Map();
+
 
     const graph = new Map();
     const state = new Map();
@@ -57,6 +62,7 @@ function resolveDependencyGraph(
     const recipeBranches = [];
     const tagBranches = [];
     const alternativeBranches = [];
+    const specialBoundaries = [];
 
 
     function addWarning(message) {
@@ -96,6 +102,8 @@ function resolveDependencyGraph(
                 id: itemId,
                 name: null,
                 leaf: false,
+                specialBoundary: false,
+                specialRecipes: [],
                 recipes: [],
                 warnings: []
             });
@@ -154,6 +162,18 @@ function resolveDependencyGraph(
         node.warnings =
             [...(normalizedItem?.warnings ?? [])];
 
+        node.specialRecipes =
+            [...(specialRecipesByItem.get(itemId) ?? [])];
+
+        if (node.specialRecipes.length > 0) {
+            node.specialBoundary = true;
+            specialBoundaries.push({
+                kind: "special-boundary",
+                itemId,
+                recipes: node.specialRecipes
+            });
+        }
+
 
         if (
             !normalizedItem ||
@@ -161,8 +181,10 @@ function resolveDependencyGraph(
             normalizedItem.recipes.length === 0
         ) {
 
-            node.leaf = true;
-            leafSet.add(itemId);
+            if (!node.specialBoundary) {
+                node.leaf = true;
+                leafSet.add(itemId);
+            }
 
         } else {
 
@@ -177,6 +199,7 @@ function resolveDependencyGraph(
 
                 const recipeBranch = {
                     kind: "recipe",
+                    dependencyMode: "all",
                     branchId: `${itemId}::recipe:${recipeIndex}`,
                     itemId,
                     recipeIndex,
@@ -270,6 +293,7 @@ function resolveDependencyGraph(
 
             const branch = {
                 kind: "tag",
+                selectionMode: "one",
                 branchId:
                     `${context.ownerItemId}::recipe:${context.recipeIndex}` +
                     `::ingredient:${context.ingredientIndex}::tag:${ingredient.id}`,
@@ -312,6 +336,7 @@ function resolveDependencyGraph(
 
             const branch = {
                 kind: "alternatives",
+                selectionMode: "one",
                 branchId:
                     `${context.ownerItemId}::recipe:${context.recipeIndex}` +
                     `::ingredient:${context.ingredientIndex}::alternatives`,
@@ -391,11 +416,22 @@ function resolveDependencyGraph(
             }))
         },
         graph,
+        recipes:
+            targets.flatMap(id =>
+                graph.get(id)?.recipes ?? []
+            ),
+        dependencies: graph,
         leafMaterials:
             Array.from(leafSet),
         recipeBranches,
         tagBranches,
         alternativeBranches,
+        branches: {
+            recipes: recipeBranches,
+            tags: tagBranches,
+            alternatives: alternativeBranches
+        },
+        specialBoundaries,
         cycles,
         warnings
     };

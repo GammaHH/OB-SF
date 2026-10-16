@@ -13,7 +13,7 @@ const templatePath =
     path.join(
         vaultRoot,
         "模板放置處",
-        "OB-SF Vanilla Parser V1.1.md"
+        "OB-SF Vanilla Parser V1.3.md"
     );
 
 const generatedPaths = new Set([
@@ -79,7 +79,7 @@ function walkFiles(root) {
 
 function assertGeneratedTarget(vaultPath) {
     if (!generatedPaths.has(vaultPath)) {
-        throw new Error(`V1.1 harness 拒絕寫入非 generated target：${vaultPath}`);
+        throw new Error(`V1.3 harness 拒絕寫入非 generated target：${vaultPath}`);
     }
 }
 
@@ -87,7 +87,7 @@ function assertGeneratedTarget(vaultPath) {
 function extractProgram(template) {
     const match = template.match(/^\s*<%\*([\s\S]*?)_?%>\s*$/);
     if (!match) {
-        throw new Error("找不到 V1.1 Templater program block");
+        throw new Error("找不到 V1.3 Templater program block");
     }
     return match[1];
 }
