@@ -12,7 +12,9 @@ const {
 const dependencies = {
     ...require("./dependencies/dependency_resolver"),
     ...require("./dependencies/generation_planner"),
-    ...require("./dependencies/base_dependency_planner")
+    ...require("./dependencies/base_dependency_planner"),
+    ...require("./dependencies/base_material_review"),
+    ...require("./dependencies/recipe_review")
 };
 const bio = {
     ...require("./bio/bio_scanner"),

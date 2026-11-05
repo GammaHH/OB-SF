@@ -1,2 +1,10 @@
 /review
 /.obsidian
+
+# Review workflow regression tests are project artifacts even when a local
+# .git/info/exclude contains a broader tests/minecraft-vanilla-pipeline rule.
+!tests/
+!tests/minecraft-vanilla-pipeline/
+tests/minecraft-vanilla-pipeline/*
+!tests/minecraft-vanilla-pipeline/base-material-review.test.cjs
+!tests/minecraft-vanilla-pipeline/recipe-review.test.cjs

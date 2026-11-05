@@ -32,7 +32,8 @@ function createBaseDependencyPlan(dependencyResult, options = {}) {
                 itemId: ingredient.id,
                 qty: ingredient.qty,
                 safe: item.safe,
-                cycles: item.cycles
+                cycles: item.cycles,
+                blockingCycles: item.safe ? [] : item.cycles
             };
         }
 
@@ -51,7 +52,10 @@ function createBaseDependencyPlan(dependencyResult, options = {}) {
                 qty: ingredient.qty,
                 selectionMode: "one",
                 safe: choices.some(choice => choice.safe),
-                choices
+                choices,
+                blockingCycles: choices.some(choice => choice.safe)
+                    ? []
+                    : choices.flatMap(choice => choice.cycles ?? [])
             };
         }
 
@@ -64,13 +68,17 @@ function createBaseDependencyPlan(dependencyResult, options = {}) {
                 qty: ingredient.qty,
                 selectionMode: "one",
                 safe: choices.some(choice => choice.safe),
-                choices
+                choices,
+                blockingCycles: choices.some(choice => choice.safe)
+                    ? []
+                    : choices.flatMap(choice => collectCycles(choice))
             };
         }
 
         return {
             kind: "unknown",
             safe: false,
+            blockingCycles: [],
             raw: ingredient ?? null
         };
     }
@@ -81,7 +89,10 @@ function createBaseDependencyPlan(dependencyResult, options = {}) {
         );
         return {
             safe: dependencies.every(dependency => dependency.safe),
-            dependencies
+            dependencies,
+            blockingCycles: dependencies
+                .filter(dependency => !dependency.safe)
+                .flatMap(dependency => dependency.blockingCycles ?? [])
         };
     }
 
@@ -126,6 +137,9 @@ function createBaseDependencyPlan(dependencyResult, options = {}) {
             safe: routes.some(route => route.safe),
             terminal: false,
             cycles,
+            blockingCycles: routes.some(route => route.safe)
+                ? []
+                : routes.flatMap(route => route.blockingCycles ?? []),
             routes
         };
         analysisCache.set(cacheKey, result);
@@ -152,7 +166,8 @@ function createBaseDependencyPlan(dependencyResult, options = {}) {
                 output: recipe.output,
                 status: analysis.safe ? "ACYCLIC" : "BLOCKED",
                 dependencies: analysis.dependencies,
-                cycles: analysis.dependencies.flatMap(collectCycles)
+                cycles: analysis.dependencies.flatMap(collectCycles),
+                blockingCycles: analysis.blockingCycles
             };
         });
         const acyclicRoutes = candidateRoutes.filter(route =>

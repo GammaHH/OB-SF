@@ -1,6 +1,6 @@
 ---
 created: 2026-08-12 17:37
-updated: 2026-08-21 16:00
+updated: 2026-11-04 15:13
 ---
 
 # OB-SF Minecraft Vanilla Pipeline V1.3
@@ -39,7 +39,9 @@ Future BIO Generator
 ├─ dependencies/
 │  ├─ dependency_resolver.js
 │  ├─ generation_planner.js
-│  └─ base_dependency_planner.js
+│  ├─ base_dependency_planner.js
+│  ├─ base_material_review.js
+│  └─ recipe_review.js
 ├─ bio/
 │  ├─ bio_scanner.js
 │  └─ tag_bio_mapping.js
@@ -297,6 +299,106 @@ Planner 使用 dependency-count topological ordering；所有 leaf 會先於依�
 天然取得物若同時存在可逆加工 recipe（例如 cobblestone ↔ stone），單靠 recipe registry 無法知道哪一端應是 base material。呼叫端可明確傳入 `baseItemIds` 作人工 boundary；Planner 不會硬編碼或自行推測。
 
 本階段沒有新增 quantity schema。Planner 原樣保留 `ingredient.qty` 與 `recipe.output`；需求量 scaling 屬於後續 Calculator／Resolver，不屬於 BIO Generator。
+
+### Obsidian Base Material Review
+
+正式人工流程不要求使用者主要透過 `--base-items`。`base_material_review.js` 會由 target dependency graph 建立 `Minecraft Base Material Review.md`：
+
+- frontmatter 記錄 `schemaVersion`、`target`、`sourceFingerprint`。
+- cycle group 與 path 由 route-level blocking cycles 產生。
+- 全域候選清單以 Minecraft Item ID 作穩定 ID，同一 item 只出現一次。
+- 只解析 `obsf:base-material-selection` markers 內的標準 Markdown Checkbox。
+- Checkbox 外的普通 Obsidian task 不會成為設定。
+- duplicate、invalid、unknown、stale、missing candidate 都產生明確 diagnostics。
+- fingerprint 對完整 in-memory Normalized Registry 計算；來源改變時發出 warning，並用目前 graph 重新驗證所有候選。
+- 重新產生時保留有效 checkbox、candidate notes 與 managed section 外的內容。
+- 新候選依穩定 canonical 順序追加在既有有效候選之後。
+- 不再屬於目前 graph 的 candidate 移到「過期候選」，不會套用。
+- `Additional External Base Materials` 用於採掘、掉落或 loot table 等 Recipe JSON 無法表達的取得方式；只接受目前 target dependency graph 內的 item。
+- 外部來源可在該 managed section 內直接新增 Checkbox 並填入 `minecraft:redstone`；下一次重算會轉成穩定 ID block，並保留勾選與人工備註。
+- 同一 item 不可同時作為 cycle candidate 與 additional external base；unknown、duplicate 或已離開 graph 的項目會明確報錯或移至過期區。
+
+Review Parser 只將通過驗證且被勾選的候選轉為 `explicitBaseItemIds`。正式 `selectionPolicy` 仍為 `none`；CLI 額外輸出的 `first-acyclic` generation order 只是 deterministic preview，Recipe／Tag／Alternative selection 仍是後續獨立審核。
+
+產生或合併 piston review：
+
+```powershell
+node scripts/minecraft-base-material-review.cjs generate minecraft:piston
+```
+
+在 Obsidian 勾選後重新計算：
+
+```powershell
+node scripts/minecraft-base-material-review.cjs recalculate minecraft:piston
+```
+
+不寫入 review 的預覽可加 `--dry-run`。兩個命令都只讀 raw recipe/tag JSON 並建立 in-memory registry，不讀三個大型 generated/debug artifacts，也不建立 BIO。
+
+### 統一人工決策入口
+
+日常操作優先使用單一 orchestration CLI；底層兩支 CLI 保留給診斷與分階段測試：
+
+```powershell
+node scripts/minecraft-review.cjs start minecraft:piston
+```
+
+`start` 會依序驗證／更新 Base Material Review，再進入 Recipe Ambiguity Review。每次在 Obsidian 完成目前階段的勾選後，統一執行：
+
+```powershell
+node scripts/minecraft-review.cjs recalculate minecraft:piston
+```
+
+若 Base Material 尚未解除 route-level cycle，流程停在 `BASE_MATERIAL`；Base 通過後但仍有 recipe／tag／alternative 未選，停在 `RECIPE_AMBIGUITY`；所有條件通過才顯示 `READY`。可加 `--dry-run` 驗證而不改寫 Review Markdown。
+
+## Route-aware Recipe Ambiguity Review
+
+完成 Base Material Review 後，`recipe_review.js` 只沿 target 目前 active dependency route 找出必須人工收斂的 ambiguity：
+
+- Multiple Recipe：多條 acyclic production routes 擇一。
+- Tag：resolved tag values 擇一，不會把 values 相加。
+- Alternative：Recipe JSON 直接定義的互斥 ingredients 擇一，與 Tag identity 分開。
+
+Review 採逐層收斂。若上游 recipe 尚未選擇，不會展開各 recipe branch 下游的 Tag／Alternative；選定上游後才產生 selected branch 的下一層 ambiguity。未走 branch 的舊 groups 會移至 inactive/stale 區，不再阻擋 readiness，也不會默默刪除選擇或備註。
+
+穩定 identity 規則：
+
+- Recipe candidate：result item、sourceFile 與 normalized recipe semantics 的 SHA-256 fingerprint，不以 array index 作永久 ID。
+- Ingredient context：owner item、recipe identity、ingredient semantics，以及只用於相同 ingredients 的 duplicate ordinal。
+- Tag group：owner item、recipe identity、ingredient identity、tag ID。
+- Alternative group：owner item、recipe identity、ingredient identity。
+
+每個 active ambiguity 必須 exactly one：0 個勾選是 unresolved，1 個有效，2 個以上是 invalid。正式 selection policy 永遠是 `none`；系統不會自動選第一條 recipe、第一個 tag value 或第一個 alternative。
+
+產生或合併 Review：
+
+```powershell
+node scripts/minecraft-recipe-review.cjs generate minecraft:piston
+```
+
+讀取人工選擇並重新計算：
+
+```powershell
+node scripts/minecraft-recipe-review.cjs recalculate minecraft:piston
+```
+
+完整分析但不寫 Markdown：
+
+```powershell
+node scripts/minecraft-recipe-review.cjs recalculate minecraft:piston --dry-run
+```
+
+CLI 先讀取並驗證 `Minecraft Base Material Review.md`，將勾選結果作為 traversal boundaries。Base material 以下的 recipes 與 ambiguities 不會展開。
+
+Machine-readable readiness 同時要求：
+
+```text
+route-aware blocked = 0
+unresolved ambiguities = 0
+invalid selections = 0
+planning cycles = 0
+```
+
+任一條件不成立時，`readyForBioGeneration` 為 `false`；本 pipeline 不會因此呼叫或啟動 BIO Generator。
 
 ## Tag BIO Mapping Draft
 
