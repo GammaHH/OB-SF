@@ -247,6 +247,88 @@ test("review selections become explicit bases and clear both cycle groups", () =
     assert.equal(preview.generationOrder.at(-1), "minecraft:piston");
 });
 
+test("cycle Base decision is reused globally as an external acquisition boundary", () => {
+    const { dependency, baseline, review } = fixture();
+    let previous = vanilla.dependencies.renderBaseMaterialReview(review);
+    previous = setChecked(previous, "minecraft:raw_iron", true);
+    previous = vanilla.dependencies.renderBaseMaterialReview(review, previous);
+
+    const registry = vanilla.dependencies.emptyReviewDecisionRegistry();
+    vanilla.dependencies.setReviewDecisionSnapshot(
+        registry,
+        "minecraft:previous_target",
+        {
+            sourceFingerprint: review.sourceFingerprint,
+            baseReview: previous,
+            recipeReview: ""
+        }
+    );
+    const index = vanilla.dependencies.createGlobalBaseDecisionIndex(registry);
+    assert.equal(index.diagnostics.length, 0);
+    assert.equal(
+        index.candidateByCycle.get("cycle-cd127ce01c79").itemId,
+        "minecraft:raw_iron"
+    );
+
+    const reusedReview = vanilla.dependencies.createBaseMaterialReview(
+        dependency,
+        baseline,
+        { globalBaseDecisionIndex: index }
+    );
+    assert.deepEqual(
+        reusedReview.globalBaseDecisions.map(decision => decision.itemId),
+        ["minecraft:raw_iron"]
+    );
+    const markdown = vanilla.dependencies.renderBaseMaterialReview(reusedReview);
+    assert.match(markdown, /Selection Source: `GLOBAL_DECISION_REGISTRY`/);
+    assert.match(markdown, /Acquisition Boundary: `external`/);
+    const parsed = vanilla.dependencies.parseBaseMaterialReview(
+        markdown,
+        reusedReview
+    );
+    assert.equal(parsed.canApply, true);
+    assert.ok(parsed.selectedBaseItemIds.includes("minecraft:raw_iron"));
+
+    vanilla.dependencies.addReviewDecisionRevocation(registry, {
+        kind: "base-cycle",
+        key: "cycle-cd127ce01c79",
+        target: "minecraft:current_target",
+        previousValue: "minecraft:raw_iron",
+        revokedAt: "2026-11-09T00:00:00.000Z"
+    });
+    const revokedIndex = vanilla.dependencies.createGlobalBaseDecisionIndex(registry);
+    assert.equal(revokedIndex.candidateByCycle.has("cycle-cd127ce01c79"), false);
+
+    const externalRegistry = vanilla.dependencies.emptyReviewDecisionRegistry();
+    vanilla.dependencies.setReviewDecisionSnapshot(
+        externalRegistry,
+        "minecraft:previous_target",
+        {
+            sourceFingerprint: review.sourceFingerprint,
+            baseReview: "<!-- obsf:locked-base:start minecraft:redstone external -->\n" +
+                "<!-- obsf:locked-base:end minecraft:redstone -->\n",
+            recipeReview: ""
+        }
+    );
+    assert.equal(
+        vanilla.dependencies.createGlobalBaseDecisionIndex(externalRegistry)
+            .externalItemIds.has("minecraft:redstone"),
+        true
+    );
+    vanilla.dependencies.addReviewDecisionRevocation(externalRegistry, {
+        kind: "base-item",
+        key: "minecraft:redstone",
+        target: "minecraft:current_target",
+        previousValue: "minecraft:redstone",
+        revokedAt: "2026-11-09T00:00:00.000Z"
+    });
+    assert.equal(
+        vanilla.dependencies.createGlobalBaseDecisionIndex(externalRegistry)
+            .externalItemIds.has("minecraft:redstone"),
+        false
+    );
+});
+
 test("external acquisition checkbox makes a graph item an explicit base", () => {
     const { pipeline, dependency, review } = fixture();
     let markdown = vanilla.dependencies.renderBaseMaterialReview(review);

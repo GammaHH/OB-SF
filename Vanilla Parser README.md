@@ -1,6 +1,6 @@
 ---
 created: 2026-08-12 17:37
-updated: 2026-11-08 00:58
+updated: 2026-11-09 01:03
 ---
 
 # OB-SF Minecraft Vanilla Pipeline V1.3
@@ -349,7 +349,17 @@ node scripts/minecraft-review.cjs next
 
 全量 scan 使用固定小批次隔離 process（預設 25 targets／batch、每個 worker 1 GiB V8 heap）；每批結束即釋放 dependency graph。若某批失敗會自動二分定位到具體 target，不以提高單一 process heap 掩蓋不受控的 graph 累積。診斷時可用 `--scan-batch-size=N`（1–100）調整批次，不改變結果順序。
 
-`next` 取得下一個 `PENDING` target，建立該 target 的 Base／Recipe Review。Queue targets 使用穩定 item ID 排序；每個 target 的 Review 路徑獨立，既有 piston root Review 會繼續沿用，不會覆蓋其他 target 的決策。
+`next` 取得下一個 `PENDING` target，並載入根目錄固定工作檔 `Minecraft Base Material Review.md`／`Minecraft Recipe Review.md`。Queue targets 使用穩定 item ID 排序；切換 target 前，上一個 target 的完整 Review snapshot 會寫入 `Minecraft Review Decisions.md`，因此 Checkbox、Locked decisions 與人工備註不會因根目錄工作檔切換而遺失。
+
+`Minecraft Review Decisions.md` 使用 Markdown 外殼與固定 marker 包住嚴格 JSON schema；程式直接解析 JSON，不依賴標題、行號或自然語言。Registry 以 target ID 為 key，保存 `sourceFingerprint`、結構化 `lockedBaseDecisions`／`lockedAmbiguityDecisions`，以及可無損還原人工備註的完整 Base／Recipe Review snapshot。既有 `Minecraft Reviews/minecraft__*/` 只作一次性 migration source，之後不再建立新的 target 資料夾。
+
+既有 target folders 可一次匯入並做完整 snapshot round-trip 驗證：
+
+```powershell
+node scripts/minecraft-review.cjs migrate-legacy
+```
+
+此命令遇到 Registry 同 target、不同內容時會整批停止，不覆蓋既有決策；驗證成功也不會刪除 legacy files，刪除或封存必須另行人工確認。
 
 每次在 Obsidian 完成目前階段的勾選後，統一執行：
 
@@ -359,13 +369,33 @@ node scripts/minecraft-review.cjs recalculate
 
 `recalculate` 從 Queue 的 `IN_REVIEW` entry 取得 target，不需再次輸入 item ID。若 Base Material 尚未解除 route-level cycle，流程停在 `BASE_MATERIAL`；Base 通過後但仍有 recipe／tag／alternative 未選，停在 `RECIPE_AMBIGUITY`；所有條件通過才標記 `READY` 並通知下一個 pending target。
 
+Locked ambiguity decision 以 stable Group ID 建立全域索引。同一 recipe／alternative group 在其他 downstream target 再次出現且 candidate identity 仍有效時，系統直接套用 `GLOBAL_DECISION_REGISTRY`；`scan` 不再把它計入 pending ambiguity，`next` 也會自動略過已 READY targets，直到下一個真正需要人工勾選的 group。若同一 Group ID 出現不同 locked candidate，流程以明確 conflict error 停止，不會靜默覆蓋。
+
+Locked Base decision 同樣建立全域索引：cycle candidate 以 stable cycle ID 重用，External acquisition 以 item ID 重用。所有 Base decisions 對 Planner 都是 `external` acquisition boundary；例如 `raw_iron ↔ raw_iron_block` 一旦選擇 `minecraft:raw_iron`，後續相同 cycle 直接以採掘取得的 raw iron 作 Base，不再重問。target-local Review 只保留顯示、人工備註與 readiness。
+
 Multiple Recipe group 會額外提供 `External acquisition：採掘／掉落／loot → 設為 Base`。此選項永遠需要人工勾選；統一 `recalculate` 會把它轉入既有 `Locked Base Decisions`、保留 Registry 原配方，接著重新計算 dependency graph。直接使用底層 Recipe CLI 時只會回報 pending transfer，不會跨檔案套用。
 
 完成的 Base／Recipe／Tag／Alternative selection 會移出可編輯 Checkbox 區，轉為無 Checkbox 的 `LOCKED` 摘要與隱藏穩定 marker。若 source identity 失效會明確報錯；要刻意修改時必須執行：
 
 ```powershell
 node scripts/minecraft-review.cjs reopen <decision-id>
+node scripts/minecraft-review.cjs reopen minecraft:redstone --target=minecraft:piston
+node scripts/minecraft-review.cjs reopen '#minecraft:planks' --target=minecraft:piston
 ```
+
+`reopen` 同時撤銷對應的 Global Decision，不只是移除目前 Markdown 的 locked block。Decision Registry 會保留 `ACTIVE → SUPERSEDED` revocation history，使其他 target 的舊 snapshots 不會立刻把已撤銷的 Base／Recipe／Alternative decision 套回；同一 target 完成新選擇後，舊 revocation 轉為 `SUPERSEDED`。Tag reopen 會清空 Mapping Draft 的 Representative Item ID，並重新產生該 Tag 的人工選擇。
+
+若只要撤銷 Global Decision 並重建整體 Queue，使用 `revoke`。它會清除所有 snapshots 中仍會套用的 locked blocks，保留 revocation history，並在同一個 foreground process 內自動執行完整 `scan`：
+
+```powershell
+node scripts/minecraft-review.cjs revoke minecraft:exposed_chiseled_copper
+node scripts/minecraft-review.cjs revoke recipe-group-xxxxxxxxxxxxxxxx
+node scripts/minecraft-review.cjs revoke '#minecraft:planks'
+```
+
+不需要再另外執行 `scan`；下一步直接執行 `node scripts/minecraft-review.cjs next`。
+
+未指定 `--target` 時只重開目前 Queue 的 `IN_REVIEW` target；要重開已標記 `READY` 的舊 target，必須明確指定 target。Queue 會把原本的 `IN_REVIEW` 放回 `PENDING`，並將指定 target 切換為新的 `IN_REVIEW`，避免把決策套到錯誤的 Review 檔案。
 
 指定 target 的舊介面仍保留作單項診斷：
 
@@ -374,15 +404,15 @@ node scripts/minecraft-review.cjs start minecraft:piston
 node scripts/minecraft-review.cjs recalculate minecraft:piston
 ```
 
-Queue state 存在 ignored `review/minecraft-review-queue.json`；Obsidian 摘要為 `Minecraft Review Queue.md`。所有命令只做 Planning／Review，不會啟動 BIO Generator。可加 `--dry-run` 驗證而不改寫 target Review Markdown。
+Queue state 存在 ignored `review/minecraft-review-queue.json`；Obsidian 摘要為 `Minecraft Review Queue.md`，其中 Current Review 固定連到根目錄兩份工作檔。所有命令只做 Planning／Review，不會啟動 BIO Generator。`--dry-run` 不會切換根目錄工作檔；若要求的 target 不是目前 active target，會明確停止而不覆寫內容。
 
 ## Route-aware Recipe Ambiguity Review
 
 完成 Base Material Review 後，`recipe_review.js` 只沿 target 目前 active dependency route 找出必須人工收斂的 ambiguity：
 
-- Multiple Recipe：多條 acyclic production routes 擇一。
+- Base Route for Generation Planning：多條 acyclic production routes 中選一條供 BIO bottom-up generation ordering；這不是唯一正式配方，所有合法 recipes 與 External acquisition 仍保留於 Normalized Registry，未來 BIO 顯示全部取得方式。
 - Tag：resolved tag values 擇一，不會把 values 相加；選擇會提升為全域 Tag representative mapping，而非 target-local 決策。
-- Alternative：Recipe JSON 直接定義的互斥 ingredients 擇一，與 Tag identity 分開。
+- Alternative：Recipe JSON 直接定義的互斥 ingredients 擇一，與 Tag identity 分開。Minecraft 染色物品會另外建立 color-family preference（例如 `minecraft-color-family:wool → minecraft:white_wool`）；只有偏好 item 仍存在於目前候選時才重用，否則維持 unresolved 並要求人工選擇。
 
 Review 採逐層收斂。若上游 recipe 尚未選擇，不會展開各 recipe branch 下游的 Tag／Alternative；選定上游後才產生 selected branch 的下一層 ambiguity。未走 branch 的舊 groups 會移至 inactive/stale 區，不再阻擋 readiness，也不會默默刪除選擇或備註。
 
@@ -391,9 +421,10 @@ Review 採逐層收斂。若上游 recipe 尚未選擇，不會展開各 recipe 
 - Recipe candidate：result item、sourceFile 與 normalized recipe semantics 的 SHA-256 fingerprint，不以 array index 作永久 ID。
 - Ingredient context：owner item、recipe identity、ingredient semantics，以及只用於相同 ingredients 的 duplicate ordinal。
 - Tag group：只以 tag ID 建立全域穩定 identity；相同 Tag 不因 target 或 ingredient 位置不同而重複詢問。
-- Alternative group：owner item、recipe identity、ingredient identity。
+- Alternative group：owner item、recipe identity、ingredient identity；精確 group decision 仍依此 identity 保存。
+- Global Alternative Preference：已辨識的 Minecraft color family 使用獨立 preference key。不同顏色 target 即使排除自身顏色、導致完整候選集合不同，仍可重用同一個有效代表；不改寫或刪除 Normalized Registry alternatives。
 
-每個 active ambiguity 必須 exactly one：0 個勾選是 unresolved，1 個有效，2 個以上是 invalid。正式 selection policy 永遠是 `none`；系統不會自動選第一條 recipe、第一個 tag value 或第一個 alternative。
+每個 active ambiguity 必須 exactly one：0 個勾選是 unresolved，1 個有效，2 個以上是 invalid。正式 selection policy 永遠是 `none`；系統不會自動選第一條 recipe、第一個 tag value 或第一個 alternative。唯一自動套用來源是已由使用者確認並保存於 Global Decision Registry／Tag mapping 的既有決策。
 
 產生或合併 Review：
 

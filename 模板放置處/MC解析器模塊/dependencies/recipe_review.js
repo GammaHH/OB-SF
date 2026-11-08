@@ -19,6 +19,36 @@ const RECIPE_LOCKED_START = "<!-- obsf:recipe-review-locked:start -->";
 const RECIPE_LOCKED_END = "<!-- obsf:recipe-review-locked:end -->";
 const GROUP_TYPES = new Set(["recipe", "tag", "alternative"]);
 const EXTERNAL_BASE_PREFIX = "external-base:";
+const MINECRAFT_COLOR_PREFIXES = [
+    "black", "blue", "brown", "cyan", "gray", "green", "light_blue",
+    "light_gray", "lime", "magenta", "orange", "pink", "purple", "red",
+    "white", "yellow"
+];
+
+function minecraftColorFamily(itemId) {
+    const match = String(itemId ?? "").match(/^minecraft:([a-z0-9_]+)$/);
+    if (!match) return null;
+    for (const color of MINECRAFT_COLOR_PREFIXES) {
+        const prefix = `${color}_`;
+        if (match[1].startsWith(prefix) && match[1].length > prefix.length) {
+            return match[1].slice(prefix.length);
+        }
+    }
+    return null;
+}
+
+function alternativePreferenceKey(group) {
+    if (group?.type !== "alternative" || group.candidates?.length < 2) return null;
+    const ownerFamily = minecraftColorFamily(group.ownerItemId);
+    if (!ownerFamily) return null;
+    const candidateFamilies = group.candidates.map(candidate =>
+        candidate.ingredient?.kind === "item"
+            ? minecraftColorFamily(candidate.ingredient.id)
+            : null
+    );
+    if (candidateFamilies.some(family => family !== ownerFamily)) return null;
+    return `minecraft-color-family:${ownerFamily}`;
+}
 
 function hashId(prefix, value) {
     const hash = crypto.createHash("sha256")
@@ -317,10 +347,19 @@ function createRecipeAmbiguityAnalysis(
     const tagMappings = options.tagMappings instanceof Map
         ? options.tagMappings
         : new Map(Object.entries(options.tagMappings ?? {}));
+    const globalAmbiguitySelections = options.globalAmbiguitySelections instanceof Map
+        ? options.globalAmbiguitySelections
+        : new Map(Object.entries(options.globalAmbiguitySelections ?? {}));
+    const globalAlternativePreferences = options.globalAlternativePreferences instanceof Map
+        ? options.globalAlternativePreferences
+        : new Map(Object.entries(options.globalAlternativePreferences ?? {}));
     const requestedExternalBaseItemIds = new Set();
     const requestedTagMappings = new Map();
     const appliedTagMappings = new Map();
+    const appliedGlobalAmbiguityDecisions = new Map();
+    const appliedGlobalAlternativePreferences = new Map();
     diagnostics.push(...(options.tagMappingDiagnostics ?? []));
+    diagnostics.push(...(options.globalDecisionDiagnostics ?? []));
 
     if (
         parsedReview.frontmatter?.sourceFingerprint &&
@@ -370,10 +409,55 @@ function createRecipeAmbiguityAnalysis(
         }
         activeGroupIds.add(group.groupId);
         const state = parsedReview.groups?.get(group.groupId) ?? null;
+        const exactGlobalDecision = globalAmbiguitySelections.get(group.groupId) ?? null;
+        const familyPreference = !exactGlobalDecision && group.preferenceKey
+            ? globalAlternativePreferences.get(group.preferenceKey) ?? null
+            : null;
+        let globalDecision = exactGlobalDecision ?? familyPreference;
+        const globalSelectionSource = exactGlobalDecision
+            ? "GLOBAL_DECISION_REGISTRY"
+            : familyPreference
+                ? "GLOBAL_ALTERNATIVE_PREFERENCE"
+                : null;
         const currentIds = new Set(group.candidates.map(candidate => candidate.candidateId));
-        const checked = state?.checkedCandidateIds ?? [];
+        let checked = [...(state?.checkedCandidateIds ?? [])];
+        let globalConflict = false;
         group.selectedCandidateId = null;
         group.status = "UNRESOLVED";
+
+        if (familyPreference && !currentIds.has(familyPreference.candidateId)) {
+            diagnostics.push({
+                code: "GLOBAL_ALTERNATIVE_PREFERENCE_UNAVAILABLE",
+                severity: "INFO",
+                message: `Global alternative preference ${group.preferenceKey} 的候選目前不可用，保留人工選擇`,
+                groupId: group.groupId,
+                preferenceKey: group.preferenceKey
+            });
+            globalDecision = null;
+        }
+        if (globalDecision) {
+            if (globalDecision.type !== group.type) {
+                diagnostics.push({
+                    code: "GLOBAL_AMBIGUITY_TYPE_CONFLICT",
+                    severity: "ERROR",
+                    message: `Global decision type 不相容：${group.groupId}`,
+                    groupId: group.groupId
+                });
+                globalConflict = true;
+            } else if (checked.length === 1 &&
+                checked[0] !== globalDecision.candidateId) {
+                diagnostics.push({
+                    code: "GLOBAL_AMBIGUITY_SELECTION_CONFLICT",
+                    severity: "ERROR",
+                    message: `目前 selection ${checked[0]} 與既有 global locked decision ${globalDecision.candidateId} 衝突`,
+                    groupId: group.groupId
+                });
+                globalConflict = true;
+            } else if (checked.length === 0) {
+                checked = [globalDecision.candidateId];
+            }
+            group.selectionSource = globalSelectionSource;
+        }
 
         if (state) {
             for (const candidate of state.candidates ?? []) {
@@ -388,7 +472,7 @@ function createRecipeAmbiguityAnalysis(
                 }
             }
         }
-        if (checked.length > 1) {
+        if (checked.length > 1 || globalConflict) {
             group.status = "INVALID";
             invalidGroupIds.add(group.groupId);
         } else if (checked.length === 1 && !currentIds.has(checked[0])) {
@@ -408,6 +492,18 @@ function createRecipeAmbiguityAnalysis(
         } else if (checked.length === 1) {
             group.selectedCandidateId = checked[0];
             group.status = "RESOLVED";
+            if (globalDecision) {
+                appliedGlobalAmbiguityDecisions.set(
+                    group.groupId,
+                    globalDecision.candidateId
+                );
+                if (familyPreference) {
+                    appliedGlobalAlternativePreferences.set(
+                        group.preferenceKey,
+                        globalDecision.candidateId
+                    );
+                }
+            }
         } else {
             diagnostics.push({
                 code: "MISSING_SELECTION",
@@ -523,6 +619,7 @@ function createRecipeAmbiguityAnalysis(
                         ingredient: candidate.choice.ingredient
                     }))
                 };
+                group.preferenceKey = alternativePreferenceKey(group);
                 const selectedId = registerGroup(group);
                 if (!selectedId) return false;
                 selected = viable.find(candidate => candidate.candidateId === selectedId);
@@ -685,6 +782,12 @@ function createRecipeAmbiguityAnalysis(
         appliedTagMappings: [...appliedTagMappings.entries()]
             .map(([tagId, representativeItemId]) => ({ tagId, representativeItemId }))
             .sort((left, right) => left.tagId.localeCompare(right.tagId)),
+        appliedGlobalAmbiguityDecisions: [...appliedGlobalAmbiguityDecisions.entries()]
+            .map(([groupId, candidateId]) => ({ groupId, candidateId }))
+            .sort((left, right) => left.groupId.localeCompare(right.groupId)),
+        appliedGlobalAlternativePreferences: [...appliedGlobalAlternativePreferences.entries()]
+            .map(([preferenceKey, candidateId]) => ({ preferenceKey, candidateId }))
+            .sort((left, right) => left.preferenceKey.localeCompare(right.preferenceKey)),
         diagnostics,
         readiness
     };
@@ -713,8 +816,16 @@ function renderGroup(group, state) {
         `- Group ID: \`${group.groupId}\``,
         `- Type: \`${group.type}\``,
         ...(group.tagId ? [`- Subject: \`#${group.tagId}\``] : []),
+        ...(group.preferenceKey ? [`- Preference Key: \`${group.preferenceKey}\``] : []),
         ""
     ];
+    if (group.type === "recipe") {
+        lines.push(
+            "> 此處只選擇 BIO bottom-up generation planning 使用的 Base Route。",
+            "> 所有合法 recipes 與 External acquisition 仍保留於 Normalized Registry，未來 BIO 會列出全部取得方式。",
+            ""
+        );
+    }
     for (const candidate of ordered) {
         const checked = reusableExisting.get(candidate.candidateId)?.checked ? "x" : " ";
         lines.push(
@@ -741,9 +852,9 @@ function renderGroup(group, state) {
 function renderInactiveGroup(groupId, state) {
     const lines = [
         `<!-- obsf:inactive-ambiguity:start ${groupId} ${state.type} -->`,
-        `### \`${groupId}\` — inactive / stale`,
+        `### \`${groupId}\` — inactive / historical`,
         "",
-        "> 此 group 已不在目前 active route，selection 不會套用。",
+        "> 此 group 已不在目前 active route；僅保留決策歷史，不會套用。",
         ""
     ];
     for (const candidate of state.candidates ?? []) {
@@ -770,7 +881,15 @@ function renderLockedGroup(group, state) {
         `- Group ID: \`${group.groupId}\``,
         `- Type: \`${group.type}\``,
         ...(group.tagId ? [`- Subject: \`#${group.tagId}\``] : []),
+        ...(group.preferenceKey ? [`- Preference Key: \`${group.preferenceKey}\``] : []),
         `- Selected: \`${group.selectedCandidateId}\` — ${selected?.label ?? ""}`,
+        ...(group.type === "recipe" ? [
+            "- Scope: `GENERATION_PLANNING_ONLY`",
+            "- Other Routes: `PRESERVED_IN_NORMALIZED_REGISTRY`"
+        ] : []),
+        ...(group.selectionSource ? [
+            `- Selection Source: \`${group.selectionSource}\``
+        ] : []),
         "- Status: `LOCKED`（不提供 Checkbox，避免誤改）",
         "",
         "<!-- obsf:notes:start -->" + notes + "<!-- obsf:notes:end -->",
@@ -816,7 +935,7 @@ function renderRecipeReview(analysis, existingMarkdown = "") {
         .filter(group => group.status === "RESOLVED")
         .sort((left, right) => left.groupId.localeCompare(right.groupId));
     const headings = {
-        recipe: "Multiple Recipe Selection",
+        recipe: "Base Route for Generation Planning",
         tag: "Tag Selection",
         alternative: "Ingredient Alternative Selection"
     };
@@ -864,7 +983,7 @@ function renderRecipeReview(analysis, existingMarkdown = "") {
         .filter(([groupId]) => !analysis.activeGroupIds.has(groupId))
         .sort(([left], [right]) => left.localeCompare(right));
     if (inactive.length > 0) {
-        lines.push("", "## Inactive / Stale Ambiguities（需重新審核）", "");
+        lines.push("", "## Inactive / Historical Ambiguities（僅保留紀錄，不會套用）", "");
         for (const [groupId, state] of inactive) {
             lines.push(renderInactiveGroup(groupId, state), "");
         }

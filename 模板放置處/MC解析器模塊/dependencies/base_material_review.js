@@ -170,6 +170,37 @@ function createBaseMaterialReview(dependencyResult, basePlan, options = {}) {
             });
         }
     }
+    const graphItemIds = [...dependencyResult.graph.keys()].sort();
+    const globalIndex = options.globalBaseDecisionIndex ?? {
+        candidateByCycle: new Map(),
+        externalItemIds: new Map(),
+        diagnostics: []
+    };
+    const applicableGlobal = new Map();
+    for (const group of cycleGroups) {
+        const decision = globalIndex.candidateByCycle?.get(group.cycleId);
+        if (!decision || !group.members.includes(decision.itemId)) continue;
+        const existing = applicableGlobal.get(decision.itemId) ?? {
+            itemId: decision.itemId,
+            kind: "candidate",
+            cycleIds: [],
+            selectionSource: "GLOBAL_DECISION_REGISTRY",
+            acquisitionKind: "external"
+        };
+        existing.cycleIds.push(group.cycleId);
+        existing.cycleIds.sort();
+        applicableGlobal.set(decision.itemId, existing);
+    }
+    for (const decision of globalIndex.externalItemIds?.values?.() ?? []) {
+        if (!graphItemIds.includes(decision.itemId)) continue;
+        applicableGlobal.set(decision.itemId, {
+            itemId: decision.itemId,
+            kind: "external",
+            cycleIds: [],
+            selectionSource: "GLOBAL_DECISION_REGISTRY",
+            acquisitionKind: "external"
+        });
+    }
 
     return {
         schemaVersion: SCHEMA_VERSION,
@@ -179,7 +210,10 @@ function createBaseMaterialReview(dependencyResult, basePlan, options = {}) {
             computeDependencySourceFingerprint(dependencyResult),
         cycleGroups,
         candidates,
-        graphItemIds: [...dependencyResult.graph.keys()].sort(),
+        graphItemIds,
+        globalBaseDecisions: [...applicableGlobal.values()]
+            .sort((left, right) => left.itemId.localeCompare(right.itemId)),
+        globalBaseDiagnostics: [...(globalIndex.diagnostics ?? [])],
         unresolvedItemIds: [...(basePlan.routeAwareBlockedItems ?? [])].sort()
     };
 }
@@ -339,6 +373,12 @@ function renderLockedBase(itemId, state) {
         `<!-- obsf:locked-base:start ${itemId} ${state.kind} -->`,
         `- Item: \`${itemId}\``,
         `- Source: \`${state.kind}\``,
+        ...(state.selectionSource ? [
+            `- Selection Source: \`${state.selectionSource}\``
+        ] : []),
+        ...(state.acquisitionKind ? [
+            `- Acquisition Boundary: \`${state.acquisitionKind}\``
+        ] : []),
         "- Status: `LOCKED`（不提供 Checkbox，避免誤改）",
         "<!-- obsf:notes:start -->" + (state.notes ?? "\n") + "<!-- obsf:notes:end -->",
         `<!-- obsf:locked-base:end ${itemId} -->`
@@ -371,6 +411,18 @@ function renderManagedReview(review, existingStates, externalStates, lockedState
             kind: "external",
             checked: true,
             notes: state.notes
+        });
+    }
+    for (const decision of review.globalBaseDecisions ?? []) {
+        const existing = effectiveLocked.get(decision.itemId);
+        effectiveLocked.set(decision.itemId, {
+            ...decision,
+            ...existing,
+            selectionSource: "GLOBAL_DECISION_REGISTRY",
+            acquisitionKind: "external",
+            checked: true,
+            notes: existing?.notes ??
+                "\n<!-- 由 Global Decision Registry 自動套用 -->\n"
         });
     }
     const currentIds = new Set(review.candidates.map(candidate => candidate.itemId));
@@ -560,6 +612,16 @@ function parseBaseMaterialReview(markdown, currentReview) {
             lockedEntries.push({ itemId, kind, checked: true });
         }
     }
+    for (const decision of currentReview.globalBaseDecisions ?? []) {
+        if (lockedEntries.some(entry => entry.itemId === decision.itemId)) continue;
+        lockedEntries.push({
+            itemId: decision.itemId,
+            kind: decision.kind,
+            checked: true,
+            global: true,
+            cycleIds: decision.cycleIds ?? []
+        });
+    }
 
     if (externalSelection) {
         const graphItemIds = new Set(currentReview.graphItemIds ?? []);
@@ -666,14 +728,46 @@ function parseBaseMaterialReview(markdown, currentReview) {
             );
         }
     }
+    const selectedActiveIds = new Set([
+        ...entries.filter(entry => entry.checked).map(entry => entry.itemId),
+        ...externalEntries.filter(entry => entry.checked).map(entry => entry.itemId)
+    ]);
     for (const entry of lockedEntries) {
-        if (seen.has(entry.itemId) || externalSeen.has(entry.itemId)) {
+        if (selectedActiveIds.has(entry.itemId)) {
             diagnostic(
                 "DUPLICATE_BASE_ITEM",
                 "ERROR",
                 `同一 Base Material 同時出現在 active 與 locked：${entry.itemId}`,
                 entry.itemId
             );
+        }
+    }
+    const globallySelectedByCycle = new Map();
+    for (const decision of currentReview.globalBaseDecisions ?? []) {
+        for (const cycleId of decision.cycleIds ?? []) {
+            globallySelectedByCycle.set(cycleId, decision.itemId);
+        }
+    }
+    const locallySelectedCandidates = [
+        ...entries.filter(entry => entry.checked).map(entry => entry.itemId),
+        ...lockedEntries
+            .filter(entry => entry.kind === "candidate" && !entry.global)
+            .map(entry => entry.itemId)
+    ];
+    for (const itemId of locallySelectedCandidates) {
+        const candidate = currentReview.candidates.find(value =>
+            value.itemId === itemId
+        );
+        for (const cycleId of candidate?.cycleIds ?? []) {
+            const globalItemId = globallySelectedByCycle.get(cycleId);
+            if (globalItemId && globalItemId !== itemId) {
+                diagnostic(
+                    "GLOBAL_BASE_SELECTION_CONFLICT",
+                    "ERROR",
+                    `Cycle ${cycleId} 已由 Global Decision Registry 選擇 ${globalItemId}，目前不可改選 ${itemId}`,
+                    itemId
+                );
+            }
         }
     }
 

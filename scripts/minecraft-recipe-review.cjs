@@ -47,7 +47,13 @@ function printDiagnostics(diagnostics) {
     }
 }
 
-function buildContext(target, baseReviewPath, recipeReviewPath, tagMappingPath) {
+function buildContext(
+    target,
+    baseReviewPath,
+    recipeReviewPath,
+    tagMappingPath,
+    decisionRegistryPath
+) {
     const runtime = createMinecraftVanillaRuntime(vaultRoot);
     if (runtime.loadErrors.length > 0) {
         const first = runtime.loadErrors[0];
@@ -112,6 +118,15 @@ function buildContext(target, baseReviewPath, recipeReviewPath, tagMappingPath) 
             fs.readFileSync(tagMappingPath, "utf8")
         )
         : { mappings: new Map(), diagnostics: [] };
+    const decisionRegistry = fs.existsSync(decisionRegistryPath)
+        ? runtime.vanilla.dependencies.parseReviewDecisionRegistry(
+            fs.readFileSync(decisionRegistryPath, "utf8")
+        )
+        : runtime.vanilla.dependencies.emptyReviewDecisionRegistry();
+    const globalDecisionIndex =
+        runtime.vanilla.dependencies.createGlobalAmbiguityDecisionIndex(
+            decisionRegistry
+        );
     const analysis =
         runtime.vanilla.dependencies.createRecipeAmbiguityAnalysis(
             dependency,
@@ -121,7 +136,11 @@ function buildContext(target, baseReviewPath, recipeReviewPath, tagMappingPath) 
                 sourceFingerprint,
                 baseItemIds: baseSelection.selectedBaseItemIds,
                 tagMappings: parsedTagMappings.mappings,
-                tagMappingDiagnostics: parsedTagMappings.diagnostics
+                tagMappingDiagnostics: parsedTagMappings.diagnostics,
+                globalAmbiguitySelections: globalDecisionIndex.selections,
+                globalAlternativePreferences:
+                    globalDecisionIndex.alternativePreferences,
+                globalDecisionDiagnostics: globalDecisionIndex.diagnostics
             }
         );
     const markdown = runtime.vanilla.dependencies.renderRecipeReview(
@@ -171,6 +190,8 @@ function printSummary(context, recipeReviewPath, dryRun) {
     process.stdout.write(`Route-aware Blocked: ${analysis.readiness.blocked}\n`);
     process.stdout.write(`Planning Cycles: ${analysis.readiness.planningCycles}\n`);
     process.stdout.write(`Global Tag Mappings Applied: ${analysis.appliedTagMappings.length}\n`);
+    process.stdout.write(`Global Ambiguity Decisions Applied: ${analysis.appliedGlobalAmbiguityDecisions.length}\n`);
+    process.stdout.write(`Global Alternative Preferences Applied: ${analysis.appliedGlobalAlternativePreferences.length}\n`);
     process.stdout.write(`Pending External Base Transfers: ${analysis.requestedExternalBaseItemIds.length}\n`);
     process.stdout.write(`Pending Global Tag Transfers: ${analysis.requestedTagMappings.length}\n`);
     process.stdout.write(`Ready For BIO Generation: ${analysis.readiness.readyForBioGeneration}\n`);
@@ -210,11 +231,16 @@ function main() {
         "tag-mapping",
         "Minecraft Tag BIO Mapping Draft.md"
     );
+    const decisionRegistryPath = reviewPath(
+        "decision-registry",
+        "Minecraft Review Decisions.md"
+    );
     const context = buildContext(
         target,
         baseReviewPath,
         recipeReviewPath,
-        tagMappingPath
+        tagMappingPath,
+        decisionRegistryPath
     );
     if (!dryRun) writeReview(recipeReviewPath, context.markdown);
     printSummary(context, recipeReviewPath, dryRun);

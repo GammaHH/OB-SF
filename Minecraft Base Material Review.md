@@ -1,16 +1,16 @@
 ---
 type: minecraft-base-material-review
 schemaVersion: 1
-target: minecraft:piston
+target: minecraft:granite_slab
 sourceFingerprint: sha256:8f687b3c5a89d38f9c8e23285ba2dc5b93c7db76aaf8b8c2834432e8dab49bdd
 created: 2026-11-04 13:31
-updated: 2026-11-08 00:43
+updated: 2026-11-09 01:13
 ---
 
 <!-- obsf:base-material-review:start -->
 # Minecraft Base Material Review
 
-- Target Item ID: `minecraft:piston`
+- Target Item ID: `minecraft:granite_slab`
 - Schema Version: `1`
 - Source Fingerprint: `sha256:8f687b3c5a89d38f9c8e23285ba2dc5b93c7db76aaf8b8c2834432e8dab49bdd`
 
@@ -20,11 +20,6 @@ updated: 2026-11-08 00:43
 
 - 候選：`minecraft:cobblestone`, `minecraft:stone`
 - 路徑：`minecraft:cobblestone` → `minecraft:stone` → `minecraft:cobblestone`
-
-### `cycle-cd127ce01c79`
-
-- 候選：`minecraft:raw_iron`, `minecraft:raw_iron_block`
-- 路徑：`minecraft:raw_iron_block` → `minecraft:raw_iron` → `minecraft:raw_iron_block`
 
 ## Base Material Selection
 
@@ -50,29 +45,24 @@ updated: 2026-11-08 00:43
 <!-- obsf:locked-base:start minecraft:cobblestone candidate -->
 - Item: `minecraft:cobblestone`
 - Source: `candidate`
+- Selection Source: `GLOBAL_DECISION_REGISTRY`
+- Acquisition Boundary: `external`
 - Status: `LOCKED`（不提供 Checkbox，避免誤改）
 <!-- obsf:notes:start -->
-<!-- 在此輸入人工備註 -->
+<!-- 由 Global Decision Registry 自動套用 -->
 <!-- obsf:notes:end -->
 <!-- obsf:locked-base:end minecraft:cobblestone -->
 
-<!-- obsf:locked-base:start minecraft:raw_iron candidate -->
-- Item: `minecraft:raw_iron`
-- Source: `candidate`
-- Status: `LOCKED`（不提供 Checkbox，避免誤改）
-<!-- obsf:notes:start -->
-<!-- 在此輸入人工備註 -->
-<!-- obsf:notes:end -->
-<!-- obsf:locked-base:end minecraft:raw_iron -->
-
-<!-- obsf:locked-base:start minecraft:redstone external -->
-- Item: `minecraft:redstone`
+<!-- obsf:locked-base:start minecraft:quartz external -->
+- Item: `minecraft:quartz`
 - Source: `external`
+- Selection Source: `GLOBAL_DECISION_REGISTRY`
+- Acquisition Boundary: `external`
 - Status: `LOCKED`（不提供 Checkbox，避免誤改）
 <!-- obsf:notes:start -->
-<!-- 在此輸入人工備註，例如：挖掘掉落 -->
+<!-- 由 Global Decision Registry 自動套用 -->
 <!-- obsf:notes:end -->
-<!-- obsf:locked-base:end minecraft:redstone -->
+<!-- obsf:locked-base:end minecraft:quartz -->
 
 <!-- obsf:base-material-locked:end -->
 

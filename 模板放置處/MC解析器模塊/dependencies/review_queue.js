@@ -78,6 +78,23 @@ function updateReviewTarget(queue, target, status) {
     return entry;
 }
 
+function focusReviewTarget(queue, target) {
+    const entry = (queue?.targets ?? []).find(candidate =>
+        candidate.target === target
+    );
+    if (!entry) throw new Error(`Review Queue 找不到 target：${target}`);
+    for (const candidate of queue.targets) {
+        if (candidate.target !== target && candidate.status === "IN_REVIEW") {
+            candidate.status = "PENDING";
+        }
+    }
+    entry.status = "IN_REVIEW";
+    queue.stats.pendingReview = queue.targets.filter(candidate =>
+        candidate.status !== "READY"
+    ).length;
+    return entry;
+}
+
 function renderReviewQueueMarkdown(queue) {
     const lines = [
         "---",
@@ -94,9 +111,26 @@ function renderReviewQueueMarkdown(queue) {
         `- Automatic Ready: ${queue.stats.automaticReady}`,
         `- Pending Review: ${queue.stats.pendingReview}`,
         "",
+        "## Current Review",
+        ""
+    ];
+    const current = currentReviewTarget(queue);
+    if (current) {
+        lines.push(
+            `- Target: \`${current.target}\``,
+            "- [[Minecraft Base Material Review]]",
+            "- [[Minecraft Recipe Review]]"
+        );
+    } else {
+        lines.push("- 無；執行 `node scripts/minecraft-review.cjs next`");
+    }
+    lines.push(
+        "",
+        "## Queue",
+        "",
         "| Status | Target | Cycle | Recipe | Tag | Alternative |",
         "| --- | --- | ---: | ---: | ---: | ---: |"
-    ];
+    );
     for (const entry of queue.targets) {
         lines.push(
             `| ${entry.status} | \`${entry.target}\` | ` +
@@ -116,5 +150,6 @@ module.exports = {
     currentReviewTarget,
     activateNextReviewTarget,
     updateReviewTarget,
+    focusReviewTarget,
     renderReviewQueueMarkdown
 };

@@ -30,6 +30,22 @@ function resolveReviewPath() {
     return absolutePath;
 }
 
+function resolveDecisionRegistryPath() {
+    const requested = option(
+        "decision-registry",
+        "Minecraft Review Decisions.md"
+    );
+    const absolutePath = path.resolve(vaultRoot, requested);
+    const relative = path.relative(vaultRoot, absolutePath);
+    if (relative.startsWith("..") || path.isAbsolute(relative)) {
+        throw new Error("Decision Registry path 必須位於 OB-SF worktree 內");
+    }
+    if (path.extname(absolutePath).toLowerCase() !== ".md") {
+        throw new Error("Decision Registry path 必須是 Markdown 檔案");
+    }
+    return absolutePath;
+}
+
 function relativeVaultPath(absolutePath) {
     return path.relative(vaultRoot, absolutePath).split(path.sep).join("/");
 }
@@ -72,6 +88,20 @@ function createContext(target) {
     const baselinePlan = runtime.pipeline.createBaseDependencyPlan(dependency, {
         selectionPolicy: "none"
     });
+    const registryPath = resolveDecisionRegistryPath();
+    const registry = fs.existsSync(registryPath)
+        ? runtime.vanilla.dependencies.parseReviewDecisionRegistry(
+            fs.readFileSync(registryPath, "utf8")
+        )
+        : runtime.vanilla.dependencies.emptyReviewDecisionRegistry();
+    const globalBaseDecisionIndex =
+        runtime.vanilla.dependencies.createGlobalBaseDecisionIndex(registry);
+    const globalErrors = globalBaseDecisionIndex.diagnostics.filter(entry =>
+        entry.severity === "ERROR"
+    );
+    if (globalErrors.length > 0) {
+        throw new Error(`Global Base Decisions 無效：${globalErrors[0].message}`);
+    }
     const review = runtime.vanilla.dependencies.createBaseMaterialReview(
         dependency,
         baselinePlan,
@@ -79,10 +109,17 @@ function createContext(target) {
             sourceFingerprint:
                 runtime.vanilla.dependencies.computeNormalizedRegistryFingerprint(
                     runtime.pipeline.itemRegistry
-                )
+                ),
+            globalBaseDecisionIndex
         }
     );
-    return { runtime, dependency, baselinePlan, review };
+    return {
+        runtime,
+        dependency,
+        baselinePlan,
+        review,
+        globalBaseDecisionIndex
+    };
 }
 
 function generate(target, reviewPath, dryRun) {
@@ -104,6 +141,7 @@ function generate(target, reviewPath, dryRun) {
     process.stdout.write(`Source Fingerprint: ${review.sourceFingerprint}\n`);
     process.stdout.write(`Cycle Groups: ${review.cycleGroups.length}\n`);
     process.stdout.write(`Candidates: ${review.candidates.length}\n`);
+    process.stdout.write(`Global Base Decisions Applied: ${review.globalBaseDecisions.length}\n`);
     process.stdout.write(`Load Errors: ${runtime.loadErrors.length}\n`);
 }
 
@@ -144,6 +182,7 @@ function recalculate(target, reviewPath, dryRun) {
     for (const itemId of parsed.selectedBaseItemIds) {
         process.stdout.write(`- ${itemId}\n`);
     }
+    process.stdout.write(`Global Base Decisions Applied: ${review.globalBaseDecisions.length}\n`);
     process.stdout.write(`Route-aware BLOCKED: ${formalPlan.routeAwareBlockedItems.length}\n`);
     for (const itemId of formalPlan.routeAwareBlockedItems) {
         process.stdout.write(`- ${itemId}\n`);

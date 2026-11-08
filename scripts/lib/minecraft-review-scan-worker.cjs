@@ -7,24 +7,53 @@ const vanilla = require("../../模板放置處/MC解析器模塊");
 
 const vaultRoot = path.resolve(__dirname, "..", "..");
 
-function assessTarget(runtime, target, fingerprint, tagMappings) {
+function assessTarget(
+    runtime,
+    target,
+    fingerprint,
+    tagMappings,
+    globalDecisionIndex,
+    globalBaseDecisionIndex
+) {
     const dependency = runtime.pipeline.resolveDependencies(target);
+    const baselinePlan = runtime.pipeline.createBaseDependencyPlan(dependency, {
+        selectionPolicy: "none"
+    });
+    const baselineReview = vanilla.dependencies.createBaseMaterialReview(
+        dependency,
+        baselinePlan,
+        { sourceFingerprint: fingerprint, globalBaseDecisionIndex }
+    );
+    const globalBaseItemIds = baselineReview.globalBaseDecisions.map(decision =>
+        decision.itemId
+    );
     const basePlan = runtime.pipeline.createBaseDependencyPlan(dependency, {
+        baseItemIds: globalBaseItemIds,
         selectionPolicy: "none"
     });
     const baseReview = vanilla.dependencies.createBaseMaterialReview(
         dependency,
         basePlan,
-        { sourceFingerprint: fingerprint }
+        { sourceFingerprint: fingerprint, globalBaseDecisionIndex }
     );
     const analysis = vanilla.dependencies.createRecipeAmbiguityAnalysis(
         dependency,
         basePlan,
         { groups: new Map(), diagnostics: [], frontmatter: {} },
-        { sourceFingerprint: fingerprint, baseItemIds: [], tagMappings }
+        {
+            sourceFingerprint: fingerprint,
+            baseItemIds: globalBaseItemIds,
+            tagMappings,
+            globalAmbiguitySelections: globalDecisionIndex.selections,
+            globalAlternativePreferences:
+                globalDecisionIndex.alternativePreferences,
+            globalDecisionDiagnostics: globalDecisionIndex.diagnostics
+        }
     );
     const counts = { recipe: 0, tag: 0, alternative: 0 };
-    for (const group of analysis.groups) counts[group.type]++;
+    for (const group of analysis.groups) {
+        if (group.status !== "RESOLVED") counts[group.type]++;
+    }
     const reasons = {
         blockedCycles: baseReview.cycleGroups.length,
         recipe: counts.recipe,
@@ -67,12 +96,36 @@ function main() {
     if (mappingErrors.length > 0) {
         throw new Error(`Tag mapping 無效：${mappingErrors[0].message}`);
     }
+    const decisionRegistryPath = path.join(
+        vaultRoot,
+        "Minecraft Review Decisions.md"
+    );
+    const decisionRegistry = fs.existsSync(decisionRegistryPath)
+        ? vanilla.dependencies.parseReviewDecisionRegistry(
+            fs.readFileSync(decisionRegistryPath, "utf8")
+        )
+        : vanilla.dependencies.emptyReviewDecisionRegistry();
+    const globalDecisionIndex =
+        vanilla.dependencies.createGlobalAmbiguityDecisionIndex(
+            decisionRegistry
+        );
+    const globalBaseDecisionIndex =
+        vanilla.dependencies.createGlobalBaseDecisionIndex(decisionRegistry);
+    const decisionErrors = [
+        ...globalDecisionIndex.diagnostics,
+        ...globalBaseDecisionIndex.diagnostics
+    ].filter(entry => entry.severity === "ERROR");
+    if (decisionErrors.length > 0) {
+        throw new Error(`Decision Registry 無效：${decisionErrors[0].message}`);
+    }
     process.stdout.write(JSON.stringify(
         targets.map(target => assessTarget(
             runtime,
             target,
             fingerprint,
-            parsedTagMappings.mappings
+            parsedTagMappings.mappings,
+            globalDecisionIndex,
+            globalBaseDecisionIndex
         ))
     ));
 }

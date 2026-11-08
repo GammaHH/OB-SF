@@ -200,10 +200,46 @@ function upsertTagRepresentativeMapping(markdown, tagId, representativeItemId) {
     return `${lines.join("\n").replace(/\n*$/, "")}\n`;
 }
 
+function clearTagRepresentativeMapping(markdown, tagId) {
+    const canonical = canonicalTagId(tagId);
+    if (!canonical) throw new Error(`無效 Minecraft Tag ID：${tagId}`);
+    const lines = String(markdown ?? "").split(/\r?\n/);
+    const headerIndex = lines.findIndex(line => {
+        const cells = splitMarkdownRow(line);
+        return cells?.some(cell => cell.toLowerCase() === "tag id");
+    });
+    if (headerIndex === -1) throw new Error("找不到 Minecraft Tag BIO Mapping table");
+    const headers = splitMarkdownRow(lines[headerIndex]);
+    const representativeColumn = headers.findIndex(value =>
+        value.toLowerCase() === "representative item id"
+    );
+    if (representativeColumn === -1) {
+        return { markdown: String(markdown ?? ""), changed: false, previousValue: null };
+    }
+    for (let index = headerIndex + 2; index < lines.length; index++) {
+        const cells = splitMarkdownRow(lines[index]);
+        if (!cells) break;
+        if (canonicalTagId(cells[0]) !== canonical) continue;
+        const previousValue = cells[representativeColumn] ?? "";
+        if (!previousValue) {
+            return { markdown: String(markdown ?? ""), changed: false, previousValue: null };
+        }
+        cells[representativeColumn] = "";
+        lines[index] = `| ${cells.join(" | ")} |`;
+        return {
+            markdown: `${lines.join("\n").replace(/\n*$/, "")}\n`,
+            changed: true,
+            previousValue
+        };
+    }
+    return { markdown: String(markdown ?? ""), changed: false, previousValue: null };
+}
+
 module.exports = {
     canonicalTagId,
     parseTagBIOMappingMarkdown,
     createTagBIOMappingDraft,
     renderTagBIOMappingMarkdown,
-    upsertTagRepresentativeMapping
+    upsertTagRepresentativeMapping,
+    clearTagRepresentativeMapping
 };

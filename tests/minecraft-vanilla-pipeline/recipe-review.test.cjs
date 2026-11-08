@@ -78,6 +78,9 @@ test("multiple recipes require exactly one stable recipe identity", () => {
     assert.equal(first.groups[0].candidates[0].candidateId, "external-base:minecraft:target");
 
     let markdown = vanilla.dependencies.renderRecipeReview(first);
+    assert.match(markdown, /Base Route for Generation Planning/);
+    assert.match(markdown, /GENERATION_PLANNING|bottom-up generation planning/);
+    assert.match(markdown, /未來 BIO 會列出全部取得方式/);
     markdown = setChoice(markdown, firstRecipeCandidate(first.groups[0]).candidateId, true);
     const selected = analyze(pipeline, "minecraft:target", markdown).analysis;
     assert.equal(selected.groups[0].status, "RESOLVED");
@@ -135,7 +138,7 @@ test("ambiguity below an unselected recipe branch is not active or blocking", ()
     const initial = analyze(pipeline, "minecraft:target").analysis;
     assert.deepEqual(initial.groups.map(group => group.type), ["recipe"]);
     const stoneRecipe = initial.groups[0].candidates.find(candidate =>
-        candidate.recipe.ingredients[0].id === "minecraft:stone"
+        candidate.recipe?.ingredients[0].id === "minecraft:stone"
     );
     let markdown = vanilla.dependencies.renderRecipeReview(initial);
     markdown = setChoice(markdown, stoneRecipe.candidateId, true);
@@ -228,6 +231,40 @@ test("recipe External acquisition requests a locked Base transfer without changi
     );
 });
 
+test("stable recipe decision is reused globally across downstream targets", () => {
+    const pipeline = multipleRecipePipeline();
+    const initial = analyze(pipeline, "minecraft:target").analysis;
+    const group = initial.groups[0];
+    const selected = firstRecipeCandidate(group);
+    const globalAmbiguitySelections = new Map([[group.groupId, {
+        groupId: group.groupId,
+        type: "recipe",
+        candidateId: selected.candidateId,
+        targets: ["minecraft:previous_target"]
+    }]]);
+    const reused = analyze(
+        pipeline,
+        "minecraft:target",
+        "",
+        [],
+        { globalAmbiguitySelections }
+    ).analysis;
+    assert.equal(reused.groups[0].status, "RESOLVED");
+    assert.equal(
+        reused.groups[0].selectionSource,
+        "GLOBAL_DECISION_REGISTRY"
+    );
+    assert.deepEqual(reused.appliedGlobalAmbiguityDecisions, [{
+        groupId: group.groupId,
+        candidateId: selected.candidateId
+    }]);
+    assert.equal(reused.readiness.readyForBioGeneration, true);
+    assert.match(
+        vanilla.dependencies.renderRecipeReview(reused),
+        /Selection Source: `GLOBAL_DECISION_REGISTRY`/
+    );
+});
+
 test("tag multiple selection and stale value produce explicit diagnostics", () => {
     const originalPipeline = vanilla.createVanillaPipeline({
         tagEntries: [{
@@ -315,6 +352,116 @@ test("alternatives require exactly one and stale choices do not apply", () => {
     ));
 });
 
+test("Minecraft color-family alternative preference is reused when the preferred item remains valid", () => {
+    const blackPipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            recipe("minecraft:black_wool", [[
+                "minecraft:blue_wool",
+                "minecraft:white_wool"
+            ]])
+        ]
+    });
+    const blackInitial = analyze(blackPipeline, "minecraft:black_wool").analysis;
+    const blackGroup = blackInitial.groups[0];
+    assert.equal(blackGroup.preferenceKey, "minecraft-color-family:wool");
+    const whiteCandidate = blackGroup.candidates.find(candidate =>
+        candidate.label === "minecraft:white_wool"
+    );
+    let blackMarkdown = vanilla.dependencies.renderRecipeReview(blackInitial);
+    blackMarkdown = setChoice(blackMarkdown, whiteCandidate.candidateId, true);
+    const blackSelected = analyze(
+        blackPipeline,
+        "minecraft:black_wool",
+        blackMarkdown
+    ).analysis;
+    blackMarkdown = vanilla.dependencies.renderRecipeReview(
+        blackSelected,
+        blackMarkdown
+    );
+
+    const registry = vanilla.dependencies.emptyReviewDecisionRegistry();
+    vanilla.dependencies.setReviewDecisionSnapshot(
+        registry,
+        "minecraft:black_wool",
+        {
+            sourceFingerprint: "sha256:test",
+            baseReview: "",
+            recipeReview: blackMarkdown
+        }
+    );
+    const index = vanilla.dependencies.createGlobalAmbiguityDecisionIndex(registry);
+    assert.equal(index.diagnostics.length, 0);
+    assert.equal(
+        index.alternativePreferences.get("minecraft-color-family:wool").candidateId,
+        whiteCandidate.candidateId
+    );
+
+    const bluePipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            recipe("minecraft:blue_wool", [[
+                "minecraft:black_wool",
+                "minecraft:white_wool"
+            ]])
+        ]
+    });
+    const reused = analyze(
+        bluePipeline,
+        "minecraft:blue_wool",
+        "",
+        [],
+        { globalAlternativePreferences: index.alternativePreferences }
+    ).analysis;
+    assert.equal(reused.groups[0].status, "RESOLVED");
+    assert.equal(
+        reused.groups[0].selectionSource,
+        "GLOBAL_ALTERNATIVE_PREFERENCE"
+    );
+    assert.equal(
+        reused.groups[0].candidates.find(candidate =>
+            candidate.candidateId === reused.groups[0].selectedCandidateId
+        ).label,
+        "minecraft:white_wool"
+    );
+    assert.deepEqual(reused.appliedGlobalAlternativePreferences, [{
+        preferenceKey: "minecraft-color-family:wool",
+        candidateId: whiteCandidate.candidateId
+    }]);
+
+    const whitePipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            recipe("minecraft:white_wool", [[
+                "minecraft:black_wool",
+                "minecraft:blue_wool"
+            ]])
+        ]
+    });
+    const unavailable = analyze(
+        whitePipeline,
+        "minecraft:white_wool",
+        "",
+        [],
+        { globalAlternativePreferences: index.alternativePreferences }
+    ).analysis;
+    assert.equal(unavailable.groups[0].status, "UNRESOLVED");
+    assert.ok(unavailable.diagnostics.some(entry =>
+        entry.code === "GLOBAL_ALTERNATIVE_PREFERENCE_UNAVAILABLE"
+    ));
+
+    vanilla.dependencies.addReviewDecisionRevocation(registry, {
+        kind: "alternative-preference",
+        key: "minecraft-color-family:wool",
+        target: "minecraft:blue_wool",
+        previousValue: whiteCandidate.candidateId,
+        revokedAt: "2026-11-09T00:00:00.000Z"
+    });
+    const revokedPreferences =
+        vanilla.dependencies.createGlobalAmbiguityDecisionIndex(registry);
+    assert.equal(
+        revokedPreferences.alternativePreferences.has("minecraft-color-family:wool"),
+        false
+    );
+});
+
 test("unselected alternative branch ambiguity does not remain blocking", () => {
     const pipeline = vanilla.createVanillaPipeline({
         tagEntries: [{
@@ -375,7 +522,7 @@ test("upstream route change moves downstream ambiguity to inactive area", () => 
     const first = analyze(pipeline, "minecraft:target").analysis;
     let markdown = vanilla.dependencies.renderRecipeReview(first);
     const tagRecipe = first.groups[0].candidates.find(candidate =>
-        candidate.recipe.ingredients[0].kind === "tag"
+        candidate.recipe?.ingredients[0].kind === "tag"
     );
     markdown = setChoice(markdown, tagRecipe.candidateId, true);
     const tagStage = analyze(pipeline, "minecraft:target", markdown).analysis;
@@ -383,7 +530,7 @@ test("upstream route change moves downstream ambiguity to inactive area", () => 
     assert.equal(tagStage.groups.some(group => group.type === "tag"), true);
 
     const stoneRecipe = first.groups[0].candidates.find(candidate =>
-        candidate.recipe.ingredients[0].id === "minecraft:stone"
+        candidate.recipe?.ingredients[0].id === "minecraft:stone"
     );
     const reopened = vanilla.dependencies.reopenRecipeDecision(
         markdown,
@@ -403,7 +550,7 @@ test("upstream route change moves downstream ambiguity to inactive area", () => 
     const stoneStage = analyze(pipeline, "minecraft:target", markdown).analysis;
     const regenerated = vanilla.dependencies.renderRecipeReview(stoneStage, markdown);
     assert.equal(stoneStage.groups.some(group => group.type === "tag"), false);
-    assert.match(regenerated, /Inactive \/ Stale Ambiguities/);
+    assert.match(regenerated, /Inactive \/ Historical Ambiguities/);
 });
 
 test("review queue is deterministic and advances only through explicit state changes", () => {
@@ -441,6 +588,95 @@ test("review queue is deterministic and advances only through explicit state cha
         vanilla.dependencies.renderReviewQueueMarkdown(queue),
         /minecraft:zeta/
     );
+    const reopened = vanilla.dependencies.focusReviewTarget(
+        queue,
+        "minecraft:alpha"
+    );
+    assert.equal(reopened.status, "IN_REVIEW");
+    assert.equal(queue.targets.find(entry =>
+        entry.target === "minecraft:zeta"
+    ).status, "PENDING");
+    assert.match(
+        vanilla.dependencies.renderReviewQueueMarkdown(queue),
+        /\[\[Minecraft Recipe Review\]\]/
+    );
+});
+
+test("review decision registry round-trips complete target snapshots deterministically", () => {
+    const registry = vanilla.dependencies.emptyReviewDecisionRegistry();
+    vanilla.dependencies.setReviewDecisionSnapshot(
+        registry,
+        "minecraft:piston",
+        {
+            sourceFingerprint: "sha256:test",
+            baseReview: "---\ntarget: minecraft:piston\n---\n<!-- obsf:locked-base:start minecraft:redstone external -->\n<!-- obsf:locked-base:end minecraft:redstone -->\n",
+            recipeReview: "---\ntarget: minecraft:piston\n---\n<!-- obsf:locked-ambiguity:start recipe-group-test recipe recipe-test -->\n<!-- obsf:locked-ambiguity:end recipe-group-test -->\n"
+        }
+    );
+    const markdown = vanilla.dependencies.renderReviewDecisionRegistry(registry);
+    const parsed = vanilla.dependencies.parseReviewDecisionRegistry(markdown);
+    assert.deepEqual(
+        vanilla.dependencies.getReviewDecisionSnapshot(parsed, "minecraft:piston"),
+        registry.targets["minecraft:piston"]
+    );
+    assert.deepEqual(
+        parsed.targets["minecraft:piston"].lockedBaseDecisions,
+        [{ itemId: "minecraft:redstone", kind: "external" }]
+    );
+    assert.deepEqual(
+        parsed.targets["minecraft:piston"].lockedAmbiguityDecisions,
+        [{
+            groupId: "recipe-group-test",
+            type: "recipe",
+            candidateId: "recipe-test",
+            subject: null
+        }]
+    );
+    const globalIndex =
+        vanilla.dependencies.createGlobalAmbiguityDecisionIndex(parsed);
+    assert.equal(globalIndex.diagnostics.length, 0);
+    assert.equal(
+        globalIndex.selections.get("recipe-group-test").candidateId,
+        "recipe-test"
+    );
+    assert.equal(
+        vanilla.dependencies.renderReviewDecisionRegistry(parsed),
+        markdown
+    );
+    vanilla.dependencies.addReviewDecisionRevocation(parsed, {
+        kind: "ambiguity-group",
+        key: "recipe-group-test",
+        target: "minecraft:piston",
+        previousValue: "recipe-test",
+        revokedAt: "2026-11-09T00:00:00.000Z"
+    });
+    assert.equal(
+        vanilla.dependencies.createGlobalAmbiguityDecisionIndex(parsed)
+            .selections.has("recipe-group-test"),
+        false
+    );
+    const revokedRoundTrip = vanilla.dependencies.parseReviewDecisionRegistry(
+        vanilla.dependencies.renderReviewDecisionRegistry(parsed)
+    );
+    assert.equal(revokedRoundTrip.revocations[0].status, "ACTIVE");
+    const stripped = vanilla.dependencies.stripRevokedDecisionsFromSnapshot(
+        revokedRoundTrip,
+        "minecraft:piston",
+        revokedRoundTrip.targets["minecraft:piston"]
+    );
+    assert.doesNotMatch(stripped.recipeReview, /obsf:locked-ambiguity:start recipe-group-test/);
+    assert.deepEqual(stripped.lockedAmbiguityDecisions, []);
+    vanilla.dependencies.setReviewDecisionSnapshot(
+        revokedRoundTrip,
+        "minecraft:piston",
+        revokedRoundTrip.targets["minecraft:piston"]
+    );
+    assert.equal(revokedRoundTrip.revocations[0].status, "SUPERSEDED");
+    assert.equal(
+        vanilla.dependencies.createGlobalAmbiguityDecisionIndex(revokedRoundTrip)
+            .selections.get("recipe-group-test").candidateId,
+        "recipe-test"
+    );
 });
 
 test("locked recipe decision is parsed without an editable checkbox", () => {
@@ -452,6 +688,8 @@ test("locked recipe decision is parsed without an editable checkbox", () => {
     const locked = vanilla.dependencies.renderRecipeReview(selected, markdown);
     assert.doesNotMatch(locked, /- \[x\] `recipe-/);
     assert.match(locked, /Status: `LOCKED`/);
+    assert.match(locked, /Scope: `GENERATION_PLANNING_ONLY`/);
+    assert.match(locked, /Other Routes: `PRESERVED_IN_NORMALIZED_REGISTRY`/);
     const reparsed = analyze(pipeline, "minecraft:target", locked).analysis;
     assert.equal(reparsed.groups[0].status, "RESOLVED");
     assert.equal(reparsed.readiness.readyForBioGeneration, true);
