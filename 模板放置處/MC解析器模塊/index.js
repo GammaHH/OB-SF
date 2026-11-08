@@ -14,7 +14,8 @@ const dependencies = {
     ...require("./dependencies/generation_planner"),
     ...require("./dependencies/base_dependency_planner"),
     ...require("./dependencies/base_material_review"),
-    ...require("./dependencies/recipe_review")
+    ...require("./dependencies/recipe_review"),
+    ...require("./dependencies/review_queue")
 };
 const bio = {
     ...require("./bio/bio_scanner"),

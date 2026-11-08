@@ -19,7 +19,7 @@ function emptyReview() {
     return { groups: new Map(), diagnostics: [], frontmatter: {} };
 }
 
-function analyze(pipeline, target, markdown = "", baseItemIds = []) {
+function analyze(pipeline, target, markdown = "", baseItemIds = [], options = {}) {
     const dependency = pipeline.resolveDependencies(target);
     const basePlan = pipeline.createBaseDependencyPlan(dependency, {
         baseItemIds,
@@ -36,9 +36,13 @@ function analyze(pipeline, target, markdown = "", baseItemIds = []) {
         dependency,
         basePlan,
         parsed,
-        { sourceFingerprint, baseItemIds }
+        { sourceFingerprint, baseItemIds, ...options }
     );
     return { dependency, basePlan, parsed, analysis };
+}
+
+function firstRecipeCandidate(group) {
+    return group.candidates.find(candidate => candidate.recipe);
 }
 
 function setChoice(markdown, candidateId, checked) {
@@ -68,12 +72,13 @@ test("multiple recipes require exactly one stable recipe identity", () => {
     assert.equal(first.groups[0].type, "recipe");
     assert.equal(first.groups[0].status, "UNRESOLVED");
     assert.equal(first.readiness.unresolvedAmbiguities, 1);
-    assert.ok(first.groups[0].candidates.every(candidate =>
+    assert.ok(first.groups[0].candidates.filter(candidate => candidate.recipe).every(candidate =>
         /^recipe-[0-9a-f]{16}$/.test(candidate.candidateId)
     ));
+    assert.equal(first.groups[0].candidates[0].candidateId, "external-base:minecraft:target");
 
     let markdown = vanilla.dependencies.renderRecipeReview(first);
-    markdown = setChoice(markdown, first.groups[0].candidates[0].candidateId, true);
+    markdown = setChoice(markdown, firstRecipeCandidate(first.groups[0]).candidateId, true);
     const selected = analyze(pipeline, "minecraft:target", markdown).analysis;
     assert.equal(selected.groups[0].status, "RESOLVED");
     assert.equal(selected.readiness.unresolvedAmbiguities, 0);
@@ -98,7 +103,7 @@ test("multiple checked recipes are invalid and never auto-select first", () => {
 test("removed selected recipe becomes stale when the item remains ambiguous", () => {
     const originalPipeline = multipleRecipePipeline();
     const original = analyze(originalPipeline, "minecraft:target").analysis;
-    const removedId = original.groups[0].candidates[0].candidateId;
+    const removedId = firstRecipeCandidate(original.groups[0]).candidateId;
     let markdown = vanilla.dependencies.renderRecipeReview(original);
     markdown = setChoice(markdown, removedId, true);
 
@@ -166,9 +171,61 @@ test("single-value tag auto-resolves while multi-value tag requires selection", 
     assert.equal(initial.groups[0].status, "UNRESOLVED");
     let markdown = vanilla.dependencies.renderRecipeReview(initial);
     markdown = setChoice(markdown, "minecraft:a", true);
+    assert.deepEqual(
+        vanilla.dependencies.collectRecipeDecisionTransfers(markdown).tagMappings,
+        [{ tagId: "minecraft:multi", representativeItemId: "minecraft:a" }]
+    );
     const selected = analyze(multi, "minecraft:target", markdown).analysis;
     assert.equal(selected.groups[0].status, "RESOLVED");
-    assert.equal(selected.readiness.readyForBioGeneration, true);
+    assert.equal(selected.readiness.readyForBioGeneration, false);
+    assert.deepEqual(selected.requestedTagMappings, [{
+        tagId: "minecraft:multi",
+        representativeItemId: "minecraft:a"
+    }]);
+});
+
+test("global tag mapping resolves a tag once and preserves tag identity", () => {
+    const pipeline = vanilla.createVanillaPipeline({
+        tagEntries: [{
+            tagId: "minecraft:oak_logs",
+            registryType: "item",
+            json: { values: ["minecraft:oak_log", "minecraft:oak_wood"] }
+        }],
+        recipeEntries: [recipe("minecraft:target", ["#minecraft:oak_logs"])]
+    });
+    const tagMappings = new Map([["minecraft:oak_logs", {
+        tagId: "minecraft:oak_logs",
+        bioId: "OAK_LOGS",
+        representativeItemId: "minecraft:oak_log"
+    }]]);
+    const result = analyze(
+        pipeline,
+        "minecraft:target",
+        "",
+        [],
+        { tagMappings }
+    ).analysis;
+    assert.equal(result.groups.length, 0);
+    assert.deepEqual(result.appliedTagMappings, [{
+        tagId: "minecraft:oak_logs",
+        representativeItemId: "minecraft:oak_log"
+    }]);
+    assert.equal(result.readiness.readyForBioGeneration, true);
+});
+
+test("recipe External acquisition requests a locked Base transfer without changing Registry", () => {
+    const pipeline = multipleRecipePipeline();
+    const initial = analyze(pipeline, "minecraft:target").analysis;
+    let markdown = vanilla.dependencies.renderRecipeReview(initial);
+    markdown = setChoice(markdown, "external-base:minecraft:target", true);
+    const selected = analyze(pipeline, "minecraft:target", markdown).analysis;
+    assert.deepEqual(selected.requestedExternalBaseItemIds, ["minecraft:target"]);
+    assert.equal(selected.readiness.readyForBioGeneration, false);
+    assert.equal(pipeline.itemRegistry.get("minecraft:target").recipes.length, 2);
+    assert.deepEqual(
+        vanilla.dependencies.collectRecipeDecisionTransfers(markdown).externalBaseItemIds,
+        ["minecraft:target"]
+    );
 });
 
 test("tag multiple selection and stale value produce explicit diagnostics", () => {
@@ -286,7 +343,7 @@ test("Markdown round-trip preserves text, notes, valid selection, and is idempot
     const initial = analyze(pipeline, "minecraft:target").analysis;
     let markdown = vanilla.dependencies.renderRecipeReview(initial) +
         "\n\n## User text\n- [x] ordinary task\n";
-    markdown = setChoice(markdown, initial.groups[0].candidates[0].candidateId, true);
+    markdown = setChoice(markdown, firstRecipeCandidate(initial.groups[0]).candidateId, true);
     markdown = markdown.replace(
         "<!-- 在此輸入人工備註 -->",
         "人工備註：選擇此路線。"
@@ -295,7 +352,8 @@ test("Markdown round-trip preserves text, notes, valid selection, and is idempot
     const regenerated = vanilla.dependencies.renderRecipeReview(next, markdown);
     assert.match(regenerated, /ordinary task/);
     assert.match(regenerated, /人工備註：選擇此路線。/);
-    assert.match(regenerated, /- \[x\] `recipe-/);
+    assert.doesNotMatch(regenerated, /- \[x\] `recipe-/);
+    assert.match(regenerated, /obsf:locked-ambiguity:start recipe-group-/);
     assert.equal(
         vanilla.dependencies.renderRecipeReview(next, regenerated),
         regenerated
@@ -327,22 +385,83 @@ test("upstream route change moves downstream ambiguity to inactive area", () => 
     const stoneRecipe = first.groups[0].candidates.find(candidate =>
         candidate.recipe.ingredients[0].id === "minecraft:stone"
     );
-    markdown = setChoice(markdown, tagRecipe.candidateId, false);
+    const reopened = vanilla.dependencies.reopenRecipeDecision(
+        markdown,
+        first.groups[0].groupId
+    );
+    assert.equal(reopened.reopened, true);
+    const reopenedStage = analyze(
+        pipeline,
+        "minecraft:target",
+        reopened.markdown
+    ).analysis;
+    markdown = vanilla.dependencies.renderRecipeReview(
+        reopenedStage,
+        reopened.markdown
+    );
     markdown = setChoice(markdown, stoneRecipe.candidateId, true);
     const stoneStage = analyze(pipeline, "minecraft:target", markdown).analysis;
     const regenerated = vanilla.dependencies.renderRecipeReview(stoneStage, markdown);
     assert.equal(stoneStage.groups.some(group => group.type === "tag"), false);
     assert.match(regenerated, /Inactive \/ Stale Ambiguities/);
-    assert.ok(stoneStage.diagnostics.some(entry =>
-        entry.code === "CANDIDATE_NO_LONGER_ON_ACTIVE_ROUTE"
-    ));
+});
+
+test("review queue is deterministic and advances only through explicit state changes", () => {
+    const queue = vanilla.dependencies.createReviewQueue({
+        sourceFingerprint: "sha256:test",
+        scannedTargets: 3,
+        existingBIO: 1,
+        automaticReady: 1,
+        targets: [
+            {
+                target: "minecraft:zeta",
+                reasons: { recipe: 1 },
+                baseReview: "z/base.md",
+                recipeReview: "z/recipe.md"
+            },
+            {
+                target: "minecraft:alpha",
+                reasons: { blockedCycles: 1 },
+                baseReview: "a/base.md",
+                recipeReview: "a/recipe.md"
+            }
+        ]
+    });
+    assert.deepEqual(queue.targets.map(entry => entry.target), [
+        "minecraft:alpha",
+        "minecraft:zeta"
+    ]);
+    const first = vanilla.dependencies.activateNextReviewTarget(queue);
+    assert.equal(first.target, "minecraft:alpha");
+    assert.equal(vanilla.dependencies.currentReviewTarget(queue).target, "minecraft:alpha");
+    vanilla.dependencies.updateReviewTarget(queue, first.target, "READY");
+    const second = vanilla.dependencies.activateNextReviewTarget(queue);
+    assert.equal(second.target, "minecraft:zeta");
+    assert.match(
+        vanilla.dependencies.renderReviewQueueMarkdown(queue),
+        /minecraft:zeta/
+    );
+});
+
+test("locked recipe decision is parsed without an editable checkbox", () => {
+    const pipeline = multipleRecipePipeline();
+    const initial = analyze(pipeline, "minecraft:target").analysis;
+    let markdown = vanilla.dependencies.renderRecipeReview(initial);
+    markdown = setChoice(markdown, firstRecipeCandidate(initial.groups[0]).candidateId, true);
+    const selected = analyze(pipeline, "minecraft:target", markdown).analysis;
+    const locked = vanilla.dependencies.renderRecipeReview(selected, markdown);
+    assert.doesNotMatch(locked, /- \[x\] `recipe-/);
+    assert.match(locked, /Status: `LOCKED`/);
+    const reparsed = analyze(pipeline, "minecraft:target", locked).analysis;
+    assert.equal(reparsed.groups[0].status, "RESOLVED");
+    assert.equal(reparsed.readiness.readyForBioGeneration, true);
 });
 
 test("fingerprint changes warn while still-valid identity is revalidated", () => {
     const pipeline = multipleRecipePipeline();
     const initial = analyze(pipeline, "minecraft:target").analysis;
     let markdown = vanilla.dependencies.renderRecipeReview(initial);
-    markdown = setChoice(markdown, initial.groups[0].candidates[0].candidateId, true);
+    markdown = setChoice(markdown, firstRecipeCandidate(initial.groups[0]).candidateId, true);
     markdown = markdown.replace(
         initial.sourceFingerprint,
         "sha256:" + "0".repeat(64)
@@ -390,7 +509,7 @@ test("real Vanilla piston integration is target-closure scoped", () => {
         new Set(ironGroup.candidates.map(candidate => candidate.label)).size,
         ironGroup.candidates.length
     );
-    assert.ok(ironGroup.candidates.every(candidate =>
+    assert.ok(ironGroup.candidates.filter(candidate => candidate.recipe).every(candidate =>
         candidate.label.includes("參考資料/Minecraft/recipe/")
     ));
     assert.equal(analysis.groups.some(group =>

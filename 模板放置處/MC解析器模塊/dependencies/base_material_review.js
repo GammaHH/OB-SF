@@ -12,6 +12,8 @@ const SELECTION_START = "<!-- obsf:base-material-selection:start -->";
 const SELECTION_END = "<!-- obsf:base-material-selection:end -->";
 const EXTERNAL_START = "<!-- obsf:external-base-materials:start -->";
 const EXTERNAL_END = "<!-- obsf:external-base-materials:end -->";
+const BASE_LOCKED_START = "<!-- obsf:base-material-locked:start -->";
+const BASE_LOCKED_END = "<!-- obsf:base-material-locked:end -->";
 const ITEM_ID_PATTERN = /^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
 
 function stableValue(value) {
@@ -274,6 +276,35 @@ function extractExistingExternalBaseState(markdown) {
     return states;
 }
 
+function extractExistingLockedBaseState(markdown) {
+    const states = new Map();
+    const pattern = /<!-- obsf:locked-base:start ([^\s>]+) (candidate|external) -->([\s\S]*?)<!-- obsf:locked-base:end \1 -->/g;
+    const expiredPattern = /<!-- obsf:expired-locked-base:start ([^\s>]+) (candidate|external) -->([\s\S]*?)<!-- obsf:expired-locked-base:end \1 -->/g;
+    const review = managedSlice(markdown, REVIEW_START, REVIEW_END);
+    if (!review) return states;
+    for (const match of review.content.matchAll(pattern)) {
+        const notes = match[3].match(/<!-- obsf:notes:start -->([\s\S]*?)<!-- obsf:notes:end -->/);
+        states.set(match[1], {
+            itemId: match[1],
+            kind: match[2],
+            checked: true,
+            notes: notes?.[1]?.replace(/\r?\n[ \t]*$/, "\n") ??
+                "\n<!-- 在此輸入人工備註 -->\n"
+        });
+    }
+    for (const match of review.content.matchAll(expiredPattern)) {
+        if (states.has(match[1])) continue;
+        const notes = match[3].match(/<!-- obsf:notes:start -->([\s\S]*?)<!-- obsf:notes:end -->/);
+        states.set(match[1], {
+            itemId: match[1],
+            kind: match[2],
+            checked: true,
+            notes: notes?.[1]?.replace(/\r?\n[ \t]*$/, "\n") ?? "\n"
+        });
+    }
+    return states;
+}
+
 function renderCandidate(candidate, state, stale = false) {
     const checked = state?.checked ? "x" : " ";
     const notes = state?.notes ?? "\n<!-- 在此輸入人工備註 -->\n";
@@ -303,7 +334,45 @@ function renderExternalBase(itemId, state, stale = false) {
     ].join("\n");
 }
 
-function renderManagedReview(review, existingStates, externalStates) {
+function renderLockedBase(itemId, state) {
+    return [
+        `<!-- obsf:locked-base:start ${itemId} ${state.kind} -->`,
+        `- Item: \`${itemId}\``,
+        `- Source: \`${state.kind}\``,
+        "- Status: `LOCKED`（不提供 Checkbox，避免誤改）",
+        "<!-- obsf:notes:start -->" + (state.notes ?? "\n") + "<!-- obsf:notes:end -->",
+        `<!-- obsf:locked-base:end ${itemId} -->`
+    ].join("\n");
+}
+
+function renderExpiredLockedBase(itemId, state) {
+    return [
+        `<!-- obsf:expired-locked-base:start ${itemId} ${state.kind} -->`,
+        `- Item: \`${itemId}\``,
+        "- Status: `STALE`（不會套用，需重新審核）",
+        "<!-- obsf:notes:start -->" + (state.notes ?? "\n") + "<!-- obsf:notes:end -->",
+        `<!-- obsf:expired-locked-base:end ${itemId} -->`
+    ].join("\n");
+}
+
+function renderManagedReview(review, existingStates, externalStates, lockedStates) {
+    const effectiveLocked = new Map(lockedStates);
+    for (const [itemId, state] of existingStates) {
+        if (state.checked) effectiveLocked.set(itemId, {
+            itemId,
+            kind: "candidate",
+            checked: true,
+            notes: state.notes
+        });
+    }
+    for (const [itemId, state] of externalStates) {
+        if (state.checked) effectiveLocked.set(itemId, {
+            itemId,
+            kind: "external",
+            checked: true,
+            notes: state.notes
+        });
+    }
     const currentIds = new Set(review.candidates.map(candidate => candidate.itemId));
     const candidatesById = new Map(
         review.candidates.map(candidate => [candidate.itemId, candidate])
@@ -320,6 +389,15 @@ function renderManagedReview(review, existingStates, externalStates) {
         orderedCandidates.push(candidate);
         orderedIds.add(candidate.itemId);
     }
+    const coveredCycleIds = new Set();
+    for (const candidate of review.candidates) {
+        if (!effectiveLocked.has(candidate.itemId)) continue;
+        for (const cycleId of candidate.cycleIds ?? []) coveredCycleIds.add(cycleId);
+    }
+    const activeCandidates = orderedCandidates.filter(candidate =>
+        !effectiveLocked.has(candidate.itemId) &&
+        (candidate.cycleIds ?? []).some(cycleId => !coveredCycleIds.has(cycleId))
+    );
     const stale = [...existingStates.entries()]
         .filter(([itemId]) => !currentIds.has(itemId))
         .sort(([left], [right]) => left.localeCompare(right));
@@ -350,8 +428,8 @@ function renderManagedReview(review, existingStates, externalStates) {
         "",
         SELECTION_START
     );
-    if (orderedCandidates.length === 0) lines.push("- 無候選");
-    for (const candidate of orderedCandidates) {
+    if (activeCandidates.length === 0) lines.push("- 無候選");
+    for (const candidate of activeCandidates) {
         lines.push(renderCandidate(candidate, existingStates.get(candidate.itemId)));
     }
     lines.push(
@@ -366,7 +444,7 @@ function renderManagedReview(review, existingStates, externalStates) {
     );
     const graphIds = new Set(review.graphItemIds ?? []);
     const activeExternal = [...externalStates.entries()]
-        .filter(([itemId]) => graphIds.has(itemId))
+        .filter(([itemId, state]) => graphIds.has(itemId) && !state.checked && !effectiveLocked.has(itemId))
         .sort(([left], [right]) => left.localeCompare(right));
     if (activeExternal.length === 0) {
         lines.push(
@@ -377,7 +455,29 @@ function renderManagedReview(review, existingStates, externalStates) {
     for (const [itemId, state] of activeExternal) {
         lines.push(renderExternalBase(itemId, state));
     }
-    lines.push(EXTERNAL_END, "", "## 未解決的循環", "");
+    lines.push(EXTERNAL_END, "", "## Locked Base Decisions", "", BASE_LOCKED_START);
+    const activeLocked = [...effectiveLocked.entries()]
+        .filter(([itemId, state]) =>
+            state.kind === "candidate" ? currentIds.has(itemId) : graphIds.has(itemId)
+        )
+        .sort(([left], [right]) => left.localeCompare(right));
+    if (activeLocked.length === 0) lines.push("- 無");
+    for (const [itemId, state] of activeLocked) {
+        lines.push(renderLockedBase(itemId, state), "");
+    }
+    lines.push(BASE_LOCKED_END);
+    const staleLocked = [...effectiveLocked.entries()]
+        .filter(([itemId, state]) =>
+            state.kind === "candidate" ? !currentIds.has(itemId) : !graphIds.has(itemId)
+        )
+        .sort(([left], [right]) => left.localeCompare(right));
+    if (staleLocked.length > 0) {
+        lines.push("", "## 過期 Locked Base Decisions（需重新審核）", "");
+        for (const [itemId, state] of staleLocked) {
+            lines.push(renderExpiredLockedBase(itemId, state), "");
+        }
+    }
+    lines.push("", "## 未解決的循環", "");
     if (review.unresolvedItemIds.length === 0) lines.push("- 無");
     else for (const itemId of review.unresolvedItemIds) lines.push(`- \`${itemId}\``);
     if (stale.length > 0) {
@@ -402,7 +502,8 @@ function renderManagedReview(review, existingStates, externalStates) {
 function renderBaseMaterialReview(review, existingMarkdown = "") {
     const existingStates = extractExistingCandidateState(existingMarkdown);
     const externalStates = extractExistingExternalBaseState(existingMarkdown);
-    const managed = renderManagedReview(review, existingStates, externalStates);
+    const lockedStates = extractExistingLockedBaseState(existingMarkdown);
+    const managed = renderManagedReview(review, existingStates, externalStates, lockedStates);
     const oldManaged = managedSlice(existingMarkdown, REVIEW_START, REVIEW_END);
     let merged;
     if (oldManaged) {
@@ -425,14 +526,39 @@ function parseBaseMaterialReview(markdown, currentReview) {
     const frontmatter = parseFrontmatter(markdown).values;
     const selection = managedSlice(markdown, SELECTION_START, SELECTION_END);
     const externalSelection = managedSlice(markdown, EXTERNAL_START, EXTERNAL_END);
+    const lockedSelection = managedSlice(markdown, BASE_LOCKED_START, BASE_LOCKED_END);
     const candidateIds = new Set(currentReview.candidates.map(candidate => candidate.itemId));
     const entries = [];
     const externalEntries = [];
     const seen = new Set();
     const externalSeen = new Set();
+    const lockedEntries = [];
 
     function diagnostic(code, severity, message, itemId = null) {
         diagnostics.push({ code, severity, message, itemId });
+    }
+
+    if (lockedSelection) {
+        const lockedPattern = /<!-- obsf:locked-base:start ([^\s>]+) (candidate|external) -->([\s\S]*?)<!-- obsf:locked-base:end \1 -->/g;
+        const lockedSeen = new Set();
+        for (const match of lockedSelection.content.matchAll(lockedPattern)) {
+            const itemId = match[1];
+            const kind = match[2];
+            if (!ITEM_ID_PATTERN.test(itemId)) {
+                diagnostic("INVALID_ITEM_ID", "ERROR", `無效 Locked Base ID：${itemId}`, itemId);
+            }
+            if (lockedSeen.has(itemId)) {
+                diagnostic("DUPLICATE_BASE_ITEM", "ERROR", `Locked Base 重複：${itemId}`, itemId);
+            }
+            lockedSeen.add(itemId);
+            if (kind === "candidate" && !candidateIds.has(itemId)) {
+                diagnostic("UNKNOWN_OR_STALE_CANDIDATE", "ERROR", `Locked cycle candidate 已過期：${itemId}`, itemId);
+            }
+            if (kind === "external" && !(currentReview.graphItemIds ?? []).includes(itemId)) {
+                diagnostic("UNKNOWN_OR_STALE_EXTERNAL_BASE", "ERROR", `Locked external base 不在目前 target graph：${itemId}`, itemId);
+            }
+            lockedEntries.push({ itemId, kind, checked: true });
+        }
     }
 
     if (externalSelection) {
@@ -512,8 +638,19 @@ function parseBaseMaterialReview(markdown, currentReview) {
                 `Base Material Selection 內有 ${allCheckboxLines.length - recognizedCheckboxes} 個格式不合法的 Checkbox`
             );
         }
-        for (const itemId of candidateIds) {
-            if (!seen.has(itemId)) {
+        const lockedCandidateIds = new Set(
+            lockedEntries.filter(entry => entry.kind === "candidate").map(entry => entry.itemId)
+        );
+        const coveredCycleIds = new Set();
+        for (const candidate of currentReview.candidates) {
+            if (!lockedCandidateIds.has(candidate.itemId)) continue;
+            for (const cycleId of candidate.cycleIds ?? []) coveredCycleIds.add(cycleId);
+        }
+        for (const candidate of currentReview.candidates) {
+            const required = !lockedCandidateIds.has(candidate.itemId) &&
+                (candidate.cycleIds ?? []).some(cycleId => !coveredCycleIds.has(cycleId));
+            if (required && !seen.has(candidate.itemId)) {
+                const itemId = candidate.itemId;
                 diagnostic("MISSING_CANDIDATE", "ERROR", `缺少目前 Base Material 候選：${itemId}`, itemId);
             }
         }
@@ -526,6 +663,16 @@ function parseBaseMaterialReview(markdown, currentReview) {
                 "ERROR",
                 `同一 Base Material 同時出現在循環候選與外部來源：${itemId}`,
                 itemId
+            );
+        }
+    }
+    for (const entry of lockedEntries) {
+        if (seen.has(entry.itemId) || externalSeen.has(entry.itemId)) {
+            diagnostic(
+                "DUPLICATE_BASE_ITEM",
+                "ERROR",
+                `同一 Base Material 同時出現在 active 與 locked：${entry.itemId}`,
+                entry.itemId
             );
         }
     }
@@ -552,7 +699,12 @@ function parseBaseMaterialReview(markdown, currentReview) {
         .map(entry => entry.itemId)
         .filter((itemId, index, values) => values.indexOf(itemId) === index)
         .sort();
-    const selectedBaseItemIds = [...selectedCandidateIds, ...selectedExternalIds];
+    const selectedLockedIds = lockedEntries.map(entry => entry.itemId);
+    const selectedBaseItemIds = [
+        ...selectedLockedIds,
+        ...selectedCandidateIds,
+        ...selectedExternalIds
+    ].filter((itemId, index, values) => values.indexOf(itemId) === index);
 
     return {
         schemaVersion: currentReview.schemaVersion,
@@ -561,9 +713,45 @@ function parseBaseMaterialReview(markdown, currentReview) {
         currentSourceFingerprint: currentReview.sourceFingerprint,
         entries,
         externalEntries,
+        lockedEntries,
         selectedBaseItemIds: hasErrors ? [] : selectedBaseItemIds,
         diagnostics,
         canApply: !hasErrors
+    };
+}
+
+function reopenBaseDecision(markdown, itemId) {
+    const escaped = String(itemId).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(
+        `<!-- obsf:locked-base:start ${escaped} (?:candidate|external) -->[\\s\\S]*?<!-- obsf:locked-base:end ${escaped} -->\\n?`,
+        "g"
+    );
+    const source = String(markdown ?? "");
+    if (!pattern.test(source)) return { markdown: source, reopened: false };
+    return { markdown: source.replace(pattern, ""), reopened: true };
+}
+
+function selectExternalBaseMaterial(markdown, itemId) {
+    if (!ITEM_ID_PATTERN.test(String(itemId ?? ""))) {
+        throw new Error(`無效 Minecraft Item ID：${itemId}`);
+    }
+    const source = String(markdown ?? "");
+    const locked = extractExistingLockedBaseState(source);
+    if (locked.has(itemId)) return { markdown: source, changed: false };
+    const external = extractExistingExternalBaseState(source);
+    if (external.get(itemId)?.checked) return { markdown: source, changed: false };
+    const section = managedSlice(source, EXTERNAL_START, EXTERNAL_END);
+    if (!section) throw new Error("找不到 Additional External Base Materials managed section");
+    const block = renderExternalBase(itemId, {
+        checked: true,
+        notes: "\n<!-- 由 Recipe Review 的 External acquisition 決策轉入 -->\n"
+    });
+    const beforeEnd = section.end - EXTERNAL_END.length;
+    const prefix = source.slice(0, beforeEnd).replace(/[ \t]*$/, "");
+    const suffix = source.slice(beforeEnd);
+    return {
+        markdown: `${prefix}\n${block}\n${suffix}`,
+        changed: true
     };
 }
 
@@ -575,6 +763,8 @@ module.exports = {
     SELECTION_END,
     EXTERNAL_START,
     EXTERNAL_END,
+    BASE_LOCKED_START,
+    BASE_LOCKED_END,
     ITEM_ID_PATTERN,
     parseFrontmatter,
     replaceFrontmatter,
@@ -583,5 +773,7 @@ module.exports = {
     computeNormalizedRegistryFingerprint,
     createBaseMaterialReview,
     renderBaseMaterialReview,
-    parseBaseMaterialReview
+    parseBaseMaterialReview,
+    reopenBaseDecision,
+    selectExternalBaseMaterial
 };

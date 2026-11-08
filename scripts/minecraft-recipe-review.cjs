@@ -47,7 +47,7 @@ function printDiagnostics(diagnostics) {
     }
 }
 
-function buildContext(target, baseReviewPath, recipeReviewPath) {
+function buildContext(target, baseReviewPath, recipeReviewPath, tagMappingPath) {
     const runtime = createMinecraftVanillaRuntime(vaultRoot);
     if (runtime.loadErrors.length > 0) {
         const first = runtime.loadErrors[0];
@@ -107,6 +107,11 @@ function buildContext(target, baseReviewPath, recipeReviewPath) {
     const parsedRecipeReview = existingMarkdown
         ? runtime.vanilla.dependencies.parseRecipeReviewMarkdown(existingMarkdown)
         : { groups: new Map(), diagnostics: [], frontmatter: {} };
+    const parsedTagMappings = fs.existsSync(tagMappingPath)
+        ? runtime.vanilla.bio.parseTagBIOMappingMarkdown(
+            fs.readFileSync(tagMappingPath, "utf8")
+        )
+        : { mappings: new Map(), diagnostics: [] };
     const analysis =
         runtime.vanilla.dependencies.createRecipeAmbiguityAnalysis(
             dependency,
@@ -114,7 +119,9 @@ function buildContext(target, baseReviewPath, recipeReviewPath) {
             parsedRecipeReview,
             {
                 sourceFingerprint,
-                baseItemIds: baseSelection.selectedBaseItemIds
+                baseItemIds: baseSelection.selectedBaseItemIds,
+                tagMappings: parsedTagMappings.mappings,
+                tagMappingDiagnostics: parsedTagMappings.diagnostics
             }
         );
     const markdown = runtime.vanilla.dependencies.renderRecipeReview(
@@ -163,6 +170,9 @@ function printSummary(context, recipeReviewPath, dryRun) {
     process.stdout.write(`Stale/Inactive: ${analysis.inactiveGroupIds.length}\n`);
     process.stdout.write(`Route-aware Blocked: ${analysis.readiness.blocked}\n`);
     process.stdout.write(`Planning Cycles: ${analysis.readiness.planningCycles}\n`);
+    process.stdout.write(`Global Tag Mappings Applied: ${analysis.appliedTagMappings.length}\n`);
+    process.stdout.write(`Pending External Base Transfers: ${analysis.requestedExternalBaseItemIds.length}\n`);
+    process.stdout.write(`Pending Global Tag Transfers: ${analysis.requestedTagMappings.length}\n`);
     process.stdout.write(`Ready For BIO Generation: ${analysis.readiness.readyForBioGeneration}\n`);
     process.stdout.write("Formal Selection Policy: none\n");
     process.stdout.write("Preview Generation Order:\n");
@@ -196,7 +206,16 @@ function main() {
         "Minecraft Recipe Review.md"
     );
     const dryRun = hasFlag("dry-run");
-    const context = buildContext(target, baseReviewPath, recipeReviewPath);
+    const tagMappingPath = reviewPath(
+        "tag-mapping",
+        "Minecraft Tag BIO Mapping Draft.md"
+    );
+    const context = buildContext(
+        target,
+        baseReviewPath,
+        recipeReviewPath,
+        tagMappingPath
+    );
     if (!dryRun) writeReview(recipeReviewPath, context.markdown);
     printSummary(context, recipeReviewPath, dryRun);
     if (context.analysis.readiness.invalidSelections > 0) {

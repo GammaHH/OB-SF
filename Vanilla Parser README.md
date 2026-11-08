@@ -1,6 +1,6 @@
 ---
 created: 2026-08-12 17:37
-updated: 2026-11-04 15:13
+updated: 2026-11-08 00:58
 ---
 
 # OB-SF Minecraft Vanilla Pipeline V1.3
@@ -287,6 +287,8 @@ Planner 使用 dependency-count topological ordering；所有 leaf 會先於依�
 
 `createBaseDependencyPlan(dependencyResult)` 以 route 為單位檢查 cycle，另外建立供 BIO bottom-up ordering 使用的 `baseDependencyMap`。完整 registry 與完整 dependency graph 仍保留全部 recipes。
 
+Route safety 使用 monotone fixed-point rank，並針對每條 candidate route 排除 owner item 後重新驗證。這保留「某 route 自身 cyclic、同 item 另一 route acyclic」的語意，同時避免將完整 DFS active path 當 cache identity 所造成的組合爆炸。真正無法到達 leaf／explicit base 的區域再以 SCC 產生 bounded representative cycle paths；染色羊毛等高度互連 alternative family 不會展開所有路徑排列。
+
 每個 map entry 包含：
 
 - `status`: `LEAF`、`SPECIAL_BOUNDARY`、`EXPLICIT_BASE`、`ROUTES_AVAILABLE` 或 `BLOCKED`
@@ -294,7 +296,7 @@ Planner 使用 dependency-count topological ordering；所有 leaf 會先於依�
 - `acyclicRouteIds[]` / `blockedRouteIds[]`
 - `safe`: 至少有一條 acyclic route，或本身是 terminal/base boundary
 
-預設 `selectionPolicy: "none"`，不選 multiple recipe、tag 或 alternative。`first-acyclic` 只作 deterministic preview：依 Normalized Registry 與 tag values 的既有順序選第一條 acyclic route/choice，不代表成本最佳化政策。
+預設 `selectionPolicy: "none"`，不選 multiple recipe、tag 或 alternative。`first-acyclic` 只作 deterministic preview：先依 fixed-point rank 避開 cycle，再以 Normalized Registry／tag values 的既有順序作 tie-break，不代表成本最佳化政策。
 
 天然取得物若同時存在可逆加工 recipe（例如 cobblestone ↔ stone），單靠 recipe registry 無法知道哪一端應是 base material。呼叫端可明確傳入 `baseItemIds` 作人工 boundary；Planner 不會硬編碼或自行推測。
 
@@ -336,26 +338,50 @@ node scripts/minecraft-base-material-review.cjs recalculate minecraft:piston
 
 ### 統一人工決策入口
 
-日常操作優先使用單一 orchestration CLI；底層兩支 CLI 保留給診斷與分階段測試：
+日常操作優先使用單一 orchestration CLI；底層兩支 CLI 保留給診斷與分階段測試。正式流程不要求使用者事先知道 target：
+
+```powershell
+node scripts/minecraft-review.cjs scan
+node scripts/minecraft-review.cjs next
+```
+
+`scan` 以 in-memory Normalized Registry 與 BIO Scanner 建立 generation-planning scope：預設掃描 Registry 中尚無正式 MC BIO 的 result items，並保留目前已開啟的開發 Review target。只有 dependency planning 實際遇到 route cycle、multiple recipe、tag 或 alternative 的 target 才進入 `Minecraft Review Queue.md`；合法 branch 本身不會被 Raw Parser 分類為錯誤。
+
+全量 scan 使用固定小批次隔離 process（預設 25 targets／batch、每個 worker 1 GiB V8 heap）；每批結束即釋放 dependency graph。若某批失敗會自動二分定位到具體 target，不以提高單一 process heap 掩蓋不受控的 graph 累積。診斷時可用 `--scan-batch-size=N`（1–100）調整批次，不改變結果順序。
+
+`next` 取得下一個 `PENDING` target，建立該 target 的 Base／Recipe Review。Queue targets 使用穩定 item ID 排序；每個 target 的 Review 路徑獨立，既有 piston root Review 會繼續沿用，不會覆蓋其他 target 的決策。
+
+每次在 Obsidian 完成目前階段的勾選後，統一執行：
+
+```powershell
+node scripts/minecraft-review.cjs recalculate
+```
+
+`recalculate` 從 Queue 的 `IN_REVIEW` entry 取得 target，不需再次輸入 item ID。若 Base Material 尚未解除 route-level cycle，流程停在 `BASE_MATERIAL`；Base 通過後但仍有 recipe／tag／alternative 未選，停在 `RECIPE_AMBIGUITY`；所有條件通過才標記 `READY` 並通知下一個 pending target。
+
+Multiple Recipe group 會額外提供 `External acquisition：採掘／掉落／loot → 設為 Base`。此選項永遠需要人工勾選；統一 `recalculate` 會把它轉入既有 `Locked Base Decisions`、保留 Registry 原配方，接著重新計算 dependency graph。直接使用底層 Recipe CLI 時只會回報 pending transfer，不會跨檔案套用。
+
+完成的 Base／Recipe／Tag／Alternative selection 會移出可編輯 Checkbox 區，轉為無 Checkbox 的 `LOCKED` 摘要與隱藏穩定 marker。若 source identity 失效會明確報錯；要刻意修改時必須執行：
+
+```powershell
+node scripts/minecraft-review.cjs reopen <decision-id>
+```
+
+指定 target 的舊介面仍保留作單項診斷：
 
 ```powershell
 node scripts/minecraft-review.cjs start minecraft:piston
-```
-
-`start` 會依序驗證／更新 Base Material Review，再進入 Recipe Ambiguity Review。每次在 Obsidian 完成目前階段的勾選後，統一執行：
-
-```powershell
 node scripts/minecraft-review.cjs recalculate minecraft:piston
 ```
 
-若 Base Material 尚未解除 route-level cycle，流程停在 `BASE_MATERIAL`；Base 通過後但仍有 recipe／tag／alternative 未選，停在 `RECIPE_AMBIGUITY`；所有條件通過才顯示 `READY`。可加 `--dry-run` 驗證而不改寫 Review Markdown。
+Queue state 存在 ignored `review/minecraft-review-queue.json`；Obsidian 摘要為 `Minecraft Review Queue.md`。所有命令只做 Planning／Review，不會啟動 BIO Generator。可加 `--dry-run` 驗證而不改寫 target Review Markdown。
 
 ## Route-aware Recipe Ambiguity Review
 
 完成 Base Material Review 後，`recipe_review.js` 只沿 target 目前 active dependency route 找出必須人工收斂的 ambiguity：
 
 - Multiple Recipe：多條 acyclic production routes 擇一。
-- Tag：resolved tag values 擇一，不會把 values 相加。
+- Tag：resolved tag values 擇一，不會把 values 相加；選擇會提升為全域 Tag representative mapping，而非 target-local 決策。
 - Alternative：Recipe JSON 直接定義的互斥 ingredients 擇一，與 Tag identity 分開。
 
 Review 採逐層收斂。若上游 recipe 尚未選擇，不會展開各 recipe branch 下游的 Tag／Alternative；選定上游後才產生 selected branch 的下一層 ambiguity。未走 branch 的舊 groups 會移至 inactive/stale 區，不再阻擋 readiness，也不會默默刪除選擇或備註。
@@ -364,7 +390,7 @@ Review 採逐層收斂。若上游 recipe 尚未選擇，不會展開各 recipe 
 
 - Recipe candidate：result item、sourceFile 與 normalized recipe semantics 的 SHA-256 fingerprint，不以 array index 作永久 ID。
 - Ingredient context：owner item、recipe identity、ingredient semantics，以及只用於相同 ingredients 的 duplicate ordinal。
-- Tag group：owner item、recipe identity、ingredient identity、tag ID。
+- Tag group：只以 tag ID 建立全域穩定 identity；相同 Tag 不因 target 或 ingredient 位置不同而重複詢問。
 - Alternative group：owner item、recipe identity、ingredient identity。
 
 每個 active ambiguity 必須 exactly one：0 個勾選是 unresolved，1 個有效，2 個以上是 invalid。正式 selection policy 永遠是 `none`；系統不會自動選第一條 recipe、第一個 tag value 或第一個 alternative。
@@ -404,7 +430,7 @@ planning cycles = 0
 
 `createTagBIOMappingDraft(dependencyResult)` 只掃描實際 graph 的 `tagBranches`。每列使用 `kind: "minecraft:item_tag"`，與普通 `minecraft:item` identity 分開；未知 BIO ID、中文名與 filename 保持空白，`generate` 預設為 `false`。
 
-目前人工草稿見 `Minecraft Tag BIO Mapping Draft.md`。這只是 mapping input，不會建立 Tag BIO。
+目前人工草稿見 `Minecraft Tag BIO Mapping Draft.md`。`Representative Item ID` 只供 deterministic dependency preview 使用，不會把 Tag 改寫成普通 item，也不會刪除 Tag branch。統一 `recalculate` 會把尚未 mapping 的 Tag choice 寫入這份全域草稿；已存在且仍有效的 mapping 會在其他 targets 重用。BIO ID、中文名稱與 filename 不會由程式猜測。這份檔案只是 mapping input，不會建立 Tag BIO。
 
 ## BIO Scanner
 

@@ -102,12 +102,22 @@ test("multiple checked candidates round-trip in stable candidate order", () => {
     ]);
 });
 
-test("unchecked candidate cancels a previous selection", () => {
+test("locked candidate requires explicit reopen before changing the selection", () => {
     const { review } = fixture();
     let markdown = vanilla.dependencies.renderBaseMaterialReview(review);
     markdown = setChecked(markdown, "minecraft:cobblestone", true);
     markdown = vanilla.dependencies.renderBaseMaterialReview(review, markdown);
-    markdown = setChecked(markdown, "minecraft:cobblestone", false);
+    assert.doesNotMatch(markdown, /- \[x\] `minecraft:cobblestone`/);
+    assert.match(markdown, /obsf:locked-base:start minecraft:cobblestone candidate/);
+    const reopened = vanilla.dependencies.reopenBaseDecision(
+        markdown,
+        "minecraft:cobblestone"
+    );
+    assert.equal(reopened.reopened, true);
+    markdown = vanilla.dependencies.renderBaseMaterialReview(
+        review,
+        reopened.markdown
+    );
     const parsed = vanilla.dependencies.parseBaseMaterialReview(markdown, review);
     assert.equal(parsed.canApply, true);
     assert.deepEqual(parsed.selectedBaseItemIds, []);
@@ -184,7 +194,8 @@ test("regeneration preserves checkbox state, candidate notes, and outside conten
     );
     const regenerated = vanilla.dependencies.renderBaseMaterialReview(review, markdown);
     assert.match(regenerated, /Keep this paragraph\./);
-    assert.match(regenerated, /- \[x\] `minecraft:cobblestone`/);
+    assert.doesNotMatch(regenerated, /- \[x\] `minecraft:cobblestone`/);
+    assert.match(regenerated, /obsf:locked-base:start minecraft:cobblestone candidate/);
     assert.match(regenerated, /人工備註：鵝卵石由世界取得。/);
     assert.equal(
         vanilla.dependencies.renderBaseMaterialReview(review, regenerated),
@@ -258,6 +269,31 @@ test("external acquisition checkbox makes a graph item an explicit base", () => 
     assert.deepEqual(formal.routeAwareBlockedItems, []);
 });
 
+test("Recipe Review can transfer External acquisition into locked Base decisions", () => {
+    const { review } = fixture();
+    const original = vanilla.dependencies.renderBaseMaterialReview(review);
+    const transferred = vanilla.dependencies.selectExternalBaseMaterial(
+        original,
+        "minecraft:redstone"
+    );
+    assert.equal(transferred.changed, true);
+    const regenerated = vanilla.dependencies.renderBaseMaterialReview(
+        review,
+        transferred.markdown
+    );
+    assert.match(regenerated, /obsf:locked-base:start minecraft:redstone external/);
+    const parsed = vanilla.dependencies.parseBaseMaterialReview(regenerated, review);
+    assert.equal(parsed.canApply, true);
+    assert.ok(parsed.selectedBaseItemIds.includes("minecraft:redstone"));
+    assert.equal(
+        vanilla.dependencies.selectExternalBaseMaterial(
+            regenerated,
+            "minecraft:redstone"
+        ).changed,
+        false
+    );
+});
+
 test("external acquisition must be a current graph item and cannot duplicate a cycle candidate", () => {
     const { review } = fixture();
     const original = vanilla.dependencies.renderBaseMaterialReview(review);
@@ -292,11 +328,8 @@ test("external acquisition survives regeneration with stable markers and notes",
         review,
         markdown
     );
-    assert.match(
-        regenerated,
-        /<!-- obsf:external-base:start minecraft:redstone -->/
-    );
-    assert.match(regenerated, /- \[x\] `minecraft:redstone`/);
+    assert.doesNotMatch(regenerated, /- \[x\] `minecraft:redstone`/);
+    assert.match(regenerated, /obsf:locked-base:start minecraft:redstone external/);
 
     regenerated = regenerated.replace(
         "<!-- 在此輸入人工備註，例如：挖掘掉落 -->",
@@ -329,8 +362,8 @@ test("external acquisition removed from the target graph becomes stale and is no
         nextReview,
         markdown
     );
-    assert.match(regenerated, /過期外部基礎材料（需重新審核）/);
-    assert.match(regenerated, /已不在目前 target dependency graph；不會套用/);
+    assert.match(regenerated, /過期 Locked Base Decisions（需重新審核）/);
+    assert.match(regenerated, /Status: `STALE`（不會套用，需重新審核）/);
 
     const parsed = vanilla.dependencies.parseBaseMaterialReview(
         regenerated,
@@ -347,4 +380,26 @@ test("external checkbox outside the managed section is ignored", () => {
     const parsed = vanilla.dependencies.parseBaseMaterialReview(markdown, review);
     assert.equal(parsed.canApply, true);
     assert.deepEqual(parsed.selectedBaseItemIds, []);
+});
+
+test("dense recoloring alternatives use bounded fixed-point route analysis", () => {
+    const colors = Array.from({ length: 16 }, (_, index) =>
+        `minecraft:test_color_${index}`
+    );
+    const recipeEntries = colors.map(itemId => recipe(
+        itemId,
+        [colors.filter(candidate => candidate !== itemId)]
+    ));
+    recipeEntries.push(recipe(colors.at(-1), ["minecraft:string"]));
+
+    const pipeline = vanilla.createVanillaPipeline({ recipeEntries });
+    const dependency = pipeline.resolveDependencies(colors[0]);
+    const plan = pipeline.createBaseDependencyPlan(dependency, {
+        selectionPolicy: "first-acyclic"
+    });
+
+    assert.equal(plan.baseDependencyMap.get(colors[0]).safe, true);
+    assert.deepEqual(plan.routeAwareBlockedItems, []);
+    assert.equal(plan.canPlanTargets, true);
+    assert.equal(plan.generationOrder.at(-1), colors[0]);
 });

@@ -15,7 +15,10 @@ const REVIEW_START = "<!-- obsf:recipe-review:start -->";
 const REVIEW_END = "<!-- obsf:recipe-review:end -->";
 const ACTIVE_START = "<!-- obsf:recipe-review-active:start -->";
 const ACTIVE_END = "<!-- obsf:recipe-review-active:end -->";
+const RECIPE_LOCKED_START = "<!-- obsf:recipe-review-locked:start -->";
+const RECIPE_LOCKED_END = "<!-- obsf:recipe-review-locked:end -->";
 const GROUP_TYPES = new Set(["recipe", "tag", "alternative"]);
+const EXTERNAL_BASE_PREFIX = "external-base:";
 
 function hashId(prefix, value) {
     const hash = crypto.createHash("sha256")
@@ -125,22 +128,18 @@ function parseRecipeReviewMarkdown(markdown) {
     const groups = new Map();
     const frontmatter = parseFrontmatter(markdown).values;
     const active = managedSlice(markdown, ACTIVE_START, ACTIVE_END);
-    if (!active) {
-        return {
-            frontmatter,
-            groups,
-            diagnostics: [{
-                code: "MISSING_ACTIVE_SECTION",
-                severity: "WARNING",
-                message: "找不到 Recipe Review active managed section；視為尚未產生 selection"
-            }]
-        };
-    }
+    const locked = managedSlice(markdown, RECIPE_LOCKED_START, RECIPE_LOCKED_END);
+    if (!active) diagnostics.push({
+        code: "MISSING_ACTIVE_SECTION",
+        severity: "WARNING",
+        message: "找不到 Recipe Review active managed section；視為尚未產生 selection"
+    });
 
     const groupPattern = /<!-- obsf:ambiguity:start ([^\s>]+) (recipe|tag|alternative) -->([\s\S]*?)<!-- obsf:ambiguity:end \1 -->/g;
-    const declaredGroups = active.content.match(/<!-- obsf:ambiguity:start /g)?.length ?? 0;
+    const activeContent = active?.content ?? "";
+    const declaredGroups = activeContent.match(/<!-- obsf:ambiguity:start /g)?.length ?? 0;
     let recognizedGroups = 0;
-    for (const match of active.content.matchAll(groupPattern)) {
+    for (const match of activeContent.matchAll(groupPattern)) {
         recognizedGroups++;
         const groupId = match[1];
         const type = match[2];
@@ -205,11 +204,13 @@ function parseRecipeReviewMarkdown(markdown) {
             });
         }
         const notes = body.match(/<!-- obsf:notes:start -->([\s\S]*?)<!-- obsf:notes:end -->/);
+        const subject = body.match(/^- Subject: `([^`]+)`$/m)?.[1] ?? null;
         groups.set(groupId, {
             groupId,
             type,
             candidates,
             checkedCandidateIds: checked.map(candidate => candidate.candidateId),
+            tagId: type === "tag" ? subject?.replace(/^#/, "") ?? null : null,
             notes: notes?.[1]?.replace(/\r?\n[ \t]*$/, "\n") ??
                 "\n<!-- 在此輸入人工備註 -->\n"
         });
@@ -219,6 +220,36 @@ function parseRecipeReviewMarkdown(markdown) {
             code: "INVALID_SELECTION",
             severity: "ERROR",
             message: `有 ${declaredGroups - recognizedGroups} 個 malformed ambiguity group markers`
+        });
+    }
+
+    const lockedPattern = /<!-- obsf:locked-ambiguity:start ([^\s>]+) (recipe|tag|alternative) ([^\s>]+) -->([\s\S]*?)<!-- obsf:locked-ambiguity:end \1 -->/g;
+    for (const match of (locked?.content ?? "").matchAll(lockedPattern)) {
+        const groupId = match[1];
+        const type = match[2];
+        const candidateId = match[3];
+        const body = match[4];
+        if (groups.has(groupId)) {
+            diagnostics.push({
+                code: "DUPLICATE_GROUP",
+                severity: "ERROR",
+                message: `Ambiguity group 同時出現在 active 與 locked：${groupId}`,
+                groupId
+            });
+            continue;
+        }
+        const label = body.match(/^- Selected: `[^`]+` — (.*)$/m)?.[1] ?? "";
+        const subject = body.match(/^- Subject: `([^`]+)`$/m)?.[1] ?? null;
+        const notes = body.match(/<!-- obsf:notes:start -->([\s\S]*?)<!-- obsf:notes:end -->/);
+        groups.set(groupId, {
+            groupId,
+            type,
+            locked: true,
+            candidates: [{ candidateId, checked: true, label }],
+            checkedCandidateIds: [candidateId],
+            tagId: type === "tag" ? subject?.replace(/^#/, "") ?? null : null,
+            notes: notes?.[1]?.replace(/\r?\n[ \t]*$/, "\n") ??
+                "\n<!-- 在此輸入人工備註 -->\n"
         });
     }
     return { frontmatter, groups, diagnostics };
@@ -275,6 +306,7 @@ function createRecipeAmbiguityAnalysis(
     const selectedBaseItemIds = [...(options.baseItemIds ?? [])];
     const diagnostics = [...(parsedReview.diagnostics ?? [])];
     const groups = [];
+    const registeredGroups = new Map();
     const activeGroupIds = new Set();
     const unresolvedGroupIds = [];
     const invalidGroupIds = new Set();
@@ -282,6 +314,13 @@ function createRecipeAmbiguityAnalysis(
     const planningCycles = [];
     const generationOrder = [];
     const generated = new Set();
+    const tagMappings = options.tagMappings instanceof Map
+        ? options.tagMappings
+        : new Map(Object.entries(options.tagMappings ?? {}));
+    const requestedExternalBaseItemIds = new Set();
+    const requestedTagMappings = new Map();
+    const appliedTagMappings = new Map();
+    diagnostics.push(...(options.tagMappingDiagnostics ?? []));
 
     if (
         parsedReview.frontmatter?.sourceFingerprint &&
@@ -326,6 +365,9 @@ function createRecipeAmbiguityAnalysis(
     }
 
     function registerGroup(group) {
+        if (registeredGroups.has(group.groupId)) {
+            return registeredGroups.get(group.groupId).selectedCandidateId;
+        }
         activeGroupIds.add(group.groupId);
         const state = parsedReview.groups?.get(group.groupId) ?? null;
         const currentIds = new Set(group.candidates.map(candidate => candidate.candidateId));
@@ -376,6 +418,7 @@ function createRecipeAmbiguityAnalysis(
             unresolvedGroupIds.push(group.groupId);
         }
         groups.push(group);
+        registeredGroups.set(group.groupId, group);
         return group.selectedCandidateId;
     }
 
@@ -401,19 +444,31 @@ function createRecipeAmbiguityAnalysis(
                 return false;
             }
             let selected = viable[0];
-            if (viable.length > 1) {
-                const groupId = hashId("tag", {
-                    ownerItemId: context.ownerItemId,
-                    recipeId: context.recipeId,
-                    ingredientId: context.ingredientId,
+            const globalMapping = tagMappings.get(ingredient.id);
+            if (globalMapping?.representativeItemId) {
+                const mapped = viable.find(candidate =>
+                    candidate.id === globalMapping.representativeItemId
+                );
+                if (mapped) {
+                    appliedTagMappings.set(ingredient.id, mapped.id);
+                    return walkItem(mapped.id, activePath);
+                }
+                diagnostics.push({
+                    code: "TAG_REPRESENTATIVE_NO_LONGER_EXISTS",
+                    severity: "WARNING",
+                    message: `全域 Tag representative 已不在目前 values：#${ingredient.id} → ${globalMapping.representativeItemId}`,
                     tagId: ingredient.id
                 });
+            }
+            if (viable.length > 1) {
+                const groupId = hashId("tag-global", { tagId: ingredient.id });
                 const group = {
                     groupId,
                     type: "tag",
                     ownerItemId: context.ownerItemId,
                     recipeId: context.recipeId,
                     ingredientId: context.ingredientId,
+                    tagId: ingredient.id,
                     title: `#${ingredient.id} ×${ingredient.qty ?? 1}`,
                     candidates: viable.map(candidate => ({
                         candidateId: candidate.id,
@@ -424,6 +479,7 @@ function createRecipeAmbiguityAnalysis(
                 const selectedId = registerGroup(group);
                 if (!selectedId) return false;
                 selected = viable.find(candidate => candidate.id === selectedId);
+                requestedTagMappings.set(ingredient.id, selectedId);
             }
             return walkItem(selected.id, activePath);
         }
@@ -527,11 +583,16 @@ function createRecipeAmbiguityAnalysis(
         }
         let selected = viable[0];
         if (viable.length > 1) {
-            const candidates = viable.map(recipe => ({
+            const candidates = [{
+                candidateId: `${EXTERNAL_BASE_PREFIX}${itemId}`,
+                label: "External acquisition：採掘／掉落／loot → 設為 Base",
+                itemId,
+                externalBase: true
+            }, ...viable.map(recipe => ({
                 candidateId: recipeIdentity(itemId, recipe),
                 label: recipeLabel(recipe),
                 recipe
-            }));
+            }))];
             const groupId = hashId("recipe-group", { itemId });
             const selectedId = registerGroup({
                 groupId,
@@ -541,7 +602,16 @@ function createRecipeAmbiguityAnalysis(
                 candidates
             });
             if (!selectedId) return false;
-            selected = candidates.find(candidate => candidate.candidateId === selectedId).recipe;
+            const selectedCandidate = candidates.find(candidate =>
+                candidate.candidateId === selectedId
+            );
+            if (selectedCandidate.externalBase) {
+                requestedExternalBaseItemIds.add(itemId);
+                generated.add(itemId);
+                generationOrder.push(itemId);
+                return true;
+            }
+            selected = selectedCandidate.recipe;
         }
         const nextPath = [...activePath, itemId];
         if (!walkRecipe(itemId, selected, nextPath)) return false;
@@ -551,6 +621,20 @@ function createRecipeAmbiguityAnalysis(
     }
 
     const targetComplete = target ? walkItem(target) : false;
+    if (requestedExternalBaseItemIds.size > 0) {
+        diagnostics.push({
+            code: "EXTERNAL_BASE_TRANSFER_REQUIRED",
+            severity: "INFO",
+            message: "External acquisition 已選擇；請由統一 workflow 轉入 Locked Base Decisions 後重算"
+        });
+    }
+    if (requestedTagMappings.size > 0) {
+        diagnostics.push({
+            code: "GLOBAL_TAG_TRANSFER_REQUIRED",
+            severity: "INFO",
+            message: "Tag representative 已選擇；請由統一 workflow 寫入全域 Tag mapping 後重算"
+        });
+    }
     for (const [groupId] of parsedReview.groups ?? []) {
         if (activeGroupIds.has(groupId)) continue;
         diagnostics.push({
@@ -570,7 +654,9 @@ function createRecipeAmbiguityAnalysis(
             activeBlockedItems.size === 0 &&
             unresolvedGroupIds.length === 0 &&
             invalidSelections === 0 &&
-            planningCycles.length === 0,
+            planningCycles.length === 0 &&
+            requestedExternalBaseItemIds.size === 0 &&
+            requestedTagMappings.size === 0,
         blocked: activeBlockedItems.size,
         unresolvedAmbiguities: unresolvedGroupIds.length,
         invalidSelections,
@@ -592,6 +678,13 @@ function createRecipeAmbiguityAnalysis(
         activeBlockedItems: [...activeBlockedItems],
         planningCycles,
         generationOrder,
+        requestedExternalBaseItemIds: [...requestedExternalBaseItemIds].sort(),
+        requestedTagMappings: [...requestedTagMappings.entries()]
+            .map(([tagId, representativeItemId]) => ({ tagId, representativeItemId }))
+            .sort((left, right) => left.tagId.localeCompare(right.tagId)),
+        appliedTagMappings: [...appliedTagMappings.entries()]
+            .map(([tagId, representativeItemId]) => ({ tagId, representativeItemId }))
+            .sort((left, right) => left.tagId.localeCompare(right.tagId)),
         diagnostics,
         readiness
     };
@@ -619,6 +712,7 @@ function renderGroup(group, state) {
         "",
         `- Group ID: \`${group.groupId}\``,
         `- Type: \`${group.type}\``,
+        ...(group.tagId ? [`- Subject: \`#${group.tagId}\``] : []),
         ""
     ];
     for (const candidate of ordered) {
@@ -664,6 +758,50 @@ function renderInactiveGroup(groupId, state) {
     return lines.join("\n");
 }
 
+function renderLockedGroup(group, state) {
+    const selected = group.candidates.find(candidate =>
+        candidate.candidateId === group.selectedCandidateId
+    );
+    const notes = state?.notes ?? "\n<!-- 在此輸入人工備註 -->\n";
+    return [
+        `<!-- obsf:locked-ambiguity:start ${group.groupId} ${group.type} ${group.selectedCandidateId} -->`,
+        `### ${group.title}`,
+        "",
+        `- Group ID: \`${group.groupId}\``,
+        `- Type: \`${group.type}\``,
+        ...(group.tagId ? [`- Subject: \`#${group.tagId}\``] : []),
+        `- Selected: \`${group.selectedCandidateId}\` — ${selected?.label ?? ""}`,
+        "- Status: `LOCKED`（不提供 Checkbox，避免誤改）",
+        "",
+        "<!-- obsf:notes:start -->" + notes + "<!-- obsf:notes:end -->",
+        `<!-- obsf:locked-ambiguity:end ${group.groupId} -->`
+    ].join("\n");
+}
+
+function collectRecipeDecisionTransfers(markdown) {
+    const parsed = parseRecipeReviewMarkdown(markdown);
+    const externalBaseItemIds = [];
+    const tagMappings = [];
+    for (const group of parsed.groups.values()) {
+        if (group.checkedCandidateIds.length !== 1) continue;
+        const selected = group.checkedCandidateIds[0];
+        if (group.type === "recipe" && selected.startsWith(EXTERNAL_BASE_PREFIX)) {
+            externalBaseItemIds.push(selected.slice(EXTERNAL_BASE_PREFIX.length));
+        }
+        if (group.type === "tag" && group.tagId) {
+            tagMappings.push({
+                tagId: group.tagId,
+                representativeItemId: selected
+            });
+        }
+    }
+    return {
+        externalBaseItemIds: [...new Set(externalBaseItemIds)].sort(),
+        tagMappings: tagMappings.sort((left, right) => left.tagId.localeCompare(right.tagId)),
+        diagnostics: parsed.diagnostics
+    };
+}
+
 function renderRecipeReview(analysis, existingMarkdown = "") {
     const existingStates = extractAllExistingGroupStates(existingMarkdown);
     const activeByType = new Map([
@@ -671,7 +809,12 @@ function renderRecipeReview(analysis, existingMarkdown = "") {
         ["tag", []],
         ["alternative", []]
     ]);
-    for (const group of analysis.groups) activeByType.get(group.type).push(group);
+    for (const group of analysis.groups) {
+        if (group.status !== "RESOLVED") activeByType.get(group.type).push(group);
+    }
+    const lockedGroups = analysis.groups
+        .filter(group => group.status === "RESOLVED")
+        .sort((left, right) => left.groupId.localeCompare(right.groupId));
     const headings = {
         recipe: "Multiple Recipe Selection",
         tag: "Tag Selection",
@@ -695,7 +838,12 @@ function renderRecipeReview(analysis, existingMarkdown = "") {
             lines.push(renderGroup(group, existingStates.get(group.groupId)), "");
         }
     }
-    lines.push(ACTIVE_END, "", "## Readiness", "", "```json", JSON.stringify(analysis.readiness, null, 2), "```");
+    lines.push(ACTIVE_END, "", "## Locked Decisions", "", RECIPE_LOCKED_START);
+    if (lockedGroups.length === 0) lines.push("- 無");
+    for (const group of lockedGroups) {
+        lines.push(renderLockedGroup(group, existingStates.get(group.groupId)), "");
+    }
+    lines.push(RECIPE_LOCKED_END, "", "## Readiness", "", "```json", JSON.stringify(analysis.readiness, null, 2), "```");
     lines.push("", "## Diagnostics", "");
     if (analysis.diagnostics.length === 0) lines.push("- 無");
     else for (const diagnostic of analysis.diagnostics) {
@@ -741,18 +889,34 @@ function renderRecipeReview(analysis, existingMarkdown = "") {
     });
 }
 
+function reopenRecipeDecision(markdown, groupId) {
+    const escaped = String(groupId).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(
+        `<!-- obsf:locked-ambiguity:start ${escaped} (?:recipe|tag|alternative) [^\\s>]+ -->[\\s\\S]*?<!-- obsf:locked-ambiguity:end ${escaped} -->\\n?`,
+        "g"
+    );
+    const source = String(markdown ?? "");
+    if (!pattern.test(source)) return { markdown: source, reopened: false };
+    return { markdown: source.replace(pattern, ""), reopened: true };
+}
+
 module.exports = {
     SCHEMA_VERSION,
     REVIEW_START,
     REVIEW_END,
     ACTIVE_START,
     ACTIVE_END,
+    RECIPE_LOCKED_START,
+    RECIPE_LOCKED_END,
     GROUP_TYPES,
+    EXTERNAL_BASE_PREFIX,
     recipeIdentity,
     ingredientIdentity,
     recipeLabel,
     baseSelectionFingerprint,
     parseRecipeReviewMarkdown,
     createRecipeAmbiguityAnalysis,
-    renderRecipeReview
+    renderRecipeReview,
+    reopenRecipeDecision,
+    collectRecipeDecisionTransfers
 };

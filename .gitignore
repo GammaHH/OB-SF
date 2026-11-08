@@ -1,5 +1,6 @@
 /review
 /.obsidian
+/Minecraft Review Queue.md
 
 # Review workflow regression tests are project artifacts even when a local
 # .git/info/exclude contains a broader tests/minecraft-vanilla-pipeline rule.
