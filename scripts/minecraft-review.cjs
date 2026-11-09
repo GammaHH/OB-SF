@@ -4,6 +4,12 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const { createMinecraftVanillaRuntime } = require("./lib/minecraft-vanilla-runtime.cjs");
+const { writeFileWithRetrySync } = require("./lib/file-write-retry.cjs");
+const {
+    readReviewDecisionStore,
+    writeReviewDecisionStore,
+    backupLegacyMarkdown
+} = require("./lib/review-decision-store.cjs");
 const vanilla = require("../模板放置處/MC解析器模塊");
 
 const vaultRoot = path.resolve(__dirname, "..");
@@ -40,8 +46,7 @@ function readText(absolute) {
 }
 
 function writeText(absolute, content) {
-    fs.mkdirSync(path.dirname(absolute), { recursive: true });
-    fs.writeFileSync(absolute, content, "utf8");
+    writeFileWithRetrySync(absolute, content);
 }
 
 function runNode(script, args) {
@@ -101,24 +106,58 @@ function legacyReviewPathsForTarget(target) {
     };
 }
 
-function decisionRegistryPath() {
-    return safeVaultPath(
-        option("decision-registry", "Minecraft Review Decisions.md"),
-        ".md"
-    );
+function decisionRegistryPaths() {
+    return {
+        jsonPath: safeVaultPath(
+            option("decision-registry", "Minecraft Review Decisions.json"),
+            ".json"
+        ),
+        summaryMarkdownPath: safeVaultPath(
+            option("decision-summary", "Minecraft Review Decisions.md"),
+            ".md"
+        )
+    };
 }
 
 function readDecisionRegistry() {
-    return vanilla.dependencies.parseReviewDecisionRegistry(
-        readText(decisionRegistryPath())
-    );
+    const paths = decisionRegistryPaths();
+    return readReviewDecisionStore({
+        ...paths,
+        legacyMarkdownPath: paths.summaryMarkdownPath
+    }).registry;
 }
 
 function writeDecisionRegistry(registry) {
-    writeText(
-        decisionRegistryPath(),
-        vanilla.dependencies.renderReviewDecisionRegistry(registry)
+    writeReviewDecisionStore(registry, decisionRegistryPaths());
+}
+
+function migrateDecisionRegistryStore() {
+    const paths = decisionRegistryPaths();
+    if (fs.existsSync(paths.jsonPath)) {
+        throw new Error(`JSON Decision Registry 已存在：${vaultPath(paths.jsonPath)}`);
+    }
+    const loaded = readReviewDecisionStore({
+        ...paths,
+        legacyMarkdownPath: paths.summaryMarkdownPath
+    });
+    if (loaded.source !== "legacy-markdown") {
+        throw new Error("找不到可遷移的完整 legacy Markdown Registry");
+    }
+    const backupPath = backupLegacyMarkdown(
+        paths.summaryMarkdownPath,
+        safeVaultPath("review/registry-migration-backups")
     );
+    writeReviewDecisionStore(loaded.registry, paths);
+    const verified = readReviewDecisionStore({
+        ...paths,
+        legacyMarkdownPath: paths.summaryMarkdownPath
+    });
+    process.stdout.write("Decision Registry Migration:\n");
+    process.stdout.write(`- source: ${vaultPath(paths.summaryMarkdownPath)}\n`);
+    process.stdout.write(`- backup: ${vaultPath(backupPath)}\n`);
+    process.stdout.write(`- machineRegistry: ${vaultPath(paths.jsonPath)}\n`);
+    process.stdout.write(`- savedTargets: ${Object.keys(verified.registry.targets).length}\n`);
+    process.stdout.write(`- validation: PASS\n`);
 }
 
 function reviewSnapshotFromPaths(paths) {
@@ -233,7 +272,7 @@ function migrateLegacyReviews() {
             throw new Error(`Legacy snapshot round-trip 驗證失敗：${snapshot.target}`);
         }
     }
-    writeText(decisionRegistryPath(), rendered);
+    writeDecisionRegistry(verified);
     process.stdout.write("Legacy Review Migration:\n");
     process.stdout.write(`- directories: ${directories.length}\n`);
     process.stdout.write(`- imported: ${imported.length}\n`);
@@ -244,7 +283,7 @@ function migrateLegacyReviews() {
     process.stdout.write(`- snapshotRoundTrip: PASS\n`);
     process.stdout.write(`- legacyFilesDeleted: 0\n`);
     process.stdout.write(
-        `- registry: ${vaultPath(decisionRegistryPath())}\n`
+        `- registry: ${vaultPath(decisionRegistryPaths().jsonPath)}\n`
     );
 }
 
@@ -864,6 +903,7 @@ function usage() {
     process.stderr.write(
         "Usage:\n" +
         "  node scripts/minecraft-review.cjs scan\n" +
+        "  node scripts/minecraft-review.cjs migrate-registry\n" +
         "  node scripts/minecraft-review.cjs migrate-legacy\n" +
         "  node scripts/minecraft-review.cjs next\n" +
         "  node scripts/minecraft-review.cjs recalculate\n" +
@@ -879,6 +919,7 @@ function main() {
     const command = process.argv[2];
     const argument = process.argv[3]?.startsWith("--") ? null : process.argv[3];
     if (command === "scan") return scan();
+    if (command === "migrate-registry") return migrateDecisionRegistryStore();
     if (command === "migrate-legacy") return migrateLegacyReviews();
     if (command === "next") return next();
     if (command === "recalculate") return recalculate(argument);

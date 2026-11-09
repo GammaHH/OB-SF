@@ -1,6 +1,6 @@
 ---
 created: 2026-08-12 17:37
-updated: 2026-11-09 01:03
+updated: 2026-11-09 14:50
 ---
 
 # OB-SF Minecraft Vanilla Pipeline V1.3
@@ -123,18 +123,28 @@ Registry API：
 
 ```json
 {
-  "sourceType": "minecraft:crafting_shaped",
+  "sourceType": "minecraft:crafting_shapeless",
   "section": "常規",
   "machine": "工作台",
   "output": 1,
   "ingredients": [],
   "meta": {
-    "sourceFile": "recipe/barrel.json"
+    "resultComponents": {
+      "minecraft:suspicious_stew_effects": [
+        {
+          "duration": 60,
+          "id": "minecraft:fire_resistance"
+        }
+      ]
+    },
+    "sourceFile": "recipe/suspicious_stew_from_allium.json"
   }
 }
 ```
 
 `recipe.output` 是執行一次 recipe 的成品數量；`ingredient.qty` 是執行一次 recipe 所需的材料數量。
+
+若 raw result 含有 `components`，Parser 會原樣深拷貝到可選的 `recipe.meta.resultComponents`；沒有 components 的既有 recipes 不新增此欄位。這使相同 result item ID 的 component variants（例如不同花對應不同效果與 duration 的 suspicious stew）仍維持為語意不同的 recipes。Base Route／External Base 只影響 generation planning traversal，不會移除這些 routes 或 result components。
 
 目前註冊的 recipe types：
 
@@ -309,6 +319,7 @@ Route safety 使用 monotone fixed-point rank，並針對每條 candidate route 
 - frontmatter 記錄 `schemaVersion`、`target`、`sourceFingerprint`。
 - cycle group 與 path 由 route-level blocking cycles 產生。
 - 全域候選清單以 Minecraft Item ID 作穩定 ID，同一 item 只出現一次。
+- 若某個 cycle group 只有一個候選，Planner 以 `AUTO_SINGLE_CANDIDATE` 直接將該 item 作為 external acquisition boundary，不產生只有一格的人工 Checkbox；兩個以上候選仍必須人工選擇。
 - 只解析 `obsf:base-material-selection` markers 內的標準 Markdown Checkbox。
 - Checkbox 外的普通 Obsidian task 不會成為設定。
 - duplicate、invalid、unknown、stale、missing candidate 都產生明確 diagnostics。
@@ -320,7 +331,7 @@ Route safety 使用 monotone fixed-point rank，並針對每條 candidate route 
 - 外部來源可在該 managed section 內直接新增 Checkbox 並填入 `minecraft:redstone`；下一次重算會轉成穩定 ID block，並保留勾選與人工備註。
 - 同一 item 不可同時作為 cycle candidate 與 additional external base；unknown、duplicate 或已離開 graph 的項目會明確報錯或移至過期區。
 
-Review Parser 只將通過驗證且被勾選的候選轉為 `explicitBaseItemIds`。正式 `selectionPolicy` 仍為 `none`；CLI 額外輸出的 `first-acyclic` generation order 只是 deterministic preview，Recipe／Tag／Alternative selection 仍是後續獨立審核。
+Review Parser 將通過驗證且被勾選的候選，以及唯一候選的 `AUTO_SINGLE_CANDIDATE` locked decision，轉為 `explicitBaseItemIds`。正式 `selectionPolicy` 仍為 `none`；CLI 額外輸出的 `first-acyclic` generation order 只是 deterministic preview，Recipe／Tag／Alternative selection 仍是後續獨立審核。
 
 產生或合併 piston review：
 
@@ -349,9 +360,17 @@ node scripts/minecraft-review.cjs next
 
 全量 scan 使用固定小批次隔離 process（預設 25 targets／batch、每個 worker 1 GiB V8 heap）；每批結束即釋放 dependency graph。若某批失敗會自動二分定位到具體 target，不以提高單一 process heap 掩蓋不受控的 graph 累積。診斷時可用 `--scan-batch-size=N`（1–100）調整批次，不改變結果順序。
 
-`next` 取得下一個 `PENDING` target，並載入根目錄固定工作檔 `Minecraft Base Material Review.md`／`Minecraft Recipe Review.md`。Queue targets 使用穩定 item ID 排序；切換 target 前，上一個 target 的完整 Review snapshot 會寫入 `Minecraft Review Decisions.md`，因此 Checkbox、Locked decisions 與人工備註不會因根目錄工作檔切換而遺失。
+`next` 取得下一個 `PENDING` target，並載入根目錄固定工作檔 `Minecraft Base Material Review.md`／`Minecraft Recipe Review.md`。Queue targets 使用穩定 item ID 排序；切換 target 前，上一個 target 的完整 Review snapshot 會寫入 `Minecraft Review Decisions.json`，因此 Checkbox、Locked decisions 與人工備註不會因根目錄工作檔切換而遺失。
 
-`Minecraft Review Decisions.md` 使用 Markdown 外殼與固定 marker 包住嚴格 JSON schema；程式直接解析 JSON，不依賴標題、行號或自然語言。Registry 以 target ID 為 key，保存 `sourceFingerprint`、結構化 `lockedBaseDecisions`／`lockedAmbiguityDecisions`，以及可無損還原人工備註的完整 Base／Recipe Review snapshot。既有 `Minecraft Reviews/minecraft__*/` 只作一次性 migration source，之後不再建立新的 target 資料夾。
+`Minecraft Review Decisions.json` 是機器讀寫的唯一 source-of-truth。Registry 以 target ID 為 key，保存 `sourceFingerprint`、結構化 `lockedBaseDecisions`／`lockedAmbiguityDecisions`，以及可無損還原人工備註的完整 Base／Recipe Review snapshot。每次更新先寫入並驗證 temporary JSON，再保留上一版為 `Minecraft Review Decisions.json.previous`，最後才替換正式檔案。`Minecraft Review Decisions.md` 只是 Obsidian 可讀的小型 target 摘要，不再包含大型 JSON；既有 `Minecraft Reviews/minecraft__*/` 只作一次性 migration source，之後不再建立新的 target 資料夾。
+
+舊版大型 Markdown Registry 必須先遷移；命令會先在 `review/registry-migration-backups/` 建立 timestamped 完整備份、驗證 JSON round-trip，成功後才把根目錄 Markdown 改成小型摘要：
+
+```powershell
+node scripts/minecraft-review.cjs migrate-registry
+```
+
+遷移期間請停用會在每次編輯時重寫 frontmatter 的 Obsidian 外掛；確認 JSON、備份與 target 數量後，才恢復 `scan`／`next`／`recalculate`。JSON 不應由 Obsidian 日期外掛處理。
 
 既有 target folders 可一次匯入並做完整 snapshot round-trip 驗證：
 
@@ -412,7 +431,7 @@ Queue state 存在 ignored `review/minecraft-review-queue.json`；Obsidian 摘�
 
 - Base Route for Generation Planning：多條 acyclic production routes 中選一條供 BIO bottom-up generation ordering；這不是唯一正式配方，所有合法 recipes 與 External acquisition 仍保留於 Normalized Registry，未來 BIO 顯示全部取得方式。
 - Tag：resolved tag values 擇一，不會把 values 相加；選擇會提升為全域 Tag representative mapping，而非 target-local 決策。
-- Alternative：Recipe JSON 直接定義的互斥 ingredients 擇一，與 Tag identity 分開。Minecraft 染色物品會另外建立 color-family preference（例如 `minecraft-color-family:wool → minecraft:white_wool`）；只有偏好 item 仍存在於目前候選時才重用，否則維持 unresolved 並要求人工選擇。
+- Alternative：Recipe JSON 直接定義的互斥 ingredients 擇一，與 Tag identity 分開。候選集合完全相同時會建立 candidate-set preference（例如 `{coal, charcoal} → coal`）；Minecraft 染色物品則使用 color-family preference（例如 `minecraft-color-family:wool → minecraft:white_wool`）。只有偏好 item 仍存在於目前候選時才重用，否則維持 unresolved 並要求人工選擇。
 
 Review 採逐層收斂。若上游 recipe 尚未選擇，不會展開各 recipe branch 下游的 Tag／Alternative；選定上游後才產生 selected branch 的下一層 ambiguity。未走 branch 的舊 groups 會移至 inactive/stale 區，不再阻擋 readiness，也不會默默刪除選擇或備註。
 
@@ -423,8 +442,9 @@ Review 採逐層收斂。若上游 recipe 尚未選擇，不會展開各 recipe 
 - Tag group：只以 tag ID 建立全域穩定 identity；相同 Tag 不因 target 或 ingredient 位置不同而重複詢問。
 - Alternative group：owner item、recipe identity、ingredient identity；精確 group decision 仍依此 identity 保存。
 - Global Alternative Preference：已辨識的 Minecraft color family 使用獨立 preference key。不同顏色 target 即使排除自身顏色、導致完整候選集合不同，仍可重用同一個有效代表；不改寫或刪除 Normalized Registry alternatives。
+- Generic Alternative Preference：其餘 alternatives 以排序後的完整 normalized candidate set 建立穩定 key；候選順序不同仍可重用，但候選內容不同不會互相套用。
 
-每個 active ambiguity 必須 exactly one：0 個勾選是 unresolved，1 個有效，2 個以上是 invalid。正式 selection policy 永遠是 `none`；系統不會自動選第一條 recipe、第一個 tag value 或第一個 alternative。唯一自動套用來源是已由使用者確認並保存於 Global Decision Registry／Tag mapping 的既有決策。
+每個 active ambiguity 必須 exactly one：0 個勾選是 unresolved，1 個有效，2 個以上是 invalid。正式 selection policy 永遠是 `none`；系統不會自動選第一條 recipe、第一個 tag value 或第一個 alternative。Recipe ambiguity 的自動套用來源限於已由使用者確認並保存於 Global Decision Registry／Tag mapping 的既有決策；Base Material 另允許 cycle group 唯一候選使用 `AUTO_SINGLE_CANDIDATE`。
 
 產生或合併 Review：
 
@@ -494,6 +514,12 @@ minecraft:iron_ingot
 Normalized registry 仍使用 Minecraft canonical ID。BIO Generator 負責 deterministic mapping，不以中文檔名反推 ID。
 
 Tag 索引 BIO（例如 `PLANKS`／任意木材）會使用獨立格式，尚未在本階段定案。
+
+## Deferred Optimizations
+
+- **Potion／Brewing component-aware normalization（低優先級）**：Minecraft 藥水 variants 共用 `minecraft:potion`、`minecraft:splash_potion`、`minecraft:lingering_potion` 等 item ID，實際 identity 與效果存在 `minecraft:potion_contents`。未來若納入 Brewing Registry，需保存 base potion component、釀造材料、output component，以及 copy／replace transform semantics；不可將所有藥水壓成同一普通 item recipe。
+- 目前 raw recipe/tag source 不含完整 Brewing Registry；`minecraft:crafting_imbue`（例如 tipped arrow）繼續作為 component-copying `SPECIAL` boundary。
+- 此項不阻擋目前 Slimefun 主流程、Vanilla dependency review 或 BIO Generator 第一階段；待實際需要解析藥水取得鏈時再實作，不在目前階段擴充 schema。
 
 ## Status
 

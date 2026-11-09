@@ -1,25 +1,20 @@
 ---
 type: minecraft-base-material-review
 schemaVersion: 1
-target: minecraft:granite_slab
-sourceFingerprint: sha256:8f687b3c5a89d38f9c8e23285ba2dc5b93c7db76aaf8b8c2834432e8dab49bdd
-created: 2026-11-04 13:31
-updated: 2026-11-09 01:13
+target: minecraft:white_stained_glass_pane
+sourceFingerprint: sha256:3d1de5458af845711aad82e53a2a285b0114f0b65e0d129699940e81954544ec
 ---
 
 <!-- obsf:base-material-review:start -->
 # Minecraft Base Material Review
 
-- Target Item ID: `minecraft:granite_slab`
+- Target Item ID: `minecraft:white_stained_glass_pane`
 - Schema Version: `1`
-- Source Fingerprint: `sha256:8f687b3c5a89d38f9c8e23285ba2dc5b93c7db76aaf8b8c2834432e8dab49bdd`
+- Source Fingerprint: `sha256:3d1de5458af845711aad82e53a2a285b0114f0b65e0d129699940e81954544ec`
 
 ## 循環群組
 
-### `cycle-946b2c92528a`
-
-- 候選：`minecraft:cobblestone`, `minecraft:stone`
-- 路徑：`minecraft:cobblestone` → `minecraft:stone` → `minecraft:cobblestone`
+- 無
 
 ## Base Material Selection
 
@@ -42,28 +37,7 @@ updated: 2026-11-09 01:13
 ## Locked Base Decisions
 
 <!-- obsf:base-material-locked:start -->
-<!-- obsf:locked-base:start minecraft:cobblestone candidate -->
-- Item: `minecraft:cobblestone`
-- Source: `candidate`
-- Selection Source: `GLOBAL_DECISION_REGISTRY`
-- Acquisition Boundary: `external`
-- Status: `LOCKED`（不提供 Checkbox，避免誤改）
-<!-- obsf:notes:start -->
-<!-- 由 Global Decision Registry 自動套用 -->
-<!-- obsf:notes:end -->
-<!-- obsf:locked-base:end minecraft:cobblestone -->
-
-<!-- obsf:locked-base:start minecraft:quartz external -->
-- Item: `minecraft:quartz`
-- Source: `external`
-- Selection Source: `GLOBAL_DECISION_REGISTRY`
-- Acquisition Boundary: `external`
-- Status: `LOCKED`（不提供 Checkbox，避免誤改）
-<!-- obsf:notes:start -->
-<!-- 由 Global Decision Registry 自動套用 -->
-<!-- obsf:notes:end -->
-<!-- obsf:locked-base:end minecraft:quartz -->
-
+- 無
 <!-- obsf:base-material-locked:end -->
 
 ## 未解決的循環

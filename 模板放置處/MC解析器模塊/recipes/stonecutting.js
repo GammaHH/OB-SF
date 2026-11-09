@@ -147,6 +147,10 @@ module.exports = {
 
                 meta: {
 
+                    ...(result.components == null ? {} : {
+                        resultComponents: result.components
+                    }),
+
                     sourceFile
                 }
             },

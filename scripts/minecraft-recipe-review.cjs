@@ -3,6 +3,12 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { createMinecraftVanillaRuntime } = require("./lib/minecraft-vanilla-runtime.cjs");
+const {
+    writeFileWithRetrySync,
+    readFileWithRetrySync,
+    isFrontmatterOnlyPlaceholder
+} = require("./lib/file-write-retry.cjs");
+const { readReviewDecisionStore } = require("./lib/review-decision-store.cjs");
 const vanilla = require("../模板放置處/MC解析器模塊");
 
 const vaultRoot = path.resolve(__dirname, "..");
@@ -26,6 +32,19 @@ function reviewPath(name, fallback) {
     }
     if (path.extname(absolutePath).toLowerCase() !== ".md") {
         throw new Error(`${name} path 必須是 Markdown 檔案`);
+    }
+    return absolutePath;
+}
+
+function jsonPath(name, fallback) {
+    const requested = option(name, fallback);
+    const absolutePath = path.resolve(vaultRoot, requested);
+    const relative = path.relative(vaultRoot, absolutePath);
+    if (relative.startsWith("..") || path.isAbsolute(relative)) {
+        throw new Error(`${name} path 必須位於 OB-SF worktree 內`);
+    }
+    if (path.extname(absolutePath).toLowerCase() !== ".json") {
+        throw new Error(`${name} path 必須是 JSON 檔案`);
     }
     return absolutePath;
 }
@@ -89,7 +108,12 @@ function buildContext(
             `Base Material Review 不存在：${vaultPath(baseReviewPath)}；請先完成 base review`
         );
     }
-    const baseMarkdown = fs.readFileSync(baseReviewPath, "utf8");
+    const baseMarkdown = readFileWithRetrySync(baseReviewPath, {
+        validate: content =>
+            content.includes("<!-- obsf:base-material-review:start -->") &&
+            content.includes("<!-- obsf:base-material-selection:start -->") &&
+            content.includes("<!-- obsf:base-material-review:end -->")
+    }).content;
     const baseSelection =
         runtime.vanilla.dependencies.parseBaseMaterialReview(
             baseMarkdown,
@@ -107,9 +131,18 @@ function buildContext(
         baseItemIds: baseSelection.selectedBaseItemIds,
         selectionPolicy: "none"
     });
-    const existingMarkdown = fs.existsSync(recipeReviewPath)
-        ? fs.readFileSync(recipeReviewPath, "utf8")
+    const existingSource = fs.existsSync(recipeReviewPath) &&
+        fs.statSync(recipeReviewPath).size > 0
+        ? readFileWithRetrySync(recipeReviewPath, {
+            validate: content =>
+                (content.includes("<!-- obsf:recipe-review:start -->") &&
+                    content.includes("<!-- obsf:recipe-review-active:start -->")) ||
+                isFrontmatterOnlyPlaceholder(content)
+        }).content
         : "";
+    const existingMarkdown = isFrontmatterOnlyPlaceholder(existingSource)
+        ? ""
+        : existingSource;
     const parsedRecipeReview = existingMarkdown
         ? runtime.vanilla.dependencies.parseRecipeReviewMarkdown(existingMarkdown)
         : { groups: new Map(), diagnostics: [], frontmatter: {} };
@@ -118,11 +151,13 @@ function buildContext(
             fs.readFileSync(tagMappingPath, "utf8")
         )
         : { mappings: new Map(), diagnostics: [] };
-    const decisionRegistry = fs.existsSync(decisionRegistryPath)
-        ? runtime.vanilla.dependencies.parseReviewDecisionRegistry(
-            fs.readFileSync(decisionRegistryPath, "utf8")
+    const decisionRegistry = readReviewDecisionStore({
+        jsonPath: decisionRegistryPath,
+        legacyMarkdownPath: path.join(
+            vaultRoot,
+            "Minecraft Review Decisions.md"
         )
-        : runtime.vanilla.dependencies.emptyReviewDecisionRegistry();
+    }).registry;
     const globalDecisionIndex =
         runtime.vanilla.dependencies.createGlobalAmbiguityDecisionIndex(
             decisionRegistry
@@ -159,8 +194,7 @@ function buildContext(
 }
 
 function writeReview(absolutePath, markdown) {
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
-    fs.writeFileSync(absolutePath, markdown, "utf8");
+    writeFileWithRetrySync(absolutePath, markdown);
 }
 
 function printSummary(context, recipeReviewPath, dryRun) {
@@ -231,9 +265,9 @@ function main() {
         "tag-mapping",
         "Minecraft Tag BIO Mapping Draft.md"
     );
-    const decisionRegistryPath = reviewPath(
+    const decisionRegistryPath = jsonPath(
         "decision-registry",
-        "Minecraft Review Decisions.md"
+        "Minecraft Review Decisions.json"
     );
     const context = buildContext(
         target,

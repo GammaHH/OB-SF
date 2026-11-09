@@ -131,6 +131,51 @@ test("real fixtures preserve every tag branch and recipe output in memory", () =
     );
 });
 
+test("suspicious stew routes preserve distinct result effects and durations", () => {
+    const pipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            recipeFixture("suspicious_stew_from_allium.json"),
+            recipeFixture("suspicious_stew_from_poppy.json")
+        ]
+    });
+    const recipes = pipeline.itemRegistry
+        .get("minecraft:suspicious_stew")
+        .recipes;
+    assert.equal(recipes.length, 2);
+
+    const allium = recipes.find(recipe =>
+        recipe.meta.sourceFile.endsWith("suspicious_stew_from_allium.json")
+    );
+    const poppy = recipes.find(recipe =>
+        recipe.meta.sourceFile.endsWith("suspicious_stew_from_poppy.json")
+    );
+    assert.deepEqual(allium.meta.resultComponents, {
+        "minecraft:suspicious_stew_effects": [{
+            duration: 60,
+            id: "minecraft:fire_resistance"
+        }]
+    });
+    assert.deepEqual(poppy.meta.resultComponents, {
+        "minecraft:suspicious_stew_effects": [{
+            duration: 100,
+            id: "minecraft:night_vision"
+        }]
+    });
+    assert.notDeepEqual(
+        allium.meta.resultComponents,
+        poppy.meta.resultComponents
+    );
+
+    const dependency = pipeline.resolveDependencies(
+        "minecraft:suspicious_stew"
+    );
+    assert.deepEqual(
+        dependency.graph.get("minecraft:suspicious_stew").recipes
+            .map(recipe => recipe.meta.resultComponents),
+        recipes.map(recipe => recipe.meta.resultComponents)
+    );
+});
+
 test("generation planner produces bottom-up order for nested dependencies", () => {
     const pipeline = vanilla.createVanillaPipeline({
         recipeEntries: [

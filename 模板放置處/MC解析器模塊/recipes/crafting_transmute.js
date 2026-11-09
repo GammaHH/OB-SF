@@ -95,6 +95,9 @@ module.exports = {
                     group: json.group ?? null,
                     ingredientRoles: ["input", "material"],
                     copiesInputComponents: true,
+                    ...(result.components == null ? {} : {
+                        resultComponents: result.components
+                    }),
                     sourceFile
                 }
             },

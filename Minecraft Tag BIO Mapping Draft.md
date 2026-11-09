@@ -2,7 +2,7 @@
 type: mc-tag-bio-mapping-draft
 target: minecraft:piston
 generated_from: dependency-graph
-updated: 2026-11-09 00:44
+updated: 2026-11-09 15:31
 created: 2026-08-21 16:00
 ---
 
@@ -19,13 +19,13 @@ created: 2026-08-21 16:00
 | #minecraft:crimson_stems |  |  |  | false | minecraft:crimson_stem |  |
 | #minecraft:dark_oak_logs |  |  |  | false | minecraft:dark_oak_log |  |
 | #minecraft:iron_tool_materials |          |        |          | false    |                        |                                        |
-| #minecraft:jungle_logs         |          |        |          | false    |                        |                                        |
-| #minecraft:mangrove_logs       |          |        |          | false    |                        |                                        |
+| #minecraft:jungle_logs |  |  |  | false | minecraft:jungle_log |  |
+| #minecraft:mangrove_logs |  |  |  | false | minecraft:mangrove_log |  |
 | #minecraft:oak_logs            | OAK_LOGS | 任意橡木原木 |          | false    | minecraft:oak_log      | 全域 Tag mapping；filename 尚待人工決定         |
-| #minecraft:pale_oak_logs       |          |        |          | false    |                        |                                        |
+| #minecraft:pale_oak_logs |  |  |  | false | minecraft:pale_oak_log |  |
 | #minecraft:planks              | PLANKS   | 任意木材   | 任意木材.md  | false    | minecraft:oak_planks   | 既有草稿；Tag identity 與普通 item identity 分離 |
-| #minecraft:spruce_logs         |          |        |          | false    |                        |                                        |
-| #minecraft:warped_stems        |          |        |          | false    |                        |                                        |
+| #minecraft:spruce_logs |  |  |  | false | minecraft:spruce_log |  |
+| #minecraft:warped_stems |  |  |  | false | minecraft:warped_stem |  |
 | #minecraft:wooden_slabs |  |  |  | false | minecraft:oak_slab |  |
 | #minecraft:smelts_to_glass |  |  |  | false | minecraft:sand |  |
 | #minecraft:bundles |  |  |  | false | minecraft:bundle |  |
@@ -33,3 +33,10 @@ created: 2026-08-21 16:00
 | #minecraft:stone_crafting_materials |  |  |  | false | minecraft:cobblestone |  |
 | #minecraft:eggs |  |  |  | false | minecraft:egg |  |
 | #minecraft:logs_that_burn |  |  |  | false | minecraft:oak_log |  |
+| #minecraft:leaves |  |  |  | false | minecraft:oak_leaves |  |
+| #minecraft:metal_nuggets |  |  |  | false | minecraft:iron_nugget |  |
+| #minecraft:wool |  |  |  | false | minecraft:white_wool |  |
+| #minecraft:logs |  |  |  | false | minecraft:oak_log |  |
+| #minecraft:soul_fire_base_blocks |  |  |  | false | minecraft:soul_sand |  |
+| #minecraft:stone_tool_materials |  |  |  | false | minecraft:cobblestone |  |
+| #minecraft:wooden_tool_materials |  |  |  | false | minecraft:oak_planks |  |

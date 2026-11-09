@@ -96,6 +96,9 @@ module.exports = {
                 meta: {
                     ingredientRoles:
                         slots.map(([slot]) => slot),
+                    ...(result.components == null ? {} : {
+                        resultComponents: result.components
+                    }),
                     sourceFile
                 }
             },

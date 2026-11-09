@@ -88,6 +88,46 @@ test("multiple recipes require exactly one stable recipe identity", () => {
     assert.equal(selected.readiness.readyForBioGeneration, true);
 });
 
+test("suspicious stew recipe choices display preserved effect semantics", () => {
+    const stewRecipe = (flower, effect, duration) => ({
+        type: "minecraft:crafting_shapeless",
+        ingredients: [
+            "minecraft:bowl",
+            "minecraft:brown_mushroom",
+            "minecraft:red_mushroom",
+            `minecraft:${flower}`
+        ],
+        result: {
+            id: "minecraft:suspicious_stew",
+            components: {
+                "minecraft:suspicious_stew_effects": [{
+                    id: `minecraft:${effect}`,
+                    duration
+                }]
+            }
+        }
+    });
+    const pipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            stewRecipe("allium", "fire_resistance", 60),
+            stewRecipe("poppy", "night_vision", 100)
+        ]
+    });
+    const analysis = analyze(
+        pipeline,
+        "minecraft:suspicious_stew"
+    ).analysis;
+    const markdown = vanilla.dependencies.renderRecipeReview(analysis);
+    assert.match(
+        markdown,
+        /minecraft:fire_resistance \(duration 60\)/
+    );
+    assert.match(
+        markdown,
+        /minecraft:night_vision \(duration 100\)/
+    );
+});
+
 test("multiple checked recipes are invalid and never auto-select first", () => {
     const pipeline = multipleRecipePipeline();
     const initial = analyze(pipeline, "minecraft:target").analysis;
@@ -459,6 +499,73 @@ test("Minecraft color-family alternative preference is reused when the preferred
     assert.equal(
         revokedPreferences.alternativePreferences.has("minecraft-color-family:wool"),
         false
+    );
+});
+
+test("identical alternative candidate sets reuse one global preference across recipe contexts", () => {
+    const firstPipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            recipe("minecraft:first_target", [[
+                "minecraft:coal",
+                "minecraft:charcoal"
+            ]])
+        ]
+    });
+    const firstInitial = analyze(firstPipeline, "minecraft:first_target").analysis;
+    const firstGroup = firstInitial.groups[0];
+    assert.match(firstGroup.preferenceKey, /^alternative-set-[0-9a-f]{16}$/);
+    const coal = firstGroup.candidates.find(candidate =>
+        candidate.label === "minecraft:coal"
+    );
+    let firstMarkdown = vanilla.dependencies.renderRecipeReview(firstInitial);
+    firstMarkdown = setChoice(firstMarkdown, coal.candidateId, true);
+    const firstSelected = analyze(
+        firstPipeline,
+        "minecraft:first_target",
+        firstMarkdown
+    ).analysis;
+    firstMarkdown = vanilla.dependencies.renderRecipeReview(
+        firstSelected,
+        firstMarkdown
+    );
+
+    const registry = vanilla.dependencies.emptyReviewDecisionRegistry();
+    vanilla.dependencies.setReviewDecisionSnapshot(
+        registry,
+        "minecraft:first_target",
+        {
+            sourceFingerprint: "sha256:test",
+            baseReview: "",
+            recipeReview: firstMarkdown
+        }
+    );
+    const index = vanilla.dependencies.createGlobalAmbiguityDecisionIndex(registry);
+
+    const secondPipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            recipe("minecraft:second_target", [[
+                "minecraft:charcoal",
+                "minecraft:coal"
+            ]])
+        ]
+    });
+    const secondInitial = analyze(secondPipeline, "minecraft:second_target").analysis;
+    assert.notEqual(secondInitial.groups[0].groupId, firstGroup.groupId);
+    assert.equal(secondInitial.groups[0].preferenceKey, firstGroup.preferenceKey);
+    const reused = analyze(
+        secondPipeline,
+        "minecraft:second_target",
+        "",
+        [],
+        { globalAlternativePreferences: index.alternativePreferences }
+    ).analysis;
+    assert.equal(reused.groups[0].status, "RESOLVED");
+    assert.equal(reused.groups[0].selectionSource, "GLOBAL_ALTERNATIVE_PREFERENCE");
+    assert.equal(
+        reused.groups[0].candidates.find(candidate =>
+            candidate.candidateId === reused.groups[0].selectedCandidateId
+        ).label,
+        "minecraft:coal"
     );
 });
 

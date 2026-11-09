@@ -201,6 +201,22 @@ function createBaseMaterialReview(dependencyResult, basePlan, options = {}) {
             acquisitionKind: "external"
         });
     }
+    for (const group of cycleGroups) {
+        if (group.members.length !== 1) continue;
+        const itemId = group.members[0];
+        const existing = applicableGlobal.get(itemId) ?? {
+            itemId,
+            kind: "candidate",
+            cycleIds: [],
+            selectionSource: "AUTO_SINGLE_CANDIDATE",
+            acquisitionKind: "external"
+        };
+        if (!existing.cycleIds.includes(group.cycleId)) {
+            existing.cycleIds.push(group.cycleId);
+            existing.cycleIds.sort();
+        }
+        applicableGlobal.set(itemId, existing);
+    }
 
     return {
         schemaVersion: SCHEMA_VERSION,
@@ -415,14 +431,17 @@ function renderManagedReview(review, existingStates, externalStates, lockedState
     }
     for (const decision of review.globalBaseDecisions ?? []) {
         const existing = effectiveLocked.get(decision.itemId);
+        const selectionSource = decision.selectionSource ??
+            "GLOBAL_DECISION_REGISTRY";
         effectiveLocked.set(decision.itemId, {
             ...decision,
             ...existing,
-            selectionSource: "GLOBAL_DECISION_REGISTRY",
+            selectionSource,
             acquisitionKind: "external",
             checked: true,
-            notes: existing?.notes ??
-                "\n<!-- 由 Global Decision Registry 自動套用 -->\n"
+            notes: existing?.notes ?? (selectionSource === "AUTO_SINGLE_CANDIDATE"
+                ? "\n<!-- 唯一循環候選，由 Planner 自動套用 -->\n"
+                : "\n<!-- 由 Global Decision Registry 自動套用 -->\n")
         });
     }
     const currentIds = new Set(review.candidates.map(candidate => candidate.itemId));
@@ -619,7 +638,9 @@ function parseBaseMaterialReview(markdown, currentReview) {
             kind: decision.kind,
             checked: true,
             global: true,
-            cycleIds: decision.cycleIds ?? []
+            cycleIds: decision.cycleIds ?? [],
+            selectionSource: decision.selectionSource ??
+                "GLOBAL_DECISION_REGISTRY"
         });
     }
 
@@ -733,7 +754,8 @@ function parseBaseMaterialReview(markdown, currentReview) {
         ...externalEntries.filter(entry => entry.checked).map(entry => entry.itemId)
     ]);
     for (const entry of lockedEntries) {
-        if (selectedActiveIds.has(entry.itemId)) {
+        if (selectedActiveIds.has(entry.itemId) &&
+            entry.selectionSource !== "AUTO_SINGLE_CANDIDATE") {
             diagnostic(
                 "DUPLICATE_BASE_ITEM",
                 "ERROR",

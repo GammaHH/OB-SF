@@ -3,6 +3,12 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { createMinecraftVanillaRuntime } = require("./lib/minecraft-vanilla-runtime.cjs");
+const {
+    writeFileWithRetrySync,
+    readFileWithRetrySync,
+    isFrontmatterOnlyPlaceholder
+} = require("./lib/file-write-retry.cjs");
+const { readReviewDecisionStore } = require("./lib/review-decision-store.cjs");
 const vanilla = require("../模板放置處/MC解析器模塊");
 
 const vaultRoot = path.resolve(__dirname, "..");
@@ -33,15 +39,15 @@ function resolveReviewPath() {
 function resolveDecisionRegistryPath() {
     const requested = option(
         "decision-registry",
-        "Minecraft Review Decisions.md"
+        "Minecraft Review Decisions.json"
     );
     const absolutePath = path.resolve(vaultRoot, requested);
     const relative = path.relative(vaultRoot, absolutePath);
     if (relative.startsWith("..") || path.isAbsolute(relative)) {
         throw new Error("Decision Registry path 必須位於 OB-SF worktree 內");
     }
-    if (path.extname(absolutePath).toLowerCase() !== ".md") {
-        throw new Error("Decision Registry path 必須是 Markdown 檔案");
+    if (path.extname(absolutePath).toLowerCase() !== ".json") {
+        throw new Error("Decision Registry path 必須是 JSON 檔案");
     }
     return absolutePath;
 }
@@ -51,8 +57,7 @@ function relativeVaultPath(absolutePath) {
 }
 
 function writeReview(absolutePath, markdown) {
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
-    fs.writeFileSync(absolutePath, markdown, "utf8");
+    writeFileWithRetrySync(absolutePath, markdown);
 }
 
 function printDiagnostics(diagnostics) {
@@ -89,11 +94,13 @@ function createContext(target) {
         selectionPolicy: "none"
     });
     const registryPath = resolveDecisionRegistryPath();
-    const registry = fs.existsSync(registryPath)
-        ? runtime.vanilla.dependencies.parseReviewDecisionRegistry(
-            fs.readFileSync(registryPath, "utf8")
+    const registry = readReviewDecisionStore({
+        jsonPath: registryPath,
+        legacyMarkdownPath: path.join(
+            vaultRoot,
+            "Minecraft Review Decisions.md"
         )
-        : runtime.vanilla.dependencies.emptyReviewDecisionRegistry();
+    }).registry;
     const globalBaseDecisionIndex =
         runtime.vanilla.dependencies.createGlobalBaseDecisionIndex(registry);
     const globalErrors = globalBaseDecisionIndex.diagnostics.filter(entry =>
@@ -124,9 +131,17 @@ function createContext(target) {
 
 function generate(target, reviewPath, dryRun) {
     const { runtime, review } = createContext(target);
-    const existing = fs.existsSync(reviewPath)
-        ? fs.readFileSync(reviewPath, "utf8")
+    const existingSource = fs.existsSync(reviewPath)
+        ? readFileWithRetrySync(reviewPath, {
+            validate: content =>
+                (content.includes("<!-- obsf:base-material-review:start -->") &&
+                    content.includes("<!-- obsf:base-material-review:end -->")) ||
+                isFrontmatterOnlyPlaceholder(content)
+        }).content
         : "";
+    const existing = isFrontmatterOnlyPlaceholder(existingSource)
+        ? ""
+        : existingSource;
     const markdown = runtime.vanilla.dependencies.renderBaseMaterialReview(
         review,
         existing
@@ -149,7 +164,11 @@ function recalculate(target, reviewPath, dryRun) {
     if (!fs.existsSync(reviewPath)) {
         throw new Error(`Review 不存在：${relativeVaultPath(reviewPath)}`);
     }
-    const existing = fs.readFileSync(reviewPath, "utf8");
+    const existing = readFileWithRetrySync(reviewPath, {
+        validate: content =>
+            content.includes("<!-- obsf:base-material-review:start -->") &&
+            content.includes("<!-- obsf:base-material-selection:start -->")
+    }).content;
     const { runtime, dependency, review } = createContext(target);
     const parsed = runtime.vanilla.dependencies.parseBaseMaterialReview(
         existing,

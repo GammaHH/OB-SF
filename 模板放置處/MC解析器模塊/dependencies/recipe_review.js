@@ -40,14 +40,22 @@ function minecraftColorFamily(itemId) {
 function alternativePreferenceKey(group) {
     if (group?.type !== "alternative" || group.candidates?.length < 2) return null;
     const ownerFamily = minecraftColorFamily(group.ownerItemId);
-    if (!ownerFamily) return null;
-    const candidateFamilies = group.candidates.map(candidate =>
-        candidate.ingredient?.kind === "item"
-            ? minecraftColorFamily(candidate.ingredient.id)
-            : null
-    );
-    if (candidateFamilies.some(family => family !== ownerFamily)) return null;
-    return `minecraft-color-family:${ownerFamily}`;
+    if (ownerFamily) {
+        const candidateFamilies = group.candidates.map(candidate =>
+            candidate.ingredient?.kind === "item"
+                ? minecraftColorFamily(candidate.ingredient.id)
+                : null
+        );
+        if (candidateFamilies.every(family => family === ownerFamily)) {
+            return `minecraft-color-family:${ownerFamily}`;
+        }
+    }
+    const candidateSet = group.candidates
+        .map(candidate => normalizedIngredient(candidate.ingredient))
+        .sort((left, right) =>
+            JSON.stringify(left).localeCompare(JSON.stringify(right))
+        );
+    return hashId("alternative-set", candidateSet);
 }
 
 function hashId(prefix, value) {
@@ -139,12 +147,20 @@ function recipeLabel(recipe) {
         const qty = ingredient.qty ?? 1;
         return `${ingredientLabel(ingredient)} ×${qty}`;
     }).join(" + ") || "no fixed ingredients";
+    const stewEffects = recipe.meta?.resultComponents?.[
+        "minecraft:suspicious_stew_effects"
+    ];
+    const effects = Array.isArray(stewEffects) && stewEffects.length > 0
+        ? ` / effects ${stewEffects.map(effect =>
+            `${effect.id ?? "unknown"} (duration ${effect.duration ?? "unknown"})`
+        ).join(", ")}`
+        : "";
     const sourceFile = recipe.meta?.sourceFile
         ? ` / ${recipe.meta.sourceFile}`
         : "";
     return `${recipe.sourceType ?? "unknown"} / ` +
         `${recipe.machine ?? recipe.section ?? "unknown"} / ` +
-        `output ${recipe.output ?? 1} / ${ingredients}${sourceFile}`;
+        `output ${recipe.output ?? 1} / ${ingredients}${effects}${sourceFile}`;
 }
 
 function baseSelectionFingerprint(baseItemIds) {

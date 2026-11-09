@@ -3,6 +3,7 @@
 const path = require("node:path");
 const fs = require("node:fs");
 const { createMinecraftVanillaRuntime } = require("./minecraft-vanilla-runtime.cjs");
+const { readReviewDecisionStore } = require("./review-decision-store.cjs");
 const vanilla = require("../../模板放置處/MC解析器模塊");
 
 const vaultRoot = path.resolve(__dirname, "..", "..");
@@ -96,15 +97,13 @@ function main() {
     if (mappingErrors.length > 0) {
         throw new Error(`Tag mapping 無效：${mappingErrors[0].message}`);
     }
-    const decisionRegistryPath = path.join(
-        vaultRoot,
-        "Minecraft Review Decisions.md"
-    );
-    const decisionRegistry = fs.existsSync(decisionRegistryPath)
-        ? vanilla.dependencies.parseReviewDecisionRegistry(
-            fs.readFileSync(decisionRegistryPath, "utf8")
+    const decisionRegistry = readReviewDecisionStore({
+        jsonPath: path.join(vaultRoot, "Minecraft Review Decisions.json"),
+        legacyMarkdownPath: path.join(
+            vaultRoot,
+            "Minecraft Review Decisions.md"
         )
-        : vanilla.dependencies.emptyReviewDecisionRegistry();
+    }).registry;
     const globalDecisionIndex =
         vanilla.dependencies.createGlobalAmbiguityDecisionIndex(
             decisionRegistry

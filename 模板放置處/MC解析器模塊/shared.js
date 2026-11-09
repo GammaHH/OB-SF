@@ -197,7 +197,12 @@ function normalizeResult(rawResult) {
             count:
                 Number(
                     rawResult.count ?? 1
-                )
+                ),
+
+            components:
+                rawResult.components == null
+                    ? null
+                    : JSON.parse(JSON.stringify(rawResult.components))
         };
     }
 

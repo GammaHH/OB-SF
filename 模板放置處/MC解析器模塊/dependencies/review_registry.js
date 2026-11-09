@@ -111,15 +111,7 @@ function extractLockedBaseDecisions(baseReview) {
     return decisions.sort((left, right) => left.itemId.localeCompare(right.itemId));
 }
 
-function parseReviewDecisionRegistry(markdown) {
-    const source = String(markdown ?? "");
-    const start = source.indexOf(DATA_START);
-    const end = source.indexOf(DATA_END, start + DATA_START.length);
-    if (start === -1 || end === -1) return emptyReviewDecisionRegistry();
-    const body = source.slice(start + DATA_START.length, end).trim();
-    const fenced = body.match(/^```json\s*([\s\S]*?)\s*```$/);
-    if (!fenced) throw new Error("Minecraft Review Decisions registry JSON block 格式無效");
-    const parsed = JSON.parse(fenced[1]);
+function validateReviewDecisionRegistry(parsed) {
     if (parsed?.schemaVersion !== SCHEMA_VERSION || !parsed.targets ||
         typeof parsed.targets !== "object" || Array.isArray(parsed.targets)) {
         throw new Error("Minecraft Review Decisions registry schema 不相容");
@@ -142,6 +134,21 @@ function parseReviewDecisionRegistry(markdown) {
         }
     }
     return parsed;
+}
+
+function parseReviewDecisionRegistryJSON(json) {
+    return validateReviewDecisionRegistry(JSON.parse(String(json ?? "")));
+}
+
+function parseReviewDecisionRegistry(markdown) {
+    const source = String(markdown ?? "");
+    const start = source.indexOf(DATA_START);
+    const end = source.indexOf(DATA_END, start + DATA_START.length);
+    if (start === -1 || end === -1) return emptyReviewDecisionRegistry();
+    const body = source.slice(start + DATA_START.length, end).trim();
+    const fenced = body.match(/^```json\s*([\s\S]*?)\s*```$/);
+    if (!fenced) throw new Error("Minecraft Review Decisions registry JSON block 格式無效");
+    return parseReviewDecisionRegistryJSON(fenced[1]);
 }
 
 function extractLockedAmbiguityDecisions(recipeReview, target) {
@@ -444,12 +451,49 @@ function renderReviewDecisionRegistry(registry) {
     return lines.join("\n");
 }
 
+function serializeReviewDecisionRegistryJSON(registry) {
+    const orderedTargets = Object.fromEntries(
+        Object.entries(registry?.targets ?? {})
+            .sort(([left], [right]) => left.localeCompare(right))
+    );
+    return `${JSON.stringify({
+        schemaVersion: SCHEMA_VERSION,
+        revocations: [...(registry.revocations ?? [])],
+        targets: orderedTargets
+    }, null, 2)}\n`;
+}
+
+function renderReviewDecisionSummary(registry) {
+    const targetIds = Object.keys(registry?.targets ?? {}).sort();
+    const activeRevocations = (registry?.revocations ?? [])
+        .filter(entry => entry.status === "ACTIVE").length;
+    return [
+        "---",
+        "type: minecraft-review-decision-summary",
+        `schemaVersion: ${SCHEMA_VERSION}`,
+        "---",
+        "",
+        "# Minecraft Review Decisions",
+        "",
+        "> Machine source-of-truth：`Minecraft Review Decisions.json`。本檔僅供 Obsidian 查看摘要，請勿作為 Registry 輸入。",
+        "",
+        `- Saved Targets: ${targetIds.length}`,
+        `- Active Revocations: ${activeRevocations}`,
+        "",
+        "## Saved Targets",
+        "",
+        ...(targetIds.length === 0 ? ["- 無"] : targetIds.map(target => `- \`${target}\``)),
+        ""
+    ].join("\n");
+}
+
 module.exports = {
     REVIEW_DECISION_REGISTRY_SCHEMA_VERSION: SCHEMA_VERSION,
     REVIEW_DECISION_REGISTRY_DATA_START: DATA_START,
     REVIEW_DECISION_REGISTRY_DATA_END: DATA_END,
     emptyReviewDecisionRegistry,
     parseReviewDecisionRegistry,
+    parseReviewDecisionRegistryJSON,
     setReviewDecisionSnapshot,
     getReviewDecisionSnapshot,
     activeRevocation,
@@ -460,5 +504,7 @@ module.exports = {
     extractLockedAmbiguityDecisions,
     createGlobalBaseDecisionIndex,
     createGlobalAmbiguityDecisionIndex,
-    renderReviewDecisionRegistry
+    renderReviewDecisionRegistry,
+    serializeReviewDecisionRegistryJSON,
+    renderReviewDecisionSummary
 };

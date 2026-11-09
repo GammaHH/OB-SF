@@ -154,6 +154,10 @@ module.exports = {
                         json.experience ??
                         null,
 
+                    ...(result.components == null ? {} : {
+                        resultComponents: result.components
+                    }),
+
                     sourceFile
                 }
             },

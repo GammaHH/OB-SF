@@ -90,6 +90,78 @@ test("blank review selects no explicit base materials and ignores outside checkb
     assert.deepEqual(parsed.diagnostics, []);
 });
 
+test("a cycle with one candidate is selected automatically without a checkbox", () => {
+    const pipeline = vanilla.createVanillaPipeline({
+        recipeEntries: [
+            recipe(
+                "minecraft:netherite_upgrade_smithing_template",
+                [
+                    "minecraft:netherite_upgrade_smithing_template",
+                    "minecraft:diamond",
+                    "minecraft:netherrack"
+                ],
+                2
+            )
+        ]
+    });
+    const dependency = pipeline.resolveDependencies(
+        "minecraft:netherite_upgrade_smithing_template"
+    );
+    const baseline = pipeline.createBaseDependencyPlan(dependency, {
+        selectionPolicy: "none"
+    });
+    const review = vanilla.dependencies.createBaseMaterialReview(
+        dependency,
+        baseline
+    );
+    assert.equal(review.cycleGroups.length, 1);
+    assert.deepEqual(review.cycleGroups[0].members, [
+        "minecraft:netherite_upgrade_smithing_template"
+    ]);
+    assert.deepEqual(review.globalBaseDecisions, [{
+        itemId: "minecraft:netherite_upgrade_smithing_template",
+        kind: "candidate",
+        cycleIds: [review.cycleGroups[0].cycleId],
+        selectionSource: "AUTO_SINGLE_CANDIDATE",
+        acquisitionKind: "external"
+    }]);
+
+    const markdown = vanilla.dependencies.renderBaseMaterialReview(review);
+    assert.doesNotMatch(markdown, /- \[[ xX]\] `minecraft:netherite_upgrade_smithing_template`/);
+    assert.match(markdown, /Selection Source: `AUTO_SINGLE_CANDIDATE`/);
+    const parsed = vanilla.dependencies.parseBaseMaterialReview(markdown, review);
+    assert.equal(parsed.canApply, true);
+    assert.deepEqual(parsed.selectedBaseItemIds, [
+        "minecraft:netherite_upgrade_smithing_template"
+    ]);
+
+    const legacyChecked = [
+        "---",
+        "type: minecraft-base-material-review",
+        "schemaVersion: 1",
+        "target: minecraft:netherite_upgrade_smithing_template",
+        `sourceFingerprint: ${review.sourceFingerprint}`,
+        "---",
+        vanilla.dependencies.REVIEW_START,
+        vanilla.dependencies.SELECTION_START,
+        "- [x] `minecraft:netherite_upgrade_smithing_template` <!-- obsf:candidate-id:minecraft:netherite_upgrade_smithing_template -->",
+        vanilla.dependencies.SELECTION_END,
+        vanilla.dependencies.EXTERNAL_START,
+        vanilla.dependencies.EXTERNAL_END,
+        vanilla.dependencies.BASE_LOCKED_START,
+        vanilla.dependencies.BASE_LOCKED_END,
+        vanilla.dependencies.REVIEW_END
+    ].join("\n");
+    const migrated = vanilla.dependencies.parseBaseMaterialReview(
+        legacyChecked,
+        review
+    );
+    assert.equal(migrated.canApply, true);
+    assert.deepEqual(migrated.selectedBaseItemIds, [
+        "minecraft:netherite_upgrade_smithing_template"
+    ]);
+});
+
 test("multiple checked candidates round-trip in stable candidate order", () => {
     const { review } = fixture();
     let markdown = vanilla.dependencies.renderBaseMaterialReview(review);

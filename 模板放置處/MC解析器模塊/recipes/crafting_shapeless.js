@@ -268,6 +268,10 @@ module.exports = {
                         json.group ??
                         null,
 
+                    ...(result.components == null ? {} : {
+                        resultComponents: result.components
+                    }),
+
                     sourceFile
                 }
             },
