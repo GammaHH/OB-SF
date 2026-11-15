@@ -4,7 +4,7 @@ const path = require("node:path");
 const fs = require("node:fs");
 const { createMinecraftVanillaRuntime } = require("./minecraft-vanilla-runtime.cjs");
 const { readReviewDecisionStore } = require("./review-decision-store.cjs");
-const vanilla = require("../../模板放置處/MC解析器模塊");
+const vanilla = require("../../BIO相關模組/MC解析器模塊");
 
 const vaultRoot = path.resolve(__dirname, "..", "..");
 

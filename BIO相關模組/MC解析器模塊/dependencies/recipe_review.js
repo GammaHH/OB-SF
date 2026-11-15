@@ -359,6 +359,7 @@ function createRecipeAmbiguityAnalysis(
     const activeBlockedItems = new Set();
     const planningCycles = [];
     const generationOrder = [];
+    const generationDependencies = new Map();
     const generated = new Set();
     const tagMappings = options.tagMappings instanceof Map
         ? options.tagMappings
@@ -672,6 +673,14 @@ function createRecipeAmbiguityAnalysis(
     }
 
     function walkItem(itemId, activePath = []) {
+        // Capture only dependencies reached through the selected recipe and
+        // ingredient choices. Record shared edges before the generated cache.
+        if (!generationDependencies.has(itemId)) generationDependencies.set(itemId, new Set());
+        const parent = activePath.at(-1);
+        if (parent) {
+            if (!generationDependencies.has(parent)) generationDependencies.set(parent, new Set());
+            generationDependencies.get(parent).add(itemId);
+        }
         if (generated.has(itemId)) return true;
         if (activePath.includes(itemId)) {
             const start = activePath.indexOf(itemId);
@@ -791,6 +800,8 @@ function createRecipeAmbiguityAnalysis(
         activeBlockedItems: [...activeBlockedItems],
         planningCycles,
         generationOrder,
+        generationDependencies: [...generationDependencies].map(([itemId, dependencies]) =>
+            ({ itemId, dependencies: [...dependencies] })),
         requestedExternalBaseItemIds: [...requestedExternalBaseItemIds].sort(),
         requestedTagMappings: [...requestedTagMappings.entries()]
             .map(([tagId, representativeItemId]) => ({ tagId, representativeItemId }))

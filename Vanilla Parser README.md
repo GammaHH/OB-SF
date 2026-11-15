@@ -22,15 +22,17 @@ Recursive Dependency Resolver
         ↓
 Dependency Generation Order
         ↓
-Future BIO Generator
+BIO Generator Preview
 ```
 
 `Minecraft Normalized Recipes.json`、`Minecraft Tag Registry.json`、`Minecraft Recipe Manifest.md` 是可選的 generated/debug artifacts，不是 pipeline 階段間的必要輸入。正式流程不應先寫 JSON 再重新讀取。
 
 ## Modules
 
+執行用 JavaScript 統一放在 `BIO相關模組/`，包含 `MC解析器模塊/` 與 `搜尋介面模塊/`；`模板放置處/` 只保留實際要由 Templater 執行的 Markdown 模板。Templater 的 User Scripts folder 仍是 `BIO engine`。模組已移出模板搜尋範圍，避免出現在插入模板選單。
+
 ```text
-模板放置處/MC解析器模塊/
+BIO相關模組/MC解析器模塊/
 ├─ index.js
 ├─ pipeline.js
 ├─ shared.js
@@ -60,7 +62,7 @@ Future BIO Generator
 ## In-memory API
 
 ```js
-const vanilla = require("./模板放置處/MC解析器模塊");
+const vanilla = require("./BIO相關模組/MC解析器模塊");
 
 const pipeline = vanilla.createVanillaPipeline({
     tagEntries: [
@@ -481,7 +483,7 @@ planning cycles = 0
 
 `createTagBIOMappingDraft(dependencyResult)` 只掃描實際 graph 的 `tagBranches`。每列使用 `kind: "minecraft:item_tag"`，與普通 `minecraft:item` identity 分開；未知 BIO ID、中文名與 filename 保持空白，`generate` 預設為 `false`。
 
-目前人工草稿見 `Minecraft Tag BIO Mapping Draft.md`。`Representative Item ID` 只供 deterministic dependency preview 使用，不會把 Tag 改寫成普通 item，也不會刪除 Tag branch。統一 `recalculate` 會把尚未 mapping 的 Tag choice 寫入這份全域草稿；已存在且仍有效的 mapping 會在其他 targets 重用。BIO ID、中文名稱與 filename 不會由程式猜測。這份檔案只是 mapping input，不會建立 Tag BIO。
+目前人工草稿見 `Minecraft Tag BIO Mapping Draft.md`。`Representative Item ID` 只供 deterministic dependency preview 使用，不會把 Tag 改寫成普通 item，也不會刪除 Tag branch。統一 `recalculate` 會把尚未 mapping 的 Tag choice 寫入這份全域草稿；已存在且仍有效的 mapping 會在其他 targets 重用。BIO ID、中文名稱與 filename 不會由程式猜測。`generate=true` 只允許 Generator 建立 Tag BIO preview，不會覆寫正式 BIO。
 
 ## BIO Scanner
 
@@ -514,6 +516,160 @@ minecraft:iron_ingot
 Normalized registry 仍使用 Minecraft canonical ID。BIO Generator 負責 deterministic mapping，不以中文檔名反推 ID。
 
 Tag 索引 BIO（例如 `PLANKS`／任意木材）會使用獨立格式，尚未在本階段定案。
+
+## BIO Generator V1 Preview / Schema V2
+
+Phase 1 Generator 只輸出至 `MC-自動化BIO/preview/`，不建立或覆寫正式 `MC-物品資料庫/`。每次執行建立 timestamped fresh directory；`Minecraft Normalized Recipes.json`、`Minecraft Tag Registry.json` 與舊 Manifest 不再作為輸入。
+
+```powershell
+node scripts/minecraft-bio-generator.cjs preview minecraft:piston
+node scripts/minecraft-bio-generator.cjs preview minecraft:piston --dry-run
+node scripts/minecraft-bio-generator.cjs preview minecraft:stick minecraft:soul_campfire minecraft:suspicious_stew minecraft:red_wool minecraft:painting minecraft:iron_ingot minecraft:piston minecraft:wooden_pickaxe minecraft:stone_pickaxe --update-existing
+```
+
+Generator 直接使用同一個 Node process 內的 Normalized Item Registry，並讀取 JSON Decision Registry、Tag Mapping Draft、現有 BIO Scanner 與 `zh_tw.json`。只有 `readyForBioGeneration: true` 的 target 可以產生 preview。
+
+一次指定多個 target 時，整批共用 `preview/batch/<時間戳>/` 資料夾及同一份來源快照，按身份合併 Item、Tag 與衍生群組，只產生一份共享依賴 BIO。批次內連結全部使用同一份路徑對照，避免同一輪測試因 target 分目錄而重複生成材料。Manifest 保存 `targets` 清單，`target` 保留第一個目標以相容原入口；單目標命令仍使用原本的目標／時間戳目錄。
+
+全部目標須先通過 READY、決策及依賴圖合併驗證，才開始寫檔。Recipe analysis 的 `generationDependencies` 只記錄實際選定 Item／Tag 代表／Alternative 路線的直接依賴；批次僅根據這些邊進行拓樸排序，各目標原有排列只用於穩定排序，不將相鄰但無關的材料當成依賴。獨立材料順序相反仍可合併；真實依賴循環、同物品依賴選擇不一致或缺少依賴資料則停止。不同執行批次仍隔離，不覆寫舊 preview；以迴圈分別呼叫多次命令仍是多個獨立批次，應改用一次多目標命令。
+
+- BIO ID：移除 `minecraft:` 後轉成大寫，例如 `IRON_INGOT`。
+- aliases：同時保留 BIO ID 與 canonical `minecraft:*` ID。
+- generation order：使用已確認的 Base Route／Tag／Alternative 決策建立 bottom-up preview 順序。
+- BIO 內容：仍列出該 item 的全部合法 recipes，不刪除未選為 Base Route 的取得方式。
+- quantity：原樣保存 `ingredient.qty` 與每條 route 的 `recipe.output`，不做需求量 scaling。
+- Base Material：已鎖定為外部取得的物品會輸出 `base_material: true`。天然原木和蕈柄的採集資訊寫在「外部取得」段落。
+- Base Route Decision：編譯為緊貼路線列點前的 `<!-- preferred -->`；首選路線和所在小節排在最前，其他已解析的取得方式仍保留。
+- `generator_schema: 2` 表示 BIO Markdown 的格式版本；`generated_by` 記錄產生工具。
+- 每份新產生的 BIO 都會明確標示一個 preferred。既有決策優先，唯一可用的非循環 route 也會被標記；沒有配方時標記外部取得列點。純渲染呼叫未傳入決策時，以穩定排序的第一條路線提供顯示預設值。
+- Tag：保留 Tag identity，不把 values 全部相加。
+- Alternative：同色系材料統合成 `obsf:color_family/*` 衍生群組，與 Minecraft item tag 分開。
+- 配方補充資訊：以 `- [note:: 說明]` 顯示經驗、處理時間、材料角色與其他非依賴欄位；未知 metadata 使用原始 key 與值，不靜默丟棄。sourceFile/category/group 為來源或分類資訊，不列為操作備註。
+- result components：Normalized Registry 與生成模型保留原始資料，BIO 正文只以 NOTE 顯示差異，不再輸出「成品 Components」JSON 區塊。例如燉湯顯示 `效果：抗火；持續時間 60 ticks`，效果透過 `zh_tw.json` 的 `effect.*` 翻譯，缺翻譯時保留原 ID；不換算原始 ticks 或猜測缺失值。
+- 人工補充標籤：Base 或無生產配方 BIO 使用 `#待補充`；其餘有配方 BIO 使用 `#未人工檢查`。所有生成 BIO（含 Tag／集合索引）均加 `#需攻略補充`，更新既有 BIO 另加 `#更新需人工解析`。更新時只清除並重建這四種管理標籤，保留其他自訂標籤；標籤不參與 Base 判斷，也不修改 preferred 決策。
+- Preview Manifest 只顯示 Planned Items 數量，不再列出完整 Generation Order；實際產生順序仍採既有 bottom-up planning。
+- existing BIO：只在 preview 目錄產生比較稿，不覆寫正式檔案。
+- leaf／External Base：不自動推測為 `mc-drop`；若沒有既有 type mapping，輸出 `TYPE_REVIEW_REQUIRED` warning。
+
+V3 不直接讀取 Decision Registry。Generator 將決策編譯進 BIO：`base_material: true` 會在 V3 建立虛擬「外部取得」路線，`<!-- preferred -->` 決定第一次展開的配方。V3 當次人工切換仍優先，不會刪除其他 routes。
+
+Tag BIO preview 由 `Minecraft Tag BIO Mapping Draft.md` 控制。中文名稱必填，filename 留空時沿用中文名稱，BIO ID 留空時沿用 Tag path 的大寫；representative 必須有效，且 `generate=true` 才會產生。當次用到且啟用的 mapping 若有 ERROR（例如缺名稱或代表物無效），Generator 在建立 preview 目錄前停止。未啟用的列可繼續作為草稿；當次使用到的 tags 會摘要到 preview 目錄內的 `Tag BIO Name Review.md`。
+
+Normalized Registry 保留 Minecraft ID，不在 parser 階段套用中文。Generator 讀取 `參考資料/Minecraft/zh_tw.json`：物品／方塊以 `item.*`／`block.*` 查找，名稱優先沿用現有 BIO。Tag 與衍生集合名稱由人工 mapping 提供，無法用單一物品翻譯推算。CLI 產生比較 preview；既有 BIO 可由 Templater 在人工確認與 Git 還原點驗證後套用。
+
+### 既有 BIO 追加更新預覽
+
+`node scripts/minecraft-bio-generator.cjs preview minecraft:piston --update-existing` 會在新時間戳 preview 目錄額外產生 `BIO Update Review.md`、`BIO Update Review.json` 及 `updates/*.update-preview.md`。加上 `--dry-run` 則僅輸出統計，不寫檔。它仍是預覽模式，沒有正式 BIO 寫回操作。
+
+共用純模組 `bio/bio_update.js` 的 `planBIOUpdate(existingText, generatedText, options)` 在原有 `# 合成/取得` 內合併路線。同一三級取得方式與五級提供科技共用標題，不另建「追加候選」區段，也不把路線放到用途／產物後面。缺少的外部取得、preferred、NOTE、Preview 標籤及標準 YAML 欄位會補入；標準逐行 aliases 清單合併缺少值。允許四種管理標籤重建、刪除 YAML output、依 Mapping 修正機器分類與收緊配方間過多空行；其餘既有欄位、人工文字、圖片與 preferred 不刪改。
+
+配方材料順序不影響比較；同設備／材料的 qty、output 或 Components 不同時不追加衝突路線，列為 REVIEW。同一 NOTE 欄位值不同、既有 YAML 值不同、非標準 aliases 格式、舊路線未出現在新來源及解析失敗也會列出。缺少 `base_material` 可依 Preview 補入；明確設定的原值則保留。來源未列出的舊路線可能是人工或插件內容，不能直接認定錯誤或刪除。Tag／衍生群組整份更新先維持人工審核。
+
+更新狀態為 `NEW`、`UNCHANGED`、`ADDITIVE_UPDATE` 或 `REVIEW`。JSON 記錄原檔與候選 SHA-256 供寫回前驗證；不會將任何候選自動套用。CLI 的既有檔案範圍仍是 `MC-物品資料庫`，完整 Vault 盤點接入尚未完成。正式套用使用下方 Templater 入口；更新候選禁止追加指向暫存 preview 的配方連結。
+
+### Templater 正式套用既有 BIO 更新
+
+先重新產生 `preview <target> --update-existing`，再使用 Templater 執行 `MC-BIO套用更新`。依序選更新批次、單一 BIO，可選「開啟測試更新預覽」或「開啟正式候選」；只有檢查並確認正式候選後，才執行寫回。更新審核 JSON 必須有 `mergeVersion: 5`、candidateSHA256 與 machineMappingSHA256，正式候選須有 `#更新需人工解析`。舊預覽必須重建，不直接套用。
+
+更新模式有兩個獨立輸出接口：`updates/*.update-preview.md` 保留原圖片／人工內容並連到同批 Preview，供測試 V4 與新排版；`formal-candidates/*.formal-candidate.md` 使用正式連結，是唯一可套用的內容。即使正式候選沒有變動，也可產生測試更新預覽。Manifest 的 previewFilename／previewSHA256 與 candidateFilename／candidateSHA256 分開記錄，預覽不能冒充正式候選。
+
+測試更新預覽會重綁已有配方的材料連結；已證明完整且等價的 Tag 清單可收為同批索引連結，未證明者保留精確候選並只重綁可用成員。正式套用明確拒絕 updates 中的測試稿，也拒絕正式候選配方內殘留的 Preview 材料路徑，避免把時間戳測試依賴寫進正式 BIO。
+
+更新候選會為既有未標明來源的機器路線補上五級標題：與本次 Vanilla 路線相符者標 `Minecraft 原版`；有唯一設備 BIO 可參考者標其來源資料夾；其餘標「其他」。獨立的 `- [[來源 BIO]]` 引用也會依唯一找到的 SF 檔案補來源資料夾標題，保留原三級分類，不套用 Machine Mapping。既有明確的五級標題不改寫。保留圖片、人工 YAML（output 除外）、preferred 及舊配方，管理標籤依新規則重建並加上 `#更新需人工解析`。衝突數值不自動取代；套用 REVIEW 仍需人工解析。
+
+每次正式寫回前，`scripts/lib/bio-apply.cjs` 會檢查原檔與候選的 SHA-256，並建立 `refs/obsf/bio-checkpoints/<timestamp>-<uuid>` Git 還原點。還原點使用獨立暫存 index 和 commit-tree 保存這一份 BIO 的當下內容；不移動分支、不修改使用者暫存區、不將其他未提交檔案一起提交。此 ref 是本機還原點，不會隨一般分支 push 自動上傳。沒有 Git、Git identity 不完整、位於 main/master、原檔過期或還原點驗證失敗時停止，不寫回。
+
+Git 還原點建立成功後，再透過 `app.vault.process` 二次驗證原文並寫入；寫後驗證內容雜湊。成功時顯示 ref，並在 `BIO-輸出報告/BIO Apply-<timestamp>.json` 記錄來源、原檔 hash、候選 hash 與 checkpoint。原檔被其他插件修改時不自動重試或回滾。需要復原時，以報告中的 ref 和 sourcePath 執行 `git restore --source <ref> --worktree -- <sourcePath>`，只復原該份 BIO。
+
+目前入口僅支援既有 Minecraft Item BIO；不建立 NEW、不套用 Tag／衍生群組、不批次寫回。Templater Script folder 維持 `BIO engine`。套用後可重新執行 MC-BIO盤點；`#更新需人工解析` 會標為人工檢查待處理。
+
+### 盤點使用方式
+
+Templater User Script folder 維持 `BIO engine`，執行模板 `模板放置處/MC-BIO盤點.md`。`tp.user.bio_inventory(tp)` 每次重新取得 Vault 的 Markdown 檔案清單與 metadata cache，不讀取所有 BIO 正文。輸出時間戳摘要與 JSON 至 `BIO-輸出報告`，不修改 BIO。
+
+盤點以 Item／Tag／衍生群組的 identity 區分，排除 preview 目錄與 `.preview.md`。查詢回傳 `PRESENT`、`MISSING`、`CONFLICT`、`INVALID` 或 `UNCONFIRMED`；cache 未就緒或身份資料不完整時，不能把查不到直接當成可新增。舊 `PLANKS` 等只有 uppercase ID、沒有 `minecraft_tag` 的集合 BIO 會列為需補 identity，不猜成普通物品。檔案存在與人工驗收分開；沒有待檢查標籤也不代表已驗收。
+
+共用純模組為 `bio/bio_inventory.js`，API `buildBIOInventory(documents, options).get(kind, id)`。Templater 當次盤點也保存於 `globalThis.__obsfBIOInventories[vaultRoot]`；檔案異動後需重新執行盤點。這個入口提供新建／更新的前置索引，目前尚未加入正式 Generator 的自動跳過或覆寫模式。
+
+`### Tag 代表材料` 下逐行列出 `- [item:: [[橡木材]]]` 等候選，用 `<!-- preferred -->` 指定下一個列點為預設代表物。V4 直接把 Tag 的需求量交給被選成員，沿用該成員自己的取得路線。
+
+預覽中的連結優先指向同批產物。Tag BIO 尚未產生或建立時，配方用 Tag 名稱顯示，連結指向已選的代表物。Normalized Recipe 仍保留原本的 Tag ID 與成員。
+
+外部取得段落使用 `- 分類：說明`，例如 `- 採集：砍伐天然生成的橡木原木。`。已確認的 Base，以及只有外部取得的 BIO，都在列點前輸出 `<!-- preferred -->`。來源尚未確認時輸出 `- 外部取得：具體來源待人工確認。`。
+
+V4 在 `### 外部取得` 中逐行讀取列點，以第一個全形冒號拆成分類和說明，保留完整文字供介面顯示。建議分類為「採集」「採掘」「掉落」「戰利品」「外部取得」。`<!-- preferred -->` 套用到下一個列點，選定外部取得路線時作為遞歸終點。自由文字列點以原文顯示並歸入「外部取得」。人工可直接維護列點文字和 preferred 位置。
+
+### BIO 搜尋介面 V4
+
+衍生色系 BIO 的成員集合由完整的記憶體 Normalized Registry 收集，不以單一 target 的生成路線子集合驗證全域代表物。例如白羊毛染色路線排除白羊毛作為輸入，不代表全域「任意羊毛」也要排除白羊毛。只為當次用到的群組產生索引，每條 recipe 的合法 alternatives 仍保留原本範圍，不因全域索引擴充而放寬。
+
+路線下拉選單以提供科技作 optgroup 標題，同組選項僅顯示「機器 ｜ 材料」。不同產量造成重複標籤時補上產量，燉湯等效果差異保留；完整來源、取得方式與產量可在選項 tooltip 查看。顯示分組不改變正文 preferred 的選擇順序，材料下拉仍保留原有行為。
+
+新生成的 NOTE 使用 `處理時間 200 ticks`、`經驗值 0.7`；底層仍保留原始 `cookingTime` 欄位。V4 讀取舊的「烹調時間（原始 ticks）：200」「烹調時間 200 ticks」「經驗值：0.7」時，也以新格式呈現；不直接修改舊 BIO。更新比較會辨識相同欄位及值，單純排版差異不重複加 NOTE，實際數值不同仍列入審核。
+
+`generate=false` 只停用獨立 Tag BIO 的生成，配方中的 Tag 仍保留合法材料下拉。已有確認身份的正式 Tag BIO 或當次生成的 Tag preview 時，材料改連到該索引並由 V4 導航，不重複內嵌清單。染色的 alternatives 必須保留該配方的精確成員，不能因存在「任意羊毛」就放入原配方不接受的顏色。
+
+染色集合可使用 `<!-- except self -->` 緊接下一個材料行，保留 `[[黑色羊毛|任意羊毛]]` 這類代表材料連結；此時不再重複列出長篇 `obsf:choices`。只有已驗證可讀集合的完整成員恰等於原配方候選加成品自身、且各候選數量一致時才輸出此格式，否則保留原清單。self 是配方成品的 canonical Minecraft identity，並非代表材料或集合 BIO。
+
+V4 依成品顏色 family 尋找對應 `derived_group` 集合，同一批次資料夾優先，再使用唯一正式集合；不借用其他 preview 批次。讀取成員後排除成品自身，在合法候選內優先使用材料行的代表連結，仍可手動切換；每個成品的排除與選擇分開，不修改共享集合或原配方 preferred。缺少集合／身份不明／排除後無候選需列診斷並保留需求，不能退回不合法成員。
+
+完整 Tag 與衍生集合的成員完全一致時，可以共用同一個實體 BIO。例如繪畫的 `#minecraft:wool` 直接連到「任意羊毛」，使用完整 16 色；染色則保留代表材料連結並用 `except self` 排除成品自身。Tag 身份仍保留於來源 Registry，不因共用顯示索引而改寫。只有唯一且已驗證可讀的集合可共用；原 Tag 有自身可用 BIO 時優先沿用，否則無法證明等價就保留精確清單。
+
+原生 Tag 之間也可依相同規則共用，例如 `wooden_tool_materials` 展開後與 `planks` 完整成員一致，就共用「任意木材」，保留木製工具的一條配方與材料下拉。候選原生／衍生索引依實際路徑去重，只有唯一完整目標才共用；正式集合須驗證正文，不能只憑 YAML identity 或檔案存在判定完整。不同批次 preview 不作正式候選的依據。
+
+指定的小集合於 BIO 顯示階段展開為完整機器配方：`minecraft:soul_fire_base_blocks` 確認恰為靈魂砂／靈魂土時列兩條；`minecraft:stone_tool_materials` 確認恰為鵝卵石／黑石／深板岩碎石時列三條。每條路線只使用一種材料，保留原材料數量與產量，僅代表材料所屬路線繼承 preferred，不另列任意材料或混搭路線。成員變更、同條配方出現多個需展開的集合或其他未指定 Tag 時，不猜測展開組合，保留原集合格式；Registry 不變。
+
+測試 preview 使用當次批次的預覽路徑，正式更新候選則使用正式 BIO 名稱。正式更新仍逐檔驗證並建立 Git 還原點；目前沒有將整批 NEW preview 發布成正式 BIO 的入口。
+
+根目錄 `Minecraft Machine Recipe Mapping Draft.md` 管理設備到三級配方分類的對應。只分類含 Machine 的配方，外部取得與 Tag 代表材料維持原樣；唯一匹配的啟用規則才修正標題，缺少或衝突規則列入診斷。預覽後若修改 Mapping，正式套用會停止並要求重建候選。同組設備配方條目緊貼、不留空行；標題與配方之間保留一行空白。分類修正不改材料、產量、NOTE、preferred 或設備配方順序。
+
+新生及更新候選不保留 YAML `output`，舊數值直接移除，不轉為配方產量。V4 只使用選定路線的 `[output:: n]`；未填預設為 1，忽略舊 YAML `output`。解析器仍須明確輸出非 1 的產量。
+
+配方的 `### 取得方式` 可包含 `##### 提供科技`。Generator 的 Vanilla 機器路線使用 `##### Minecraft 原版`，V4 保留三級取得方式並另外讀取五級 provider。`Minecraft 原版` 對應已勾選的 MC 資料夾，`Slimefun 原版` 對應已勾選的 `SF-*(原版)` 資料夾，其他 provider 名稱須與範圍資料夾一致。舊 BIO 沒有 provider 時仍相容，不自行推測來源。
+
+多個 `<!-- preferred -->` 是合法的有序優先候選，不再產生 MULTIPLE_PREFERRED／MULTIPLE_TAG_PREFERRED 警告。選擇次序為：當次有效的手動選擇 → 過濾後正文最前面的 preferred → 過濾後正文第一條路線。preferred 不再繞過取得方式篩選，也不特別把「常規」排到正文前。自動 fallback 不寫入當次手動選擇 Map，所以恢復範圍後可以回到首選；正式 BIO 標記不變。Tag 的候選仍是擇一，不會相加。
+
+全數路線不可用時保留需求量，在遞歸樹用橘字備註「目前科技／取得方式範圍沒有可用配方」，不自動設為 Base。報告列為 NO_ALLOWED_RECIPE 且 complete=false，與分析上限截斷、缺少 BIO 分開。
+
+更新預覽可依明確的 Slimefun／SF provider，或唯一且 type 為 sf-* 的設備 BIO，辨識其他科技路線。這些路線以 OTHER_SOURCE_PRESERVED 記錄，保留而不要求存在於 Vanilla JSON。這只是來源辨識，並非宣告所有配方數值已驗收；無法確認來源者仍需審核。
+
+在 Obsidian 開啟 `黏液科技DB 搜尋介面V4.md`，以 DataviewJS 執行搜尋介面。頁面從 Vault 讀取 `BIO相關模組/搜尋介面模塊/bio_reader_v4.js`，沿用 V3 的搜尋、資料夾範圍、材料統計與設備需求介面。
+
+- 取得路線下拉同時顯示外部取得和機器配方；葉節點也可切換到另一條配方。
+- 首次開啟預設納入所有取得小節，選取後可用原有的小節篩選縮小範圍。
+- 外部取得的原文會顯示在依賴樹、最終材料表與純文字報告。
+- `preferred` 提供初次展開的預設值。當次手動切換會優先，換目標時清空當次選擇。
+- Tag 和 alternatives 的下拉每次選一個候選，切換後重新計算產量、需求量與最終材料。
+- 舊 BIO 的 Machine、qty、output、Base YAML，以及 qty-free Tag 代表列仍可讀取。
+- 配方的 result components 保留，用於區分可疑燉湯等效果不同的路線。
+- 路線下的 `- [note:: 說明]` 會附加到配方樹、Mermaid、製作教程與輸出檔案。多方塊結構使用 `Machine:: 無/手動`，並以 NOTE 提供搭建說明。
+- 循環、缺少 BIO 和無效候選資料會顯示診斷。
+
+Generator 對已連結到 Tag BIO 的材料，只輸出材料連結和需求數量。候選集中在 Tag BIO 的逐行 item 列中，由 preferred 決定預設值，V4 沿文件連結展開。舊版 Tag 成員表和獨立代表列仍可讀取。Tag BIO 尚未建立時，以及配方特有的 alternatives，暫以 `<!-- obsf:choices {...} -->` 保存確切候選範圍。
+
+Node 測試涵蓋純讀取模組及使用 Vault／DOM 替身的 V4 頁面入口。實際 Obsidian 整合仍需在 DEV Vault 手動驗證。
+
+### V4 報告、製作教程與分析保護
+
+「複製 Markdown＋製作教程」輸出 Mermaid 配方樹、三類編號 Checklist，以及由底層備料、設備製作到成品的製作教程。每條教程最多列出五種材料，超過五種時拆成備料步驟。批數與產量沿用目前選中的路線；重複需求合併時保留原先計算的批數和材料成本。
+
+預設深度上限 200、總展開節點 1000（含設備依賴），並有 30 秒分析時間保護與每 50 節點讓出 UI 的處理。V4 的「分析保護」可自行調整，最多 500 層、2000 節點、60 秒；時間欄位直接以秒輸入。觸及限制的分支標成未展開，保留部分結果並標示統計可能不完整。Mermaid 預設最多顯示 200 節點；圖表截斷與分析截斷分別記錄。
+
+報告較大或分析被截斷時，V4 提示改用 Templater 輸出 JSON／PDF。JSON 保留目前已分析的資料、選中路線與完成狀態；輸出格式切換不會自動補跑被截斷的依賴。
+
+報告警告逐項區分「分析已截斷」「缺少物品 BIO」「缺少設備 BIO」「循環依賴」「缺少可用配方」「取得說明待確認」和「BIO 格式錯誤」，多種原因可並列。Mermaid 的圖表顯示上限另行提示。JSON 的 `assessment` 保存各類原因與受影響項目。
+
+Templater 設定與操作：
+
+1. Template folder location 保持 `模板放置處`。
+2. Script files folder location 設為 `BIO engine`，重新整理 User script functions，確認可偵測 `export_report_v4`。
+3. 在 V4 完成一次分析。
+4. 點選分析標題旁、複製按鈕右邊的「📤 匯出其他格式」。也可以手動執行 `Templater: Open insert template modal`，選擇 `V4-輸出製作報告`。
+5. 選 Markdown、JSON 或 PDF。檔案寫入 `BIO-輸出報告/`，每次使用新的時間戳檔名。
+
+輸出腳本為 `BIO engine/export_report_v4.js`，模板呼叫 `tp.user.export_report_v4(tp)`。PDF 透過桌面 Obsidian 的 Electron 隱藏列印視窗產生，列印版使用縮排依賴樹與可列印 Checklist。若目前 Obsidian 無法建立列印視窗，腳本會回報錯誤，可改選 JSON。PDF 的真實桌面輸出仍需手動驗證。
+
+染色 alternatives 的衍生群組名稱由 `Minecraft BIO Group Mapping Draft.md` 維護，當次摘要為 `Derived BIO Group Name Review.md`。可疑的燉湯不依 result item 去重；不同 `result.components` 仍是不同效果 route。
 
 ## Deferred Optimizations
 

@@ -19,8 +19,12 @@ const dependencies = {
     ...require("./dependencies/review_registry")
 };
 const bio = {
+    ...require("./bio/bio_update"),
+    ...require("./bio/bio_inventory"),
     ...require("./bio/bio_scanner"),
-    ...require("./bio/tag_bio_mapping")
+    ...require("./bio/tag_bio_mapping"),
+    ...require("./bio/bio_group_mapping"),
+    ...require("./bio/bio_generator")
 };
 const parsers = [
     require("./recipes/crafting_shaped"),

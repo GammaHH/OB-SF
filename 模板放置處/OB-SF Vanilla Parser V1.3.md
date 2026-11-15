@@ -36,29 +36,30 @@ const path = require("path");
 const minecraftParserPath =
     path.join(
         app.vault.adapter.basePath,
-        "模板放置處",
+        "BIO相關模組",
         "MC解析器模塊"
     );
 
+const minecraftRequire = require("node:module").createRequire(path.join(minecraftParserPath, "index.js"));
 const minecraftParserResolved =
-    require.resolve(minecraftParserPath);
+    minecraftRequire.resolve(minecraftParserPath);
 
 // 開發期間避免 index.js 已刷新、子模組仍停留在舊 cache。
 const minecraftParserCacheRoot =
     path.normalize(minecraftParserPath) +
     path.sep;
 
-for (const cachedPath of Object.keys(require.cache)) {
+for (const cachedPath of Object.keys(minecraftRequire.cache)) {
     if (
         cachedPath === minecraftParserResolved ||
         cachedPath.startsWith(minecraftParserCacheRoot)
     ) {
-        delete require.cache[cachedPath];
+        delete minecraftRequire.cache[cachedPath];
     }
 }
 
 const minecraftParser =
-    require(minecraftParserResolved);
+    minecraftRequire(minecraftParserResolved);
 
 
 // ============================================================

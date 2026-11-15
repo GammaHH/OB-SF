@@ -5,6 +5,7 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
+const { parseTagList } = require("./bio_tags");
 
 
 function canonicalMinecraftId(rawId) {
@@ -104,7 +105,7 @@ function parseFrontmatter(text) {
         const rawValue = (keyMatch[2] ?? "").trim();
 
 
-        if (key === "aliases" && rawValue === "") {
+        if ((key === "aliases" || key === "tags") && rawValue === "") {
 
             const aliases = [];
 
@@ -119,9 +120,11 @@ function parseFrontmatter(text) {
                 index++;
             }
 
-            result.aliases = aliases;
+            result[key] = aliases;
             continue;
         }
+
+        if (key === "tags") { result.tags = parseTagList(rawValue); continue; }
 
 
         if (
@@ -260,13 +263,16 @@ function scanMinecraftBIOs(
         const legacyId =
             frontmatter.id ?? null;
 
-        const normalizedId =
+        const collection = Boolean(frontmatter.minecraft_tag || frontmatter.derived_group ||
+            frontmatter.tag_identity === "minecraft:item_tag" ||
+            frontmatter.tag_identity === "obsf:derived_ingredient_group");
+        const normalizedId = collection ? null :
             canonicalMinecraftId(
                 frontmatter.minecraft_id ??
                 legacyId
             );
 
-        if (!normalizedId) {
+        if (!normalizedId && !collection) {
             warnings.push(`BIO 缺少 id：${filePath}`);
             continue;
         }
@@ -287,6 +293,9 @@ function scanMinecraftBIOs(
             normalizedId,
             legacyId,
             type,
+            minecraft_tag: frontmatter.minecraft_tag,
+            tag_identity: frontmatter.tag_identity,
+            derived_group: frontmatter.derived_group,
             aliases:
                 Array.isArray(frontmatter.aliases)
                     ? frontmatter.aliases
@@ -303,6 +312,10 @@ function scanMinecraftBIOs(
 
 
         entries.push(entry);
+
+        // Collections are navigable BIOs but never ordinary Minecraft item IDs.
+        // A Tag with legacy id PLANKS must not claim minecraft:planks.
+        if (collection) continue;
 
 
         if (byNormalizedId.has(normalizedId)) {

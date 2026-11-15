@@ -4,7 +4,7 @@ const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 
-const vanilla = require("../../模板放置處/MC解析器模塊");
+const vanilla = require("../../BIO相關模組/MC解析器模塊");
 const {
     readReviewDecisionStore,
     writeReviewDecisionStore

@@ -1,9 +1,60 @@
 ---
 created: 2026-08-08 17:24
-updated: 2026-08-21 15:13
+updated: 2026-11-09 15:04
 ---
-- 碎礦
+- 碎礦、篩礦
 - 無限
+MAPPING 操作指令
+- 資料夾路徑
+- cd C:\Users\Owner\.codex\worktrees\cee9\OB-SF
+node scripts/minecraft-review.cjs scan
+node scripts/minecraft-review.cjs recalculate
+node scripts/minecraft-review.cjs next
+
+
+
+node scripts/minecraft-bio-generator.cjs preview minecraft:piston
+
+
+```TEST
+Set-Location -LiteralPath 'C:\Users\Owner\.codex\worktrees\cee9\OB-SF'
+
+$LogDirectory = Join-Path $PWD ('review\read-retry-test-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
+New-Item -ItemType Directory -Path $LogDirectory -Force | Out-Null
+
+$TestStdout = Join-Path $LogDirectory 'tests.stdout.log'
+$TestStderr = Join-Path $LogDirectory 'tests.stderr.log'
+$TestExitCode = $null
+$TestCompleted = $false
+
+$TestArguments = [System.Collections.Generic.List[string]]::new()
+$TestArguments.Add('--test')
+
+Get-ChildItem -LiteralPath 'tests\minecraft-vanilla-pipeline' -Filter '*.test.cjs' |
+    Sort-Object FullName |
+    ForEach-Object {
+        $TestArguments.Add($_.FullName)
+    }
+
+$TestProcess = Start-Process `
+    -FilePath (Get-Command node).Source `
+    -ArgumentList $TestArguments.ToArray() `
+    -WorkingDirectory $PWD `
+    -Wait `
+    -PassThru `
+    -NoNewWindow `
+    -RedirectStandardOutput $TestStdout `
+    -RedirectStandardError $TestStderr
+
+$TestCompleted = $true
+$TestExitCode = $TestProcess.ExitCode
+
+Write-Output "TEST_COMPLETED=$TestCompleted"
+Write-Output "TEST_EXIT=$TestExitCode"
+Get-Content -LiteralPath $TestStdout -Tail 40
+Get-Content -LiteralPath $TestStderr
+Write-Output "LOG_DIRECTORY=$LogDirectory"
+```
 
 
 ```dataviewjs
@@ -1488,6 +1539,8 @@ function getAllowedRecipes(parsed) {
     return (parsed.recipes || [])
         .filter(
             recipe =>
+                recipe.external === true ||
+                recipe.preferred === true ||
                 selectedRecipeSections.has(
                     recipe.section
                 )
@@ -1526,9 +1579,13 @@ function chooseRecipe(page, parsed) {
 
 
     // 第一次遇到多配方時先提供一條可計算的預設路線：
-    // 常規優先，否則使用目前允許範圍內第一條。
+    // Generator 編譯的 preferred 優先，其次常規，最後才使用第一條。
     // 使用者可直接在遞歸樹中切換，切換後整份結果會重新計算。
     let selectedRecipe =
+        allowedRecipes.find(
+            recipe =>
+                recipe.preferred === true
+        ) ||
         allowedRecipes.find(
             recipe =>
                 recipe.section === "常規"
@@ -1608,6 +1665,10 @@ async function parseBio(page) {
     let currentRecipe =
         null;
 
+    // <!-- preferred --> 只套用到緊接著的下一條 Machine 路線。
+    let pendingPreferred =
+        false;
+
 
     const machineRegex =
         /\(Machine\s*::\s*(?:\[\[([^\]|]+)(?:\|[^\]]+)?\]\]|([^)]+))\)/i;
@@ -1615,6 +1676,13 @@ async function parseBio(page) {
 
     const ingredientRegex =
         /^\s+-\s*\[(item|drop|GEO)\s*::\s*(?:\[\[([^\]|]+)(?:\|[^\]]+)?\]\]|([^\]]+))\]\s*\(qty\s*::\s*([0-9.]+)\s*\)/i;
+
+    const tagRepresentativeRegex =
+        /^-\s*\[(item|drop)\s*::\s*(?:\[\[([^\]|]+)(?:\|[^\]]+)?\]\]|([^\]]+))\]\s*$/i;
+
+    const isTagBIO =
+        ["minecraft:item_tag", "obsf:derived_ingredient_group"]
+            .includes(page.tag_identity);
 
 
     // 支援：
@@ -1629,6 +1697,14 @@ async function parseBio(page) {
 
 
     for (let line of lines) {
+
+        if (
+            line.trim() ===
+            "<!-- preferred -->"
+        ) {
+            pendingPreferred = true;
+            continue;
+        }
 
         // ----------------------------------
         // 記住目前 ### 區段
@@ -1649,6 +1725,31 @@ async function parseBio(page) {
                 null;
 
             continue;
+        }
+
+        if (isTagBIO && currentSection === "Tag 代表材料") {
+            if (/^#{1,6}\s/.test(line)) {
+                currentSection = "";
+                currentRecipe = null;
+            } else if (!currentRecipe) {
+                const match = line.match(tagRepresentativeRegex);
+                const name = (match?.[2] || match?.[3] || "").trim();
+                if (name) {
+                    currentRecipe = {
+                        key: "tag-representative",
+                        index: recipes.length,
+                        section: currentSection,
+                        machine: "",
+                        output: 1,
+                        ingredients: [{ type: match[1].toLowerCase(), name, qty: 1 }],
+                        preferred: true,
+                        external: false,
+                        tagRepresentative: true
+                    };
+                    recipes.push(currentRecipe);
+                    continue;
+                }
+            }
         }
 
 
@@ -1689,6 +1790,12 @@ async function parseBio(page) {
                 machine:
                     machine,
 
+                preferred:
+                    pendingPreferred,
+
+                external:
+                    false,
+
                 // null 代表尚未在這條配方中指定，之後 fallback 到 defaultOutput
                 output:
                     null,
@@ -1702,6 +1809,8 @@ async function parseBio(page) {
                 currentRecipe
             );
 
+            pendingPreferred = false;
+
             continue;
         }
 
@@ -1710,7 +1819,7 @@ async function parseBio(page) {
         // Machine 底下的 output / 材料
         // ----------------------------------
 
-        if (currentRecipe) {
+        if (currentRecipe && !currentRecipe.tagRepresentative) {
 
             let outputMatch =
                 line.match(
@@ -1796,12 +1905,14 @@ async function parseBio(page) {
     }
 
 
-    // 只保留真正有材料的 Machine 配方
+    // 保留有材料的 Machine 配方與 Tag 的代表物。
+    // Base Material 的「外部取得」由 YAML 編譯成虛擬路線，
+    // 不需要在 Markdown 內偽造機器或材料。
     let validRecipes =
         recipes
             .filter(
                 recipe =>
-                    recipe.machine &&
+                    (recipe.machine || recipe.tagRepresentative) &&
                     recipe.ingredients.length > 0
             )
             .map(
@@ -1816,6 +1927,36 @@ async function parseBio(page) {
                             : defaultOutput
                 })
             );
+
+    if (
+        page.base_material === true
+    ) {
+        validRecipes.unshift({
+            key:
+                "external-base",
+
+            index:
+                -1,
+
+            section:
+                "外部取得",
+
+            machine:
+                "",
+
+            output:
+                defaultOutput,
+
+            ingredients:
+                [],
+
+            preferred:
+                true,
+
+            external:
+                true
+        });
+    }
 
 
     let parsed = {
@@ -1999,6 +2140,9 @@ async function expandBio(
         section:
             "",
 
+        tagRepresentative:
+            selectedRecipe?.tagRepresentative === true,
+
         recipeCount:
             allowedRecipes.length,
 
@@ -2046,6 +2190,29 @@ async function expandBio(
     }
 
 
+    // YAML base_material: true 的虛擬「外部取得」路線
+    // 是遞歸終點，但其他合法配方仍可在 UI 中切換。
+    if (selectedRecipe.external) {
+
+        node.leaf =
+            true;
+
+        node.section =
+            selectedRecipe.section;
+
+        addLeaf(
+            page.file.path,
+            page.file.name,
+            getBioType(page.type),
+            requiredQty,
+            page,
+            "外部取得 / Base Material"
+        );
+
+        return node;
+    }
+
+
     // ----------------------------------
     // 有配方
     // ----------------------------------
@@ -2074,10 +2241,9 @@ async function expandBio(
 
 
     node.batches =
-        Math.ceil(
-            requiredQty /
-            selectedRecipe.output
-        );
+        selectedRecipe.tagRepresentative
+            ? requiredQty
+            : Math.ceil(requiredQty / selectedRecipe.output);
 
 
     let nextStack =
@@ -2275,6 +2441,8 @@ async function expandBio(
 
 function getRecipeLabel(recipe) {
 
+    if (recipe.tagRepresentative) return recipe.section;
+
     return (
         `${recipe.section || "未分類"}` +
         ` ｜ ${recipe.machine || "無/手動"}` +
@@ -2462,10 +2630,12 @@ function renderTreeNode(
 
 
     info.textContent =
-        `← ${node.machine}` +
-        ` ｜ output ${formatNumber(node.output)}/批` +
-        ` ｜ ${node.batches} 批` +
-        ` ｜ 實得 ${formatNumber(produced)}`;
+        node.tagRepresentative
+            ? "← Tag 代表材料"
+            : `← ${node.machine}` +
+                ` ｜ output ${formatNumber(node.output)}/批` +
+                ` ｜ ${node.batches} 批` +
+                ` ｜ 實得 ${formatNumber(produced)}`;
 
 
     summary.appendChild(
@@ -3555,7 +3725,12 @@ async function registerMachine(
     index
 ) {
 
-    if (!machineName) {
+    if (
+        !machineName ||
+        ["無/手動", "外部取得"].includes(
+            String(machineName).trim()
+        )
+    ) {
         return;
     }
 
@@ -3642,6 +3817,21 @@ async function registerMachine(
 
     // 沒有目前允許的配方
     if (!selectedRecipe) {
+
+        processingMachines.delete(
+            path
+        );
+
+        processedMachines.add(
+            path
+        );
+
+        return;
+    }
+
+
+    // Base Material 不需要建造機器，也不再展開材料。
+    if (selectedRecipe.external) {
 
         processingMachines.delete(
             path
@@ -3777,6 +3967,30 @@ async function expandMachineMaterial(
     }
 
 
+    if (selectedRecipe.external) {
+
+        addLeafTo(
+            machineLeafTotals,
+
+            page.file.path,
+
+            page.file.name,
+
+            getBioType(
+                page.type
+            ),
+
+            requiredQty,
+
+            page,
+
+            "外部取得 / Base Material"
+        );
+
+        return;
+    }
+
+
     if (selectedRecipe.machine) {
 
         await registerMachine(
@@ -3787,10 +4001,9 @@ async function expandMachineMaterial(
 
 
     let batches =
-        Math.ceil(
-            requiredQty /
-            selectedRecipe.output
-        );
+        selectedRecipe.tagRepresentative
+            ? requiredQty
+            : Math.ceil(requiredQty / selectedRecipe.output);
 
 
     let nextStack =

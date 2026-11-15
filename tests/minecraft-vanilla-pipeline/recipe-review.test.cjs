@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const path = require("node:path");
 const test = require("node:test");
 
-const vanilla = require("../../模板放置處/MC解析器模塊");
+const vanilla = require("../../BIO相關模組/MC解析器模塊");
 const {
     createMinecraftVanillaRuntime
 } = require("../../scripts/lib/minecraft-vanilla-runtime.cjs");
@@ -185,6 +185,52 @@ test("ambiguity below an unselected recipe branch is not active or blocking", ()
     const selected = analyze(pipeline, "minecraft:target", markdown).analysis;
     assert.equal(selected.groups.some(group => group.type === "tag"), false);
     assert.equal(selected.readiness.readyForBioGeneration, true);
+    assert.deepEqual(selected.generationDependencies, [
+        { itemId: "minecraft:target", dependencies: ["minecraft:stone"] },
+        { itemId: "minecraft:stone", dependencies: [] }
+    ]);
+});
+
+test("generation dependency graph records selected item, Tag and alternative edges including shared Base leaves", () => {
+    const pipeline = vanilla.createVanillaPipeline({
+        tagEntries: [{ tagId: "minecraft:choices", registryType: "item",
+            json: { values: ["minecraft:tag_unused", "minecraft:tag_selected"] } }],
+        recipeEntries: [
+            recipe("minecraft:target", ["minecraft:left", "minecraft:right", "#minecraft:choices",
+                ["minecraft:alternative_unused", "minecraft:alternative_selected"]]),
+            recipe("minecraft:left", ["minecraft:shared"]),
+            recipe("minecraft:right", ["minecraft:shared"]),
+            recipe("minecraft:shared", ["minecraft:base_recipe_unused"])
+        ]
+    });
+    const baseItemIds = ["minecraft:shared"];
+    const options = { tagMappings: new Map([["minecraft:choices", {
+        representativeItemId: "minecraft:tag_selected"
+    }]]) };
+    const initial = analyze(pipeline, "minecraft:target", "", baseItemIds, options).analysis;
+    const alternative = initial.groups.find(group => group.type === "alternative");
+    const choice = alternative.candidates.find(candidate => candidate.label === "minecraft:alternative_selected");
+    const markdown = setChoice(vanilla.dependencies.renderRecipeReview(initial), choice.candidateId, true);
+    const selected = analyze(pipeline, "minecraft:target", markdown, baseItemIds, options).analysis;
+    assert.equal(selected.readiness.readyForBioGeneration, true);
+    const dependencies = new Map(selected.generationDependencies.map(row => [row.itemId, row.dependencies]));
+    assert.deepEqual(dependencies.get("minecraft:target"), [
+        "minecraft:left", "minecraft:right", "minecraft:tag_selected", "minecraft:alternative_selected"
+    ]);
+    assert.deepEqual(dependencies.get("minecraft:left"), ["minecraft:shared"]);
+    // shared was already generated through left, but right still owns its edge.
+    assert.deepEqual(dependencies.get("minecraft:right"), ["minecraft:shared"]);
+    assert.deepEqual(dependencies.get("minecraft:shared"), []);
+    assert.deepEqual(dependencies.get("minecraft:tag_selected"), []);
+    assert.deepEqual(dependencies.get("minecraft:alternative_selected"), []);
+    for (const unused of ["minecraft:tag_unused", "minecraft:alternative_unused", "minecraft:base_recipe_unused"]) {
+        assert.equal(dependencies.has(unused), false);
+    }
+    assert.deepEqual([...dependencies.keys()].sort(), [...selected.generationOrder].sort());
+    const position = new Map(selected.generationOrder.map((id, index) => [id, index]));
+    for (const [itemId, values] of dependencies) {
+        for (const dependency of values) assert.ok(position.get(dependency) < position.get(itemId));
+    }
 });
 
 test("single-value tag auto-resolves while multi-value tag requires selection", () => {
