@@ -5,9 +5,9 @@ const { spawn } = require("node:child_process");
 const { createHash, randomUUID } = require("node:crypto");
 const { parseFrontmatter } = require("../../BIO相關模組/MC解析器模塊/bio/bio_scanner");
 const { metadataIsAdditive, BIO_UPDATE_MERGE_VERSION } = require("../../BIO相關模組/MC解析器模塊/bio/bio_update");
-const { stripManagedBIOtags, rebuildManagedBIOtags } = require("../../BIO相關模組/MC解析器模塊/bio/bio_tags");
+const { stripManagedBIOtags, publicationBlockingTags } = require("../../BIO相關模組/MC解析器模塊/bio/bio_tags");
 const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
-const { parseMachineRecipeMappings, normalizeMachineRecipeSections } =
+const { RECIPE_MAPPING_FILE, parseMachineRecipeMappings, normalizeMachineRecipeSections } =
     require("../../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
 const { normalizeBIOOutput } = require("../../BIO相關模組/MC解析器模塊/bio/bio_output");
 
@@ -50,7 +50,7 @@ function addsOnlyLines(original, candidate) {
     return index === before.length;
 }
 
-function preservesBIOContent(original, candidate, rules = []) {
+function preservesBIOContent(original, candidate, rules = [], onDifference) {
     // Canonicalize only mapped Machine headers, excess recipe gaps, legacy
     // YAML output and managed tags. Custom tags, images and prose must survive.
     const providers = new Map();
@@ -67,7 +67,10 @@ function preservesBIOContent(original, candidate, rules = []) {
     if ([...sourceOutput.diagnostics, ...candidateOutput.diagnostics].some(entry => entry.severity === "ERROR")) return false;
     const before = normalizeMachineRecipeSections(sourceOutput.text, { rules, resolveProvider }).text;
     const after = normalizeMachineRecipeSections(candidateOutput.text, { rules }).text;
-    return addsOnlyLines(stripManagedBIOtags(before), stripManagedBIOtags(after));
+    const oldBody = stripManagedBIOtags(before), newBody = stripManagedBIOtags(after);
+    const preserved = addsOnlyLines(oldBody, newBody);
+    if (!preserved && onDifference) onDifference(oldBody, newBody);
+    return preserved;
 }
 
 async function checkpoint(root, sourcePath, original) {
@@ -105,7 +108,7 @@ async function applyReviewedBIO(options) {
     const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
     if (manifest.schemaVersion !== 1 || !Array.isArray(manifest.plans)) throw new Error("更新審核資料格式不相容");
     if (manifest.mergeVersion !== BIO_UPDATE_MERGE_VERSION) throw new Error("舊版更新合併結果不可套用，請重新產生 --update-existing 預覽");
-    const mappingRelative = "Minecraft Machine Recipe Mapping Draft.md";
+    const mappingRelative = RECIPE_MAPPING_FILE;
     let mappingBytes = null;
     try { mappingBytes = await fs.readFile(await inside(root, mappingRelative)); }
     catch (error) { if (error.code !== "ENOENT") throw error; }
@@ -148,7 +151,7 @@ async function applyReviewedBIO(options) {
     const candidateMetadata = parseFrontmatter(candidateText);
     if ("output" in (candidateMetadata ?? {})) throw new Error("候選仍含 YAML output，請重新產生更新預覽");
     if (!preservesBIOContent(originalText, candidateText, machineMapping.rules) ||
-        !metadataIsAdditive(fm, candidateMetadata, { allowOutputRemoval: true })) {
+        !metadataIsAdditive(fm, candidateMetadata, { allowOutputRemoval: true, allowManagedTags: true })) {
         throw new Error("候選包含刪改原文或 identity，停止套用");
     }
     const baseMaterial = candidateMetadata.base_material === "true";
@@ -158,9 +161,8 @@ async function applyReviewedBIO(options) {
             /(?:^|[\\/])preview[\\/]|\.preview(?:\.md)?$/i.test(value.name || ""))))) {
         throw new Error("正式候選仍含測試 BIO 連結，停止套用");
     }
-    const rebuilt = rebuildManagedBIOtags(candidateText, { baseMaterial, updated: true,
-        hasRecipe: parsed.recipes.some(route => !route.external && !route.tagRepresentative) });
-    if (candidateText !== rebuilt) throw new Error("候選管理標籤不符合目前規則，請重新產生預覽");
+    const tags = publicationBlockingTags(candidateText);
+    if (tags.length) throw new Error("正式候選仍有待審查標籤：" + tags.join("、") + "。請在更新 Preview 審查後移除，並走 scan-publication。");
     if (original.equals(candidate)) throw new Error("候選與原文相同，無須更新");
     const restorePoint = await checkpoint(root, plan.sourcePath, original);
     try {

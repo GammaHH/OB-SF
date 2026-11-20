@@ -64,7 +64,7 @@ function assessTarget(
     return {
         target,
         reasons,
-        requiresReview: Object.values(reasons).some(value => value > 0)
+        requiresReview: !analysis.readiness.readyForBioGeneration || Object.values(reasons).some(value => value > 0)
     };
 }
 

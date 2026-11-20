@@ -15,6 +15,48 @@ function select(parsed, routes = new Map(), ingredients = new Map()) {
     return reader.chooseRecipe("item.md", reader.allowedRecipes(parsed, new Set(["常規", "合成配方", "外部取得"])), routes, ingredients);
 }
 
+test('Tag representative cycle fallback is owner-scoped and preserves the full legal collection', () => {
+    const parsed = reader.parseBIO('### Tag 代表材料\n<!-- preferred -->\n- [item:: [[白色束口袋]]]\n- [item:: [[束口袋]]]\n- [item:: [[紅色束口袋]]]\n', { minecraft_tag: 'minecraft:bundles', tag_identity: 'minecraft:item_tag' });
+    const ingredientChoices = new Map(), key = reader.ingredientKey('各色束口袋.md', parsed.recipes[0].key, 0);
+    ingredientChoices.set(key, '白色束口袋');
+    const choose = owner => reader.chooseRecipe('各色束口袋.md', parsed.recipes, new Map(), ingredientChoices,
+        { isChoiceAllowed: choice => choice.name !== owner });
+    const white = choose('白色束口袋');
+    assert.equal(white.ingredients[0].name, '束口袋');
+    assert.deepEqual(white.ingredients[0].cycleFallback, { from: '白色束口袋', to: '束口袋' });
+    assert.equal(choose('紅色束口袋').ingredients[0].name, '白色束口袋');
+    assert.equal(ingredientChoices.get(key), '白色束口袋');
+    assert.equal(parsed.recipes[0].ingredients[0].choices.length, 3);
+    assert.equal(reader.chooseRecipe('各色束口袋.md', parsed.recipes, new Map(), ingredientChoices, { isChoiceAllowed: () => false }), null);
+});
+
+test('V4 recognizes an mc-tag collection by type alone', () => {
+    const parsed = reader.parseBIO("### Tag 代表材料\n- [item:: [[杉木材]]]\n<!-- preferred -->\n- [item:: [[橡木材]]]\n",
+        { type: "mc-tag", id: "ANY_PLANKS" });
+    const selected = select(parsed);
+    assert.equal(selected.tagRepresentative, true);
+    assert.equal(selected.ingredients[0].name, "橡木材");
+    assert.equal(selected.ingredients[0].choices.length, 2);
+});
+
+test('shared collections can recur after concrete progress but item cycles and Tag-only loops remain blocked', () => {
+    const tags = new Set(['各色界伏盒.md', '另一集合.md']);
+    const collection = path => tags.has(path);
+    assert.equal(reader.dependencyWouldCycle('各色界伏盒.md', ['棕色界伏盒.md', '各色界伏盒.md', '白色界伏盒.md'], collection), false);
+    assert.equal(reader.dependencyWouldCycle('棕色界伏盒.md', ['棕色界伏盒.md', '各色界伏盒.md', '白色界伏盒.md'], collection), true);
+    assert.equal(reader.dependencyWouldCycle('各色界伏盒.md', ['各色界伏盒.md', '另一集合.md'], collection), true);
+    assert.equal(reader.dependencyWouldCycle('各色界伏盒.md', ['各色界伏盒.md'], collection), true);
+    assert.equal(reader.dependencyWouldCycle('全新材料.md', ['棕色界伏盒.md'], collection), false);
+});
+
+test('cycle fallback policy does not silently filter ordinary exact alternatives', () => {
+    const parsed = reader.parseBIO('### 常規\n- (Machine:: 工作台)\n- **擇一材料** (qty:: 2)\n\t- [item:: A]\n\t- [item:: B]\n- [output:: 1]\n');
+    const selected = reader.chooseRecipe('owner.md', parsed.recipes, new Map(), new Map(), { isChoiceAllowed: () => false });
+    assert.equal(selected.ingredients[0].name, 'A');
+    assert.equal(selected.ingredients[0].qty, 2);
+    assert.equal(selected.ingredients[0].choices.length, 2);
+});
+
 test("multiple preferred routes follow document order after section and provider filtering", () => {
     const source = (provider, section, machine, preferred = true) =>
         "### " + section + "\n##### " + provider + "\n" + (preferred ? "<!-- preferred -->\n" : "") +

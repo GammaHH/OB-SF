@@ -106,6 +106,14 @@ test("batch rejects any blocked target or snapshot mismatch before a merged plan
     assert.throws(() => mergeBIOPreviewContexts([]), /BATCH_TARGETS_REQUIRED/);
 });
 
+test("a non-ready target reports exact readiness counters and unresolved tag identity", () => {
+    const value = context("minecraft:campfire", ["minecraft:campfire"]);
+    value.analysis.readiness = { readyForBioGeneration: false, blocked: 0, unresolvedAmbiguities: 1, invalidSelections: 0, planningCycles: 0 };
+    value.analysis.unresolvedGroupIds = ["coals-group"];
+    value.analysis.groups = [{ groupId: "coals-group", type: "tag", tagId: "minecraft:coals", status: "UNRESOLVED" }];
+    assert.throws(() => mergeBIOPreviewContexts([value]), /BATCH_TARGET_NOT_READY.*minecraft:campfire.*unresolvedAmbiguities=1.*minecraft:coals/);
+});
+
 test("batch keeps resolved groups from every target while deduplicating shared stable identities", () => {
     const shared = { groupId: "tag-global-planks", type: "tag", selectedCandidateId: "minecraft:oak_planks", status: "RESOLVED" };
     const left = context("one", ["base", "one"]);

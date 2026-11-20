@@ -32,6 +32,44 @@ function routeKeys(route, resolveName) {
     };
 }
 
+// Prove that an old concrete route is a legal instantiation of the incoming
+// Tag/alternative route. A display name such as 任意木材 is never evidence by
+// itself; callers must supply a verified member list for linked collections.
+function routeIsLegalSpecialization(existing, incoming, options = {}) {
+    const name = value => options.resolveName?.(value) || value;
+    if (name(existing.machine) !== name(incoming.machine) || Number(existing.output) !== Number(incoming.output) ||
+        existing.ingredients.length !== incoming.ingredients.length) return false;
+    const variants = route => JSON.stringify(stable({ components: route.components,
+        notes: (route.notes || []).filter(note => /^(?:效果：|成品資訊（)/.test(note)) }));
+    if (variants(existing) !== variants(incoming)) return false;
+    const members = ingredient => {
+        if (ingredient.excludeSelf) return null; // requires owner-scoped proof, not a global set
+        const choices = ingredient.choices || options.resolveIngredientChoices?.(ingredient);
+        const values = choices?.length ? choices : [{ name: ingredient.name, qty: 1 }];
+        const result = new Set();
+        for (const value of values) {
+            const qty = Number(ingredient.qty ?? 1) * Number(value.qty ?? 1);
+            if (!value.name || !Number.isFinite(qty) || qty <= 0 || value.excludeSelf) return null;
+            result.add(JSON.stringify([name(value.name), qty]));
+        }
+        return result;
+    };
+    const oldMembers = existing.ingredients.map(members), newMembers = incoming.ingredients.map(members);
+    if ([...oldMembers, ...newMembers].some(value => !value)) return false;
+    const candidates = oldMembers.map(values => newMembers.map((allowed, index) =>
+        [...values].every(value => allowed.has(value)) ? index : -1).filter(index => index >= 0));
+    const assigned = new Map();
+    function match(index, seen) {
+        for (const next of candidates[index]) {
+            if (seen.has(next)) continue;
+            seen.add(next);
+            if (!assigned.has(next) || match(assigned.get(next), seen)) { assigned.set(next, index); return true; }
+        }
+        return false;
+    }
+    return candidates.every((_, index) => match(index, new Set()));
+}
+
 // Split generated machine routes without copying its frontmatter or unrelated sections.
 function generatedRoutes(markdown) {
     const lines = String(markdown).match(/[^\n]*\n|[^\n]+$/g) || [];
@@ -62,14 +100,68 @@ function generatedRoutes(markdown) {
         if (!fence && (/^\s*-.*\(Machine\s*::/i.test(line) || external)) {
             finish();
             block = { section, provider, lines: [], start: pending ?? offset, contentStart: offset,
+                recipeEnd: offset, unsafeSpan: false, afterRecipe: false,
                 preferred: pending != null, external };
             pending = null;
         }
-        if (block) block.lines.push(line);
+        if (block) {
+            block.lines.push(line);
+            const recipeRow = /^\s*(?:-.*\(Machine\s*::|\*\*(?:合成所需|所需|批產量)\*\*|[-*]\s*\[(?:item|drop|GEO|output|note)\s*::|<!--\s*(?:obsf:choices|except self)|-\s*\*\*擇一材料)/i.test(line);
+            if (recipeRow || block.external && /^\s*-\s+/.test(line)) {
+                if (block.afterRecipe) block.unsafeSpan = true;
+                block.recipeEnd = offset + raw.length;
+            } else if (line.trim()) block.afterRecipe = true;
+        }
         offset += raw.length;
     }
     finish();
     return result;
+}
+
+const LEGACY_REVIEW_START = "<!-- obsf:legacy-recipe-review:start ";
+const LEGACY_REVIEW_END = "<!-- obsf:legacy-recipe-review:end -->";
+
+function legacyReviewEnvelope(record, newline) {
+    const fenceLength = Math.max(3, ...[...record.source.matchAll(/`+/g)].map(match => match[0].length + 1));
+    const fence = "`".repeat(fenceLength);
+    const metadata = JSON.stringify(record).replaceAll("<", "\\u003c");
+    return LEGACY_REVIEW_START + metadata + " -->" + newline + fence + "markdown" + newline +
+        record.source + (/\r?\n$/.test(record.source) ? "" : newline) + fence + newline + LEGACY_REVIEW_END + newline;
+}
+
+// The metadata stores the exact original range. Publication guards must verify
+// source === original.slice(start,end), not merely trust a fenced code block.
+function extractLegacyRecipeReviews(text) {
+    const result = [], source = String(text);
+    const pattern = /^<!-- obsf:legacy-recipe-review:start (.+) -->\r?\n/gm;
+    for (const match of source.matchAll(pattern)) {
+        const record = JSON.parse(match[1]);
+        if (record.schemaVersion !== 1 || typeof record.itemId !== "string" || typeof record.source !== "string" ||
+            !Number.isInteger(record.start) || !Number.isInteger(record.end) || record.start < 0 || record.end <= record.start ||
+            typeof record.reason !== "string" || !record.reason || typeof record.evidence !== "string" || !record.evidence) {
+            throw new Error("舊配方審核記錄格式無效");
+        }
+        const newline = match[0].endsWith("\r\n") ? "\r\n" : "\n";
+        const expected = legacyReviewEnvelope(record, newline);
+        if (source.slice(match.index, match.index + expected.length) !== expected) throw new Error("舊配方審核原文與記錄不一致");
+        result.push({ ...record, envelopeStart: match.index, envelopeEnd: match.index + expected.length });
+    }
+    if ((source.match(/<!-- obsf:legacy-recipe-review:start /g) || []).length !== result.length ||
+        (source.match(/<!-- obsf:legacy-recipe-review:end -->/g) || []).length !== result.length) throw new Error("舊配方審核 marker 不完整");
+    return result;
+}
+
+function quarantineLegacyRoutes(original, records, newline) {
+    let text = original;
+    for (const record of [...records].sort((a, b) => b.start - a.start)) {
+        if (original.slice(record.start, record.end) !== record.source) throw new Error("舊配方隔離範圍不一致");
+        text = text.slice(0, record.start) + text.slice(record.end);
+    }
+    const list = headings(text);
+    const root = list.find(heading => heading.level === 1 && heading.title === "合成/取得");
+    const at = root ? list.find(heading => heading.level === 1 && heading.start > root.start)?.start ?? text.length : text.length;
+    const review = newline + "# 舊配方審核（不參與規劃）" + newline + newline + records.map(record => legacyReviewEnvelope(record, newline)).join(newline) + newline;
+    return text.slice(0, at) + review + text.slice(at);
 }
 
 const ADDABLE_METADATA = new Set(["id", "type", "minecraft_id", "base_material", "generated_by", "generator_schema", "aliases", "level"]);
@@ -81,12 +173,13 @@ function metadataIsAdditive(before, after, options = {}) {
         if (key === "tags") {
             const custom = parseTagList(value).filter(tag => !isManagedBIOtag(tag)).map(normalizeTag);
             const retained = parseTagList(after.tags).map(normalizeTag);
-            if (!custom.every(tag => retained.includes(tag)) || retained.some(isManagedBIOtag)) return false;
+            if (!custom.every(tag => retained.includes(tag)) || (!options.allowManagedTags && retained.some(isManagedBIOtag))) return false;
         } else if (key === "aliases" && Array.isArray(value) && Array.isArray(after.aliases)) {
             if (!value.every(alias => after.aliases.includes(alias))) return false;
         } else if (JSON.stringify(value) !== JSON.stringify(after[key])) return false;
     }
-    return Object.keys(after).every(key => key in before || ADDABLE_METADATA.has(key));
+    return Object.keys(after).every(key => key in before || ADDABLE_METADATA.has(key) ||
+        (key === "tags" && options.allowManagedTags && parseTagList(after.tags).every(isManagedBIOtag)));
 }
 
 function mergeMetadata(original, generated, before, after, diagnostics, newline) {
@@ -158,6 +251,84 @@ function insertRoute(original, block, newline, providerFallback) {
     return text.slice(0, at) + fragment + text.slice(at);
 }
 
+function refreshVanillaRecipeBlocks(original, generated) {
+    const newline = original.includes("\r\n") ? "\r\n" : "\n";
+    const collect = text => {
+        const groups = new Map();
+        const titles = headings(text);
+        const root = titles.find(heading => heading.level === 1 && heading.title === "合成/取得");
+        if (!root) return groups;
+        const end = titles.find(heading => heading.level === 1 && heading.start > root.start)?.start ?? text.length;
+        for (const block of generatedRoutes(text)) {
+            if (block.external || block.provider !== "Minecraft 原版" || block.start < root.body || block.start >= end) continue;
+            const recipeText = text.slice(block.contentStart, block.recipeEnd).trimEnd();
+            const route = reader.parseBIO("### " + block.section + "\n" + recipeText).recipes[0];
+            if (!route?.machine || !recipeText || block.unsafeSpan)
+                throw new Error("原版配方混有無法安全更新的內容：" + block.section);
+            const key = JSON.stringify([block.section, route.machine]);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push({ ...block, text: recipeText, route });
+        }
+        return groups;
+    };
+    const oldGroups = collect(original), newGroups = collect(generated);
+    const patches = [], additions = [];
+    const generatedNote = /^(?:處理時間 |烹調時間|經驗值[ ：]|材料角色：|繼承輸入物品 Components：|可以存入物品$|補充資訊（|成品資訊（|效果：|效果補充資訊：)/;
+    const signature = route => JSON.stringify([route.output, route.ingredients.map(ingredient =>
+        [ingredient.label || ingredient.name, ingredient.qty])]);
+    const withManualNotes = (block, notes) => [block.text, ...notes
+        .filter(note => !generatedNote.test(note) && !block.route.notes?.includes(note))
+        .map(note => "\t- [note:: " + note + "]")].join("\n");
+    const render = block => ((block.preferred ? "<!-- preferred -->" + newline : "") +
+        block.text.replace(/\r?\n/g, newline) + newline);
+    for (const [key, old] of oldGroups) {
+        let replacementKey = key;
+        if (!newGroups.has(key)) {
+            const machine = old[0].route.machine;
+            const matches = [...newGroups].filter(([, blocks]) => blocks[0].route.machine === machine);
+            const groupsForMachine = [...oldGroups.values()].filter(blocks => blocks[0].route.machine === machine);
+            if (matches.length !== 1 || groupsForMachine.length !== 1) continue;
+            replacementKey = matches[0][0];
+        }
+        const incoming = newGroups.get(replacementKey);
+        newGroups.delete(replacementKey);
+        const moved = replacementKey !== key;
+        const remaining = new Set(incoming);
+        const pairs = old.map(block => {
+            const replacement = [...remaining].find(next => signature(next.route) === signature(block.route));
+            remaining.delete(replacement);
+            return { block, replacement };
+        });
+        for (const pair of pairs) {
+            if (pair.replacement) continue;
+            pair.replacement = [...remaining][0];
+            remaining.delete(pair.replacement);
+        }
+        const preferred = pairs.find(pair => pair.block.preferred);
+        if (preferred && old.length === 1 && incoming.length > 1)
+            preferred.replacement = incoming.find(block => block.preferred) || preferred.replacement;
+        if (preferred && !preferred.replacement)
+            throw new Error("更新時無法保留原本的首選配方：" + preferred.block.route.machine);
+        const assigned = new Set(pairs.map(pair => pair.replacement));
+        for (const [index, { block, replacement }] of pairs.entries()) {
+            const notes = block.route.notes || [];
+            if (!replacement && notes.some(note => !generatedNote.test(note)))
+                throw new Error("舊路線含人工 NOTE，請先審查：" + block.route.machine);
+            const blocks = replacement ? [{ ...replacement, text: withManualNotes(replacement, notes), preferred: block.preferred }] : [];
+            if (index === pairs.length - 1)
+                for (const extra of incoming.filter(next => !assigned.has(next))) blocks.push({ ...extra, preferred: false });
+            if (moved) additions.push(...blocks);
+            patches.push({ start: block.start, end: block.recipeEnd, text: moved ? "" : blocks.map(render).join("") });
+        }
+    }
+    for (const blocks of newGroups.values()) additions.push(...blocks.map(block => ({ ...block, preferred: false })));
+    let updated = original;
+    for (const { start, end, text } of patches.sort((a, b) => b.start - a.start))
+        updated = updated.slice(0, start) + text + updated.slice(end);
+    for (const block of additions) updated = insertRoute(updated, block, newline, block.provider);
+    return updated;
+}
+
 function groupExisting(original, routes, oldKeys, newKeys, options, newline, diagnostics) {
     const insertions = [];
     const used = new Set();
@@ -189,7 +360,8 @@ function groupExisting(original, routes, oldKeys, newKeys, options, newline, dia
                 const name = reader.readLink(machine[1]).name;
                 const index = routes.findIndex((route, i) => !used.has(i) && route.machine === name);
                 if (index >= 0) used.add(index);
-                const matched = index >= 0 && newKeys.some(key => key.exact === oldKeys[index].exact);
+                const matched = index >= 0 && (newKeys.some(key => key.exact === oldKeys[index].exact) ||
+                    (options.incomingRoutes || []).some(route => routeIsLegalSpecialization(routes[index], route, options)));
                 const source = options.classifyExistingRoute?.(index >= 0 ? routes[index] : { machine: name });
                 const evidenceFolder = source?.evidence?.replaceAll("\\", "/").split("/")[0];
                 const provider = matched ? "Minecraft 原版" : evidenceFolder || source?.provider || "其他";
@@ -253,29 +425,66 @@ function planBIOUpdate(existingText, generatedText, options = {}) {
     for (const [side, parsed] of [["existing", existing], ["generated", incoming]]) {
         diagnostics.push(...parsed.diagnostics.map(entry => ({ ...entry, side })));
     }
-    const oldRoutes = existing.recipes.filter(route => !route.external && !route.tagRepresentative);
+    let oldRoutes = existing.recipes.filter(route => !route.external && !route.tagRepresentative);
     const newRoutes = incoming.recipes.filter(route => !route.external && !route.tagRepresentative);
-    const machineRows = original.match(/\(Machine\s*::/gi) || [];
+    const machineRows = generatedRoutes(original).filter(block => !block.external);
     if (machineRows.length !== oldRoutes.length) diagnostics.push({
         code: "EXISTING_ROUTE_UNPARSED", message: "原 BIO 部分設備配方未完整解析；保留原文" });
-    const oldKeys = oldRoutes.map(route => routeKeys(route, options.resolveName));
+    let oldKeys = oldRoutes.map(route => routeKeys(route, options.resolveName));
     const newKeys = newRoutes.map(route => routeKeys(route, options.resolveName));
     const describe = route => ({ machine: route.machine, ingredients: route.ingredients,
         output: route.output, components: route.components, notes: route.notes || [] });
+    const quarantined = [], quarantinedIndexes = new Set();
+    const isolate = (index, asserted, code, message) => {
+        const block = machineRows[index];
+        if (!asserted || typeof asserted.reason !== "string" || !asserted.reason || typeof asserted.evidence !== "string" || !asserted.evidence ||
+            machineRows.length !== oldRoutes.length || !block || block.unsafeSpan || block.recipeEnd <= block.contentStart) return false;
+        const record = { schemaVersion: 1, kind: code === "LEGACY_ROUTE_REPRESENTATION_SUPERSEDED" ? "representation" : "invalid",
+            itemId: oldId, reason: asserted.reason, evidence: asserted.evidence,
+            start: block.start, end: block.recipeEnd, source: original.slice(block.start, block.recipeEnd) };
+        quarantined.push(record); quarantinedIndexes.add(index);
+        diagnostics.push({ code, route: index + 1, reason: record.reason, evidence: record.evidence,
+            existing: describe(oldRoutes[index]), source: record.source, message });
+        return true;
+    };
     for (let index = 0; index < oldKeys.length; index++) {
         if (newKeys.some(key => key.exact === oldKeys[index].exact)) continue;
         const source = options.classifyExistingRoute?.(oldRoutes[index]) ||
-            (/^(?:Slimefun 原版|SF-)/.test(oldRoutes[index].provider || "") ? { provider: oldRoutes[index].provider } : null);
-        if (source) {
+            (oldRoutes[index].provider && !["Minecraft 原版", "其他"].includes(oldRoutes[index].provider)
+                ? { provider: oldRoutes[index].provider, evidence: "existing-provider:" + oldRoutes[index].provider } : null);
+        const covering = newRoutes.find(route => routeIsLegalSpecialization(oldRoutes[index], route, options));
+        if (covering) {
+            const hasCollection = covering.ingredients.some(ingredient =>
+                (ingredient.choices || options.resolveIngredientChoices?.(ingredient))?.length > 1);
+            if (options.canonicalizeLegacyCollections && hasCollection && (!source || source.provider === "Minecraft 原版")) {
+                const saved = isolate(index, { reason: "合法舊具體材料路線已由來源的完整集合路線涵蓋", evidence: "verified-incoming-collection-membership" },
+                    "LEGACY_ROUTE_REPRESENTATION_SUPERSEDED", "舊路線合法，已改用完整集合呈現；原表示保留於 fenced 審核區，並非錯誤配方");
+                if (!saved) diagnostics.push({ code: "LEGACY_COLLECTION_REPRESENTATION_UNSAFE", route: index + 1,
+                    message: "合法舊路線與人工內容交錯，無法安全收斂表示；保留原路線供人工審核" });
+            }
+            continue;
+        }
+        if (source && source.provider !== "Minecraft 原版") {
             preservedRoutes.push({ code: "OTHER_SOURCE_PRESERVED", provider: source.provider,
                 evidence: source.evidence, existing: describe(oldRoutes[index]),
                 message: "其他科技提供的路線已保留，不要求出現在 Vanilla JSON 中" });
             continue;
         }
+        const explicitVanilla = oldRoutes[index].provider === "Minecraft 原版" || source?.provider === "Minecraft 原版";
+        const asserted = explicitVanilla
+            ? { reason: "明確標為 Minecraft 原版的舊路線與本次合法配方不符", evidence: "existing-provider:Minecraft 原版" }
+            : options.quarantineLegacyRoute?.(oldRoutes[index], { itemId: oldId, routeIndex: index + 1 });
+        if (isolate(index, asserted, "LEGACY_VANILLA_ROUTE_QUARANTINED", "不合法舊路線原文已隔離於 fenced 審核區，不再參與 V4 規劃；須人工驗收")) continue;
+        if (asserted) diagnostics.push({ code: "LEGACY_VANILLA_ROUTE_QUARANTINE_UNSAFE", route: index + 1,
+            message: "舊路線與人工內容交錯，無法安全隔離；保留原文，須先人工修復" });
         diagnostics.push({
             code: "EXISTING_ROUTE_NOT_IN_SOURCE", route: index + 1,
             existing: describe(oldRoutes[index]),
             message: "舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核" });
+    }
+    if (quarantinedIndexes.size) {
+        oldRoutes = oldRoutes.filter((_, index) => !quarantinedIndexes.has(index));
+        oldKeys = oldKeys.filter((_, index) => !quarantinedIndexes.has(index));
     }
     const allBlocks = generatedRoutes(generatedText);
     const blocks = allBlocks.filter(block => !block.external);
@@ -320,7 +529,9 @@ function planBIOUpdate(existingText, generatedText, options = {}) {
         additions.push(blocks[index]);
     }
     const newline = original.includes("\r\n") ? "\r\n" : "\n";
-    let retained = options.groupExistingRoutes ? groupExisting(original, oldRoutes, oldKeys, newKeys, options, newline, diagnostics) : original;
+    let retained = quarantined.length ? quarantineLegacyRoutes(original, quarantined, newline) : original;
+    if (options.groupExistingRoutes) retained = groupExisting(retained, oldRoutes, oldKeys, newKeys,
+        { ...options, incomingRoutes: newRoutes }, newline, diagnostics);
     retained = mergeMetadata(retained, generatedText, oldMetadata, newMetadata, diagnostics, newline);
     for (const enrichment of enrichments) {
         const existingBlock = generatedRoutes(retained).find(block => {
@@ -331,7 +542,9 @@ function planBIOUpdate(existingText, generatedText, options = {}) {
         if (!existingBlock) continue;
         if (enrichment.notes.length) {
             const noteText = enrichment.notes.map(note => "\t- [note:: " + note + "]").join(newline);
-            retained = retained.slice(0, existingBlock.end) + newline + noteText + newline + retained.slice(existingBlock.end);
+            const at = existingBlock.recipeEnd || existingBlock.end;
+            const left = retained.slice(0, at), right = retained.slice(at);
+            retained = left + (/\r?\n$/.test(left) ? "" : newline) + noteText + newline + right;
         }
         if (enrichment.preferred && !/<!-- preferred -->/.test(retained)) {
             retained = retained.slice(0, existingBlock.contentStart) + "<!-- preferred -->" + newline + retained.slice(existingBlock.contentStart);
@@ -383,7 +596,9 @@ function planBIOUpdate(existingText, generatedText, options = {}) {
             hasRecipe: parsed.recipes.some(route => !route.external && !route.tagRepresentative) });
     }
     return { status: diagnostics.length ? "REVIEW" : retained !== original ? "ADDITIVE_UPDATE" : "UNCHANGED",
-        candidate: retained, additions: additions.map(block => ({ section: block.section, provider: block.provider })), diagnostics, preservedRoutes };
+        candidate: retained, additions: additions.map(block => ({ section: block.section, provider: block.provider })), diagnostics, preservedRoutes,
+        quarantinedRoutes: quarantined };
 }
 
-module.exports = { planBIOUpdate, metadataIsAdditive, BIO_UPDATE_MERGE_VERSION };
+module.exports = { planBIOUpdate, metadataIsAdditive, BIO_UPDATE_MERGE_VERSION,
+    routeIsLegalSpecialization, extractLegacyRecipeReviews, refreshVanillaRecipeBlocks };

@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { managedTagsFor, stripManagedBIOtags, rebuildManagedBIOtags } =
+const { managedTagsFor, stripManagedBIOtags, rebuildManagedBIOtags, publicationBlockingTags } =
     require("../../BIO相關模組/MC解析器模塊/bio/bio_tags");
 const { parseFrontmatter, scanMinecraftBIOs } = require("../../BIO相關模組/MC解析器模塊/bio/bio_scanner");
 const { metadataIsAdditive } = require("../../BIO相關模組/MC解析器模塊/bio/bio_update");
@@ -38,6 +38,8 @@ test("tag stripping preserves code fences, inline examples, comments and distinc
     const examples = "````md\n<!-- sample\n```\n#待補充\n````\n" +
         "<!-- metadata\n#未人工檢查\n-->\n`#待補充`\n#待補充/自訂\n#未人工檢查完成\n";
     assert.equal(stripManagedBIOtags(examples + "#待補充\n"), examples);
+    assert.deepEqual(publicationBlockingTags(examples + "#需攻略補充\n[[#待補充]]\n"), []);
+    assert.deepEqual(publicationBlockingTags("人工備註（#未人工檢查）<!-- 內部 -->\n"), ["#未人工檢查"]);
     const mixed = "說明 #待補充 #自訂\n";
     assert.equal(stripManagedBIOtags(mixed), "說明  #自訂\n");
 });

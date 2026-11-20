@@ -66,7 +66,17 @@ function mergeGenerationOrders(orders, dependencyRecords = []) {
 
 function mergeBIOPreviewContexts(contexts) {
     if (!Array.isArray(contexts) || !contexts.length) throw new Error("BATCH_TARGETS_REQUIRED：至少需要一個 target");
-    for (const context of contexts) if (!context.analysis?.readiness?.readyForBioGeneration) throw new Error(`BATCH_TARGET_NOT_READY：${context.target}`);
+    for (const context of contexts) if (!context.analysis?.readiness?.readyForBioGeneration) {
+        const readiness = context.analysis?.readiness || {};
+        const counts = ["unresolvedAmbiguities", "blocked", "invalidSelections", "planningCycles"]
+            .map(key => `${key}=${readiness[key] ?? "unknown"}`).join(", ");
+        const unresolved = new Set(context.analysis?.unresolvedGroupIds || []);
+        const groups = (context.analysis?.groups || []).filter(group => unresolved.has(group.groupId) || group.status !== "RESOLVED")
+            .map(group => `${group.type} ${group.tagId || group.title || group.subject || group.label || group.ownerItemId || group.groupId}（${group.groupId}）`).slice(0, 10);
+        const diagnostics = (context.analysis?.diagnostics || []).filter(value => value.severity === "ERROR").map(value => value.code).slice(0, 10);
+        throw new Error(`BATCH_TARGET_NOT_READY：${context.target}；${counts}` +
+            (groups.length ? `；未決策：${groups.join("、")}` : "") + (diagnostics.length ? `；診斷：${diagnostics.join("、")}` : ""));
+    }
     const first = contexts[0], groups = new Map(), preferred = new Map();
     const graph = new Map(), baseDependencyMap = new Map(), baseState = new Map(), baseItemIds = new Set();
     const selectedDependencies = new Map();

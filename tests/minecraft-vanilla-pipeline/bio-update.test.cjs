@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { planBIOUpdate } = require("../../BIO相關模組/MC解析器模塊/bio/bio_update");
+const { planBIOUpdate, routeIsLegalSpecialization, extractLegacyRecipeReviews } = require("../../BIO相關模組/MC解析器模塊/bio/bio_update");
+const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
 const { addsOnlyLines, preservesBIOContent } = require("../../scripts/lib/bio-apply.cjs");
 const { parseMachineRecipeMappings } = require("../../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
 
@@ -18,6 +19,98 @@ function bio(body, extras = "") {
     });
     return "---\ntype: mc-item\nid: STICK\n" + extras + "---\n\n# 合成/取得\n\n" + body;
 }
+
+test("a concrete glass route is proved against complete linked Tag members and canonicalized without losing source prose", () => {
+    const original = bio(route("熔爐", "沙", 1, 1).replace("### 合成配方", "### 常規") + "\n![[玻璃.png]]\n人工說明保留\n");
+    const generated = bio(route("熔爐", "任意沙類", 1, 1, "處理時間 200 ticks"));
+    const resolveName = value => ({ "沙": "minecraft:sand", "紅沙": "minecraft:red_sand", "任意沙類": "tag:minecraft:smelts_to_glass" }[value] || value);
+    const options = { groupExistingRoutes: true, canonicalizeLegacyCollections: true, resolveName,
+        resolveIngredientChoices: ingredient => ingredient.name === "任意沙類" ? [{ name: "minecraft:sand", qty: 1 }, { name: "minecraft:red_sand", qty: 1 }] : null };
+    const plan = planBIOUpdate(original, generated, options);
+    assert.ok(plan.diagnostics.some(value => value.code === "LEGACY_ROUTE_REPRESENTATION_SUPERSEDED"));
+    assert.equal(plan.diagnostics.some(value => value.code === "EXISTING_ROUTE_NOT_IN_SOURCE"), false);
+    const records = extractLegacyRecipeReviews(plan.candidate);
+    assert.equal(records.length, 1); assert.equal(records[0].kind, "representation");
+    assert.equal(original.slice(records[0].start, records[0].end), records[0].source);
+    assert.doesNotMatch(records[0].source, /玻璃.png|人工說明/);
+    const active = reader.parseBIO(plan.candidate).recipes.filter(value => !value.external);
+    assert.equal(active.length, 1); assert.equal(active[0].ingredients[0].name, "任意沙類");
+    const outside = plan.candidate.slice(0, records[0].envelopeStart) + plan.candidate.slice(records[0].envelopeEnd);
+    assert.match(outside, /!\[\[玻璃.png\]\]\n人工說明保留/);
+    assert.equal(planBIOUpdate(plan.candidate, generated, options).candidate, plan.candidate);
+});
+
+test("furnace and campfire concrete materials match legal choices independent of ingredient order", () => {
+    const names = { "鵝卵石": "minecraft:cobblestone", "黑石": "minecraft:blackstone", "橡木原木": "minecraft:oak_log",
+        "任意原木": "tag:minecraft:logs", "木棒": "minecraft:stick", "煤炭": "minecraft:coal", "木炭": "minecraft:charcoal" };
+    const resolveName = value => names[value] || value;
+    const furnaceOld = reader.parseBIO(route("工作台", "鵝卵石", 8, 1)).recipes[0];
+    const furnaceNew = { ...furnaceOld, ingredients: [{ name: "鵝卵石", qty: 8,
+        choices: [{ name: "鵝卵石", qty: 1 }, { name: "黑石", qty: 1 }] }] };
+    assert.equal(routeIsLegalSpecialization(furnaceOld, furnaceNew, { resolveName }), true);
+    assert.equal(routeIsLegalSpecialization(furnaceOld, { ...furnaceNew, output: 2 }, { resolveName }), false);
+    const oldCampfire = { machine: "工作台", output: 1, ingredients: [
+        { name: "橡木原木", qty: 3 }, { name: "木棒", qty: 3 }, { name: "煤炭", qty: 1 }] };
+    const newCampfire = { machine: "工作台", output: 1, ingredients: [
+        { name: "木棒", qty: 3 }, { name: "煤炭", qty: 1, choices: [{ name: "煤炭", qty: 1 }, { name: "木炭", qty: 1 }] },
+        { name: "任意原木", qty: 3 }] };
+    const options = { resolveName, resolveIngredientChoices: ingredient => ingredient.name === "任意原木"
+        ? [{ name: "minecraft:oak_log", qty: 1 }, { name: "minecraft:birch_log", qty: 1 }] : null };
+    assert.equal(routeIsLegalSpecialization(oldCampfire, newCampfire, options), true);
+    assert.equal(routeIsLegalSpecialization({ ...oldCampfire, ingredients: [{ name: "橡木原木", qty: 4 }, ...oldCampfire.ingredients.slice(1)] }, newCampfire, options), false);
+    assert.equal(routeIsLegalSpecialization(oldCampfire, newCampfire, { resolveName }), false, "display names alone do not prove linked collection members");
+});
+
+test("user-reviewed invalid legacy route is retained in verifiable fenced review rather than active V4 recipes", () => {
+    const oldRoute = route("熔爐", "地獄磚頭", 1, 1).replace("### 合成配方", "### 常規");
+    const original = bio(oldRoute + "\n![[磚圖片.png]]\n人工備註\n#有錯誤配方\n").replace("id: STICK", "id: NETHER_BRICKS");
+    const generated = bio(route("工作台", "地獄磚頭", 4, 1)).replace("id: STICK", "id: NETHER_BRICKS");
+    const unasserted = planBIOUpdate(original, generated, { groupExistingRoutes: true });
+    assert.equal(extractLegacyRecipeReviews(unasserted.candidate).length, 0, "custom tag does not delete/quarantine a route");
+    const plan = planBIOUpdate(original, generated, { groupExistingRoutes: true,
+        quarantineLegacyRoute: (existing, context) => context.itemId === "minecraft:nether_bricks" && existing.machine === "熔爐"
+            ? { reason: "使用者審核指出舊機器／數量錯誤", evidence: "user-review:2026-11-20" } : null });
+    const records = extractLegacyRecipeReviews(plan.candidate);
+    assert.equal(records.length, 1); assert.equal(records[0].kind, "invalid");
+    assert.equal(records[0].source, original.slice(records[0].start, records[0].end));
+    assert.doesNotMatch(records[0].source, /圖片|人工備註|有錯誤配方/);
+    const active = reader.parseBIO(plan.candidate).recipes.filter(value => !value.external);
+    assert.equal(active.length, 1); assert.equal(active[0].machine, "工作台");
+    assert.equal(active[0].ingredients[0].qty, 4);
+    assert.ok(plan.diagnostics.some(value => value.code === "LEGACY_VANILLA_ROUTE_QUARANTINED"));
+    assert.throws(() => extractLegacyRecipeReviews(plan.candidate.replace('```markdown\n', '```markdown\n篡改\n')), /原文與記錄不一致/);
+});
+
+test("known plugin routes are never quarantined or canonicalized by Vanilla source assertions", () => {
+    const original = bio(route("熔爐", "地獄磚頭", 1, 1).replace("### 合成配方", "### 常規\n##### 海曼科技院"));
+    const generated = bio(route("工作台", "地獄磚頭", 4, 1));
+    const plan = planBIOUpdate(original, generated, { groupExistingRoutes: true, canonicalizeLegacyCollections: true,
+        quarantineLegacyRoute: () => ({ reason: "不應套用", evidence: "test" }) });
+    assert.equal(extractLegacyRecipeReviews(plan.candidate).length, 0);
+    assert.match(plan.candidate, /##### 海曼科技院/);
+    assert.equal(reader.parseBIO(plan.candidate).recipes.filter(value => !value.external).length, 2);
+    assert.ok(plan.preservedRoutes.some(value => value.provider === "海曼科技院"));
+});
+
+test("interleaved image/manual content makes legacy route quarantine refuse an unsafe source span", () => {
+    const original = bio("### 常規\n<!-- preferred -->\n- (Machine:: 熔爐)\n- [item:: 地獄磚頭] (qty:: 1)\n" +
+        "![[人工圖片.png]]\n- [item:: 其他材料] (qty:: 1)\n");
+    const generated = bio(route("工作台", "地獄磚頭", 4, 1));
+    const plan = planBIOUpdate(original, generated, { groupExistingRoutes: true,
+        quarantineLegacyRoute: () => ({ reason: "人工指定", evidence: "test" }) });
+    assert.equal(extractLegacyRecipeReviews(plan.candidate).length, 0);
+    assert.ok(plan.diagnostics.some(value => value.code === "LEGACY_VANILLA_ROUTE_QUARANTINE_UNSAFE"));
+    assert.ok(plan.candidate.includes("![[人工圖片.png]]"));
+});
+
+test("supplemental notes are appended next to recipe data rather than after trailing manual prose or empty gaps", () => {
+    const original = bio(route("熔爐", "沙", 1, 1) + "\n\n\n人工說明\n\n# 用途\n");
+    const generated = bio(route("熔爐", "沙", 1, 1, "處理時間 200 ticks"));
+    const plan = planBIOUpdate(original, generated, { groupExistingRoutes: true });
+    assert.match(plan.candidate, /\[output:: 1\]\n\t- \[note:: 處理時間 200 ticks\]/);
+    assert.match(plan.candidate, /\[note:: 處理時間 200 ticks\][\s\S]*人工說明/);
+    assert.equal(planBIOUpdate(plan.candidate, generated, { groupExistingRoutes: true }).candidate, plan.candidate);
+});
 
 test("stand-alone linked source rows receive provider headings without changing their recipe section", () => {
     const original = bio("### 常規\n\n<!-- preferred -->\n- [[紅石 (Redstone)]]\n" +

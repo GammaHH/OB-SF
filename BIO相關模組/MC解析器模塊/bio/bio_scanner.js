@@ -242,7 +242,7 @@ function scanMinecraftBIOs(
     const acceptedTypes =
         new Set(
             options.acceptedTypes ??
-            ["mc-item", "mc-drop"]
+            ["mc-item", "mc-drop", "mc-tag"]
         );
 
 
@@ -263,7 +263,7 @@ function scanMinecraftBIOs(
         const legacyId =
             frontmatter.id ?? null;
 
-        const collection = Boolean(frontmatter.minecraft_tag || frontmatter.derived_group ||
+        const collection = Boolean(frontmatter.type === "mc-tag" || frontmatter.minecraft_tag || frontmatter.derived_group ||
             frontmatter.tag_identity === "minecraft:item_tag" ||
             frontmatter.tag_identity === "obsf:derived_ingredient_group");
         const normalizedId = collection ? null :
@@ -293,6 +293,7 @@ function scanMinecraftBIOs(
             normalizedId,
             legacyId,
             type,
+            level: frontmatter.level,
             minecraft_tag: frontmatter.minecraft_tag,
             tag_identity: frontmatter.tag_identity,
             derived_group: frontmatter.derived_group,

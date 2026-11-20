@@ -8,10 +8,13 @@ const { createMinecraftVanillaRuntime } = require("./lib/minecraft-vanilla-runti
 const { readReviewDecisionStore } = require("./lib/review-decision-store.cjs");
 const { writeFileWithRetrySync } = require("./lib/file-write-retry.cjs");
 const vanilla = require("../BIO相關模組/MC解析器模塊");
-const { parseMachineRecipeMappings } = require("../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
+const { RECIPE_MAPPING_FILE, parseMachineRecipeMappings } = require("../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
 const { mergeBIOPreviewContexts } = require("./lib/bio-preview-batch.cjs");
+const { openBatchRefresh, finishBatchRefresh } = require("./lib/bio-batch-refresh.cjs");
+const { refreshVanillaRecipeBlocks } = require("../BIO相關模組/MC解析器模塊/bio/bio_update");
 const bioReader = require("../BIO相關模組/搜尋介面模塊/bio_reader_v4");
 const { rewriteBIOForPreview } = require("../BIO相關模組/MC解析器模塊/bio/bio_preview");
+const { publicationManifest, publishBIOBatch, scanPublication, selectPublicationManifest, standaloneManifest, previewSemanticHash, allowPreferredEdits, allowLevelEdits } = require("./lib/bio-publication.cjs");
 
 const vaultRoot = path.resolve(__dirname, "..");
 
@@ -112,11 +115,11 @@ function loadSharedPlanningContext() {
             fs.readFileSync(groupMappingPath, "utf8")
         )
         : { mappings: new Map(), diagnostics: [] };
-    const machineMappingPath = path.join(vaultRoot, "Minecraft Machine Recipe Mapping Draft.md");
+    const machineMappingPath = path.join(vaultRoot, RECIPE_MAPPING_FILE);
     const machineMappingBytes = fs.existsSync(machineMappingPath) ? fs.readFileSync(machineMappingPath) : null;
     const machineMapping = machineMappingBytes ? parseMachineRecipeMappings(machineMappingBytes.toString("utf8"))
         : { rules: [], diagnostics: [{ code: "MACHINE_MAPPING_FILE_MISSING", severity: "WARNING",
-            message: "找不到 Minecraft Machine Recipe Mapping Draft.md；保留原分類" }] };
+            message: `找不到 ${RECIPE_MAPPING_FILE}；保留原分類` }] };
     const globalErrors = [
         ...globalBaseIndex.diagnostics,
         ...globalDecisionIndex.diagnostics,
@@ -400,19 +403,149 @@ function renderManifest(context) {
     return lines.join("\n");
 }
 
+function selectedAlternatives(analysis) {
+    const byRecipe = new Map();
+    for (const group of analysis.groups) {
+        if (group.type !== "alternative" || group.status !== "RESOLVED") continue;
+        const ingredient = group.candidates.find(candidate => candidate.candidateId === group.selectedCandidateId)?.ingredient;
+        if (!ingredient) continue;
+        if (!byRecipe.has(group.recipeId)) byRecipe.set(group.recipeId, []);
+        byRecipe.get(group.recipeId).push(ingredient);
+    }
+    return byRecipe;
+}
+
+function refreshBatch(rawTargets) {
+    if (!rawTargets.length && !hasFlag("collections")) throw new Error("請提供要更新的 Preview 檔名或 --collections");
+    const batch = openBatchRefresh(vaultRoot, option("manifest"), rawTargets);
+    const shared = loadSharedPlanningContext();
+    const { itemRegistry, tagRegistry } = shared.runtime.pipeline;
+    const tagMappings = shared.tagMapping.mappings, alternativeGroupMappings = shared.groupMapping.mappings;
+    const translations = loadJSON(path.join(vaultRoot, "參考資料", "Minecraft", "zh_tw.json"));
+    const bioRegistry = vanilla.bio.scanMinecraftBIOs(path.join(vaultRoot, "MC-物品資料庫"), { vaultRoot });
+    if (bioRegistry.collisions.length) throw new Error("正式 BIO 身分重複，請先解決再更新批次");
+    if (shared.machineMapping.diagnostics.some(issue => issue.severity === "ERROR")) throw new Error("Machine Mapping 格式錯誤");
+
+    const models = new Map();
+    for (const { entry } of batch.selected) {
+        if (models.has(entry.identity)) continue;
+        if (!itemRegistry.get(entry.identity)) throw new Error("原版來源找不到物品：" + entry.identity);
+        const planning = loadPlanningContext(entry.identity, shared);
+        models.set(entry.identity, vanilla.bio.createBIOGenerationModel(entry.identity, {
+            itemRegistry, translations, bioRegistry,
+            externalBase: planning.baseItemIds.includes(entry.identity),
+            preferredRecipeId: preferredPlanningRecipes(planning).get(entry.identity),
+            alternativeSelections: selectedAlternatives(planning.analysis)
+        }));
+    }
+    const nativeTags = collectPreviewTagModels([...models.values()], tagRegistry, tagMappings, bioRegistry);
+    const tagModels = new Map(nativeTags.map(model => [model.tagId, model]));
+    const collections = hasFlag("collections");
+    for (const [id, mapping] of tagMappings) if (collections && mapping.generate && !tagModels.has(id)) {
+        tagModels.set(id, vanilla.bio.createTagBIOGenerationModel(id, {
+            tagRegistry, tagMappings, resolveTag: vanilla.tags.resolveTag
+        }));
+    }
+    const groupModels = vanilla.bio.collectDerivedAlternativeGroups(
+        collections ? itemRegistry.values() : [...models.values()], itemRegistry
+    ).map(({ groupId, values }) => vanilla.bio.createDerivedGroupBIOGenerationModel(groupId, values,
+        { groupMappings: alternativeGroupMappings }));
+    if (collections) for (const [id, mapping] of alternativeGroupMappings) {
+        if (mapping.generate && !groupModels.some(model => model.groupId === id))
+            throw new Error("找不到已啟用群組的來源成員：" + id);
+    }
+    const nativeList = [...tagModels.values()];
+    const nativeTagValues = new Map(nativeList.map(model => [model.tagId, model.values]));
+    const alternativeGroupValues = new Map(groupModels.map(model => [model.groupId, model.values]));
+    const availableNativeTags = verifyFormalNativeTags(nativeList, bioRegistry, translations).available;
+    const availableAlternativeGroups = verifyFormalAlternativeGroups(groupModels, bioRegistry, translations).available;
+    const itemPreviewTargets = new Map(), itemTypes = new Map();
+    const tagPreviewTargets = new Map(), groupPreviewTargets = new Map();
+    const target = filename => (batch.batch + "/" + filename).replace(/\.md$/i, "");
+    for (const entry of batch.manifest.entries) if (entry.kind === "item") {
+        const files = [entry.previewFilename, ...(entry.linkFilenames || [])].filter(name => fs.existsSync(safeVaultPath(batch.batch + "/" + name)));
+        if (!files.length) continue;
+        const filename = files.find(name => /\.preview(?:--[^/]+)?\.md$/i.test(name)) || files[0];
+        itemPreviewTargets.set(entry.identity, target(filename));
+        const metadata = vanilla.bio.readFrontmatterPrefix(safeVaultPath(batch.batch + "/" + files[0]));
+        if (metadata?.type) itemTypes.set(entry.identity, metadata.type);
+    }
+    const usedNames = new Set(batch.filenames.keys());
+    const newCollections = [];
+    for (const [kind, list, targets, available] of [
+        ["tag", nativeList, tagPreviewTargets, availableNativeTags],
+        ["group", groupModels, groupPreviewTargets, availableAlternativeGroups]
+    ]) for (const model of list) {
+        const id = kind === "tag" ? model.tagId : model.groupId;
+        const key = kind + ":" + id;
+        const existing = batch.byIdentity.get(key);
+        if (existing) {
+            const equivalent = model.values.length === existing.values?.length &&
+                model.values.every(value => existing.values.includes(value));
+            if (equivalent && fs.existsSync(safeVaultPath(batch.batch + "/" + existing.previewFilename))) {
+                targets.set(id, target(existing.previewFilename));
+                available.add(id);
+            }
+            continue;
+        }
+        if (!collections || !model.generate || available.has(id)) continue;
+        const errors = model.diagnostics.filter(issue => issue.severity === "ERROR");
+        if (errors.length) throw new Error(errors.map(issue => issue.message).join("；"));
+        const formal = bioRegistry.entries.some(entry => kind === "tag" ? entry.minecraft_tag === id : entry.derived_group === id);
+        if (formal) throw new Error("正式集合已存在但成員須確認：" + id);
+        const filename = uniquePreviewFilename(model, usedNames);
+        targets.set(id, target(filename));
+        available.add(id);
+        newCollections.push({ kind, key, model, filename });
+    }
+    const renderOptions = {
+        translations, bioRegistry, tagMappings, alternativeGroupMappings, nativeTagValues, alternativeGroupValues,
+        availableNativeTags, availableAlternativeGroups, itemPreviewTargets, itemTypes, groupPreviewTargets, tagPreviewTargets,
+        machineMappings: shared.machineMapping.rules
+    };
+    const rendered = new Map([...models].map(([id, model]) => [id, vanilla.bio.renderBIOPreview(model, renderOptions)]));
+    const updates = batch.selected.map(file => {
+        try {
+            return { ...file, refreshed: refreshVanillaRecipeBlocks(file.text, rendered.get(file.entry.identity)) };
+        } catch (error) {
+            throw new Error(file.filename + "｜" + error.message);
+        }
+    });
+    const additions = newCollections.map(({ kind, key, model, filename }) => {
+        const content = vanilla.bio.renderTagBIOPreview(model, renderOptions);
+        return { content, record: {
+            identity: key, kind, targetPath: "MC-物品資料庫/" + filename.replace(/\.preview(?=--|\.md$)/i, ""),
+            sourcePath: null, values: model.values, previewFilename: filename, linkFilenames: [filename],
+            status: "NEW", approved: false, baselineSemantic: previewSemanticHash(content),
+            baselineWithoutPreferred: previewSemanticHash(content, { ignorePreferred: true })
+        } };
+    });
+    const result = finishBatchRefresh(batch, updates, additions, hasFlag("write"));
+    process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+}
+
 function preview(rawTargets) {
-    const targets = [...new Set((Array.isArray(rawTargets) ? rawTargets : [rawTargets]).map(rawTarget => {
+    const shared = loadSharedPlanningContext();
+    const all = hasFlag("all");
+    const preparePublish = all || hasFlag("prepare-publish");
+    const updateExisting = preparePublish || hasFlag("update-existing");
+    const requested = all ? [...shared.runtime.pipeline.itemRegistry.entries()].map(([id]) => id).sort()
+        : (Array.isArray(rawTargets) ? rawTargets : [rawTargets]);
+    const targets = [...new Set(requested.map(rawTarget => {
         const target = vanilla.bio.canonicalMinecraftId(rawTarget);
         if (!target) throw new Error(`無效 target：${rawTarget}`);
         return target;
     }))];
+    if (!targets.length) throw new Error("來源沒有可產生的物品");
     const target = targets[0];
-    const shared = loadSharedPlanningContext();
-    const contexts = targets.map(target => {
+    let planning;
+    for (let index = 0; index < targets.length; index++) {
+        const target = targets[index];
         const context = loadPlanningContext(target, shared);
-        return { ...context, target, preferredRecipeByItem: preferredPlanningRecipes(context) };
-    });
-    const planning = mergeBIOPreviewContexts(contexts);
+        const current = { ...context, target, preferredRecipeByItem: preferredPlanningRecipes(context) };
+        planning = mergeBIOPreviewContexts(planning ? [planning, current] : [current]);
+        if (all && ((index + 1) % 25 === 0 || index + 1 === targets.length)) process.stdout.write(`Planning ${index + 1}/${targets.length}\n`);
+    }
     const machineMappingDiagnostics = [...planning.machineMappingDiagnostics];
     const translations = loadJSON(
         path.join(vaultRoot, "參考資料", "Minecraft", "zh_tw.json")
@@ -421,19 +554,9 @@ function preview(rawTargets) {
         path.join(vaultRoot, "MC-物品資料庫"),
         { vaultRoot }
     );
+    if (preparePublish && bioRegistry.collisions.length) throw new Error("正式 BIO 身份重複，請先解決再準備發布");
     const preferredRecipeByItem = planning.preferredRecipeByItem;
-    const alternativeSelectionsByRecipe = new Map();
-    for (const group of planning.analysis.groups) {
-        if (group.type !== "alternative" || group.status !== "RESOLVED") continue;
-        const selected = group.candidates.find(candidate =>
-            candidate.candidateId === group.selectedCandidateId
-        )?.ingredient;
-        if (!selected) continue;
-        if (!alternativeSelectionsByRecipe.has(group.recipeId)) {
-            alternativeSelectionsByRecipe.set(group.recipeId, []);
-        }
-        alternativeSelectionsByRecipe.get(group.recipeId).push(selected);
-    }
+    const alternativeSelectionsByRecipe = selectedAlternatives(planning.analysis);
     const naturalLogIds = new Set(
         vanilla.tags.resolveTag(
             "minecraft:logs",
@@ -500,6 +623,7 @@ function preview(rawTargets) {
         throw new Error(`已啟用的 BIO mapping 尚未完整（${mappingErrors.length}）：${mappingErrors.join("；")}`);
     }
     const outputRoot = safeVaultPath(option("output-root", "MC-自動化BIO"));
+    if (preparePublish && outputRoot !== path.join(vaultRoot, "MC-自動化BIO")) throw new Error("發布預覽須使用 MC-自動化BIO 預設輸出目錄");
     const runDirectory = path.join(
         outputRoot,
         "preview",
@@ -539,7 +663,7 @@ function preview(rawTargets) {
     };
     const renderedPreviews = models.map(model => vanilla.bio.renderBIOPreview(model, previewRenderOptions));
     const updatePlans = [];
-    if (hasFlag("update-existing")) {
+    if (updateExisting) {
         const names = new Map();
         const actualNames = new Map();
         const previewNames = new Map();
@@ -604,6 +728,22 @@ function preview(rawTargets) {
             return { provider: /\(原版\)$/.test(path.basename(path.dirname(matches[0])))
                 ? "Slimefun 原版" : path.basename(path.dirname(matches[0])), evidence: vaultPath(matches[0]) };
         };
+        const ingredientChoices = resolver => ingredient => {
+            const identity = resolver(ingredient.name);
+            const members = previewTagMembers.get(identity) || (identity.startsWith("tag:") ? nativeTagValues.get(identity.slice(4)) : null);
+            return members?.map(itemId => ({ name: itemId, qty: 1 }));
+        };
+        const legacyReviewAssertion = (sourcePath, resolver) => (route, context) => {
+            // Exact user-reviewed correction, not a blanket inference from a
+            // Minecraft machine name or the #有錯誤配方 body tag.
+            if (sourcePath !== "MC-物品資料庫/地獄磚.md" || context.itemId !== "minecraft:nether_bricks" ||
+                route.ingredients.length !== 1 || Number(route.output) !== 1) return null;
+            const material = route.ingredients[0], machine = resolver(route.machine);
+            if (!["minecraft:furnace", "熔爐"].includes(machine) || material.choices || material.excludeSelf ||
+                Number(material.qty) !== 1 || !["minecraft:nether_brick", "地獄磚頭"].includes(resolver(material.name))) return null;
+            return { reason: "使用者 11/20 審核指出此舊路線錯誤；原版來源為工作台使用地獄磚頭 ×4",
+                evidence: "user-review:2026-11-20:MC-物品資料庫/地獄磚.md" };
+        };
         for (let index = 0; index < models.length; index++) {
             const model = models[index];
             if (!model.existingBIO) {
@@ -628,10 +768,14 @@ function preview(rawTargets) {
                 machineMappings: planning.machineMappings, machineMappingDiagnostics
             });
             const plan = vanilla.bio.planBIOUpdate(original, generated, { resolveName, classifyExistingRoute, classifyLinkedSource,
-                groupExistingRoutes: true, machineMappings: planning.machineMappings });
+                groupExistingRoutes: true, machineMappings: planning.machineMappings,
+                resolveIngredientChoices: ingredientChoices(resolveName), canonicalizeLegacyCollections: true,
+                quarantineLegacyRoute: legacyReviewAssertion(sourcePath, resolveName) });
             const visualPlan = vanilla.bio.planBIOUpdate(original, renderedPreviews[index], {
                 resolveName: resolvePreviewName, classifyExistingRoute, classifyLinkedSource,
-                groupExistingRoutes: true, machineMappings: planning.machineMappings, allowPreviewLinks: true
+                groupExistingRoutes: true, machineMappings: planning.machineMappings, allowPreviewLinks: true,
+                resolveIngredientChoices: ingredientChoices(resolvePreviewName), canonicalizeLegacyCollections: true,
+                quarantineLegacyRoute: legacyReviewAssertion(sourcePath, resolvePreviewName)
             });
             const rewritten = rewriteBIOForPreview(visualPlan.candidate, {
                 resolveName: resolvePreviewName, targets: previewReferenceTargets, tagMembers: previewTagMembers
@@ -648,6 +792,41 @@ function preview(rawTargets) {
                 previewDiagnostics });
         }
     }
+    let publication = null;
+    if (preparePublish) {
+        const records = [];
+        for (let index = 0; index < models.length; index++) {
+            const model = models[index], entry = entries[index];
+            const update = updatePlans.find(plan => plan.itemId === model.itemId);
+            const sourcePath = model.existingBIO?.path || null;
+            records.push({ identity: model.itemId, kind: "item", sourcePath,
+                targetPath: sourcePath || "MC-物品資料庫/" + entry.filename.replace(/\.preview(?=--|\.md$)/i, ""),
+                previewFilename: update?.previewFilename || entry.filename,
+                baselineSemantic: previewSemanticHash(update?.previewMarkdown || renderedPreviews[index]),
+                baselineWithoutPreferred: previewSemanticHash(update?.previewMarkdown || renderedPreviews[index], { ignorePreferred: true }),
+                linkFilenames: [entry.filename, ...(update?.previewFilename ? [update.previewFilename] : [])],
+                status: update?.status || "NEW", approved: false, diagnostics: update?.diagnostics || [] });
+        }
+        for (const [kind, collectionModels, collectionEntries] of [["tag", generatedTagModels, tagEntries], ["group", generatedGroupModels, groupEntries]]) {
+            for (let index = 0; index < collectionModels.length; index++) {
+                const model = collectionModels[index], entry = collectionEntries[index];
+                const id = kind === "tag" ? model.tagId : model.groupId;
+                const matches = bioRegistry.entries.filter(value => kind === "tag"
+                    ? value.tag_identity === "minecraft:item_tag" && String(value.minecraft_tag || "").replace(/^#/, "") === id
+                    : value.tag_identity === "obsf:derived_ingredient_group" && value.derived_group === id);
+                if (matches.length > 1) throw new Error("集合身份重複：" + id);
+                const sourcePath = matches[0]?.path || null;
+                records.push({ identity: kind + ":" + id, kind, sourcePath,
+                    targetPath: sourcePath || "MC-物品資料庫/" + entry.filename.replace(/\.preview(?=--|\.md$)/i, ""),
+                    values: model.values,
+                    previewFilename: entry.filename, linkFilenames: [entry.filename], status: sourcePath ? "REVIEW" : "NEW",
+                    baselineSemantic: previewSemanticHash(vanilla.bio.renderTagBIOPreview(model, { translations, bioRegistry, itemPreviewTargets, itemTypes })),
+                    baselineWithoutPreferred: previewSemanticHash(vanilla.bio.renderTagBIOPreview(model, { translations, bioRegistry, itemPreviewTargets, itemTypes }), { ignorePreferred: true }),
+                    approved: false, diagnostics: sourcePath ? [{ code: "EXISTING_COLLECTION_REVIEW", message: "驗收集合內容與原人工資料；發布仍檢查原文保留" }] : [] });
+            }
+        }
+        publication = publicationManifest(vaultRoot, runDirectory, records);
+    }
     const uniqueMachineDiagnostics = [...new Map(machineMappingDiagnostics.map(diagnostic =>
         [JSON.stringify(diagnostic), diagnostic])).values()];
     const dryRun = hasFlag("dry-run");
@@ -656,7 +835,7 @@ function preview(rawTargets) {
             throw new Error(`Fresh preview directory 已存在：${vaultPath(runDirectory)}`);
         }
         fs.mkdirSync(runDirectory, { recursive: true });
-        if (hasFlag("update-existing")) {
+        if (updateExisting) {
             fs.mkdirSync(path.join(runDirectory, "updates"));
             fs.mkdirSync(path.join(runDirectory, "formal-candidates"));
             for (const plan of updatePlans) {
@@ -686,6 +865,7 @@ function preview(rawTargets) {
             }
             writeFileWithRetrySync(path.join(runDirectory, "BIO Update Review.md"), lines.join("\n") + "\n");
         }
+        if (publication) writeFileWithRetrySync(path.join(runDirectory, "BIO Publication.json"), JSON.stringify(publication, null, 2));
         for (let index = 0; index < models.length; index++) {
             writeFileWithRetrySync(
                 path.join(runDirectory, entries[index].filename),
@@ -766,7 +946,7 @@ function preview(rawTargets) {
     for (const diagnostic of uniqueMachineDiagnostics) {
         process.stdout.write(`  - ${diagnostic.severity || "WARNING"} ${diagnostic.code}：${diagnostic.itemId || "Machine Mapping"} — ${diagnostic.message || "保留原分類，請檢查 mapping"}\n`);
     }
-    if (hasFlag("update-existing")) {
+    if (updateExisting) {
         process.stdout.write(`- updatePreviews: ${updatePlans.filter(plan => plan.previewFilename).length}\n`);
         process.stdout.write(`- formalCandidates: ${updatePlans.filter(plan => plan.candidateFilename).length}\n`);
         process.stdout.write(`- updatePreviewDiagnostics: ${updatePlans.reduce((sum, plan) => sum + (plan.previewDiagnostics?.length || 0), 0)}\n`);
@@ -774,6 +954,7 @@ function preview(rawTargets) {
             process.stdout.write(`- update${status}: ${updatePlans.filter(plan => plan.status === status).length}\n`);
         }
     }
+    if (publication) process.stdout.write(`- publicationManifest: ${vaultPath(path.join(runDirectory, "BIO Publication.json"))}\n`);
     process.stdout.write(`- output: ${dryRun ? "no (dry-run)" : vaultPath(runDirectory)}\n`);
 }
 
@@ -784,16 +965,80 @@ function usage() {
         "  node scripts/minecraft-bio-generator.cjs preview minecraft:piston --dry-run\n"
         + "  node scripts/minecraft-bio-generator.cjs preview minecraft:piston --update-existing\n"
         + "  node scripts/minecraft-bio-generator.cjs preview minecraft:stick minecraft:soul_campfire --update-existing\n"
+        + "  node scripts/minecraft-bio-generator.cjs preview --all\n"
+        + "  node scripts/minecraft-bio-generator.cjs refresh-batch [--manifest=<BIO Publication.json>] [--collections] [Preview 檔名 ...] [--write]\n"
+        + "  node scripts/minecraft-bio-generator.cjs preview minecraft:piston --prepare-publish\n"
+        + "  node scripts/minecraft-bio-generator.cjs allow-preferred --manifest=\"MC-自動化BIO/preview/batch/<timestamp>/BIO Publication.json\"\n"
+        + "  node scripts/minecraft-bio-generator.cjs scan-publication [--manifest=<BIO Publication.json>]\n"
+        + "  node scripts/minecraft-bio-generator.cjs publish [--manifest=<BIO Publication.json>] [--write]\n"
     );
 }
 
 try {
     const command = process.argv[2];
     const targets = process.argv.slice(3).filter(argument => !argument.startsWith("--"));
-    if (command !== "preview" || targets.length === 0) {
+    if (command === "allow-preferred" || command === "allow-level") {
+        const manifestPath = option("manifest");
+        if (!manifestPath || targets.length) throw new Error("allow-preferred 需要 --manifest=<BIO Publication.json 路徑>");
+        const upgrade = command === "allow-level" ? allowLevelEdits : allowPreferredEdits;
+        process.stdout.write(JSON.stringify(upgrade(vaultRoot, manifestPath), null, 2) + "\n");
+    } else if (command === "refresh-batch") {
+        const invalidOptions = process.argv.slice(3).filter(flag => flag.startsWith("--") &&
+            !["--collections", "--write"].includes(flag) && !flag.startsWith("--manifest="));
+        if (invalidOptions.length) throw new Error("refresh-batch 未知參數：" + invalidOptions.join("、"));
+        refreshBatch(targets);
+    } else if (command === "scan-publication") {
+        if (targets.length || hasFlag("write") || hasFlag("skip-review")) throw new Error("scan-publication 參數衝突");
+        const manifestPath = selectPublicationManifest(vaultRoot, option("manifest"));
+        if (manifestPath === standaloneManifest && !fs.existsSync(safeVaultPath(manifestPath))) {
+            const file = safeVaultPath(manifestPath), directory = path.dirname(file);
+            const manifest = publicationManifest(vaultRoot, directory, []);
+            fs.mkdirSync(directory, { recursive: true });
+            fs.writeFileSync(file, JSON.stringify(manifest, null, 2), { flag: "wx" });
+        }
+        let runtime;
+        const report = scanPublication(vaultRoot, manifestPath, { lookupVanilla: id => {
+            runtime ??= createMinecraftVanillaRuntime(vaultRoot);
+            const verified = runtime.counts.recipeFiles > 0 && !runtime.loadErrors.length &&
+                !runtime.pipeline.diagnostics.some(entry => ["ERROR", "UNSUPPORTED", "REVIEW"].includes(entry.status));
+            return { verified, hasRecipes: Boolean(runtime.pipeline.itemRegistry.get(id)?.recipes.length) };
+        } });
+        const { status, counts, diagnostics, previousValidation } = report;
+        const previousLabel = { NONE: "首次驗證", UNCHANGED: "與上次驗證一致", CHANGED: "內容或依賴已變更，已重新驗證" };
+        process.stdout.write([
+            `批次：${manifestPath}`,
+            report.issueLimitReached ? `結果：${status}｜掃描未完成`
+                : `結果：${status}｜READY ${counts.READY}｜REVIEW ${counts.REVIEW}｜BLOCKED ${counts.BLOCKED}`,
+            ...(report.preflightBlocked ? ["批次預檢失敗，尚未逐項統計。"] : []),
+            report.issueLimitReached
+                ? `驗證：已找到 ${report.issueLimitReached} 項待處理問題並停止，處理後請重掃。`
+                : `驗證：${previousLabel[previousValidation]}`,
+            `問題：${diagnostics.length} 項`,
+            ...diagnostics.slice(0, 25).map(issue => {
+                const previewLocation = issue.path ? issue.path + (issue.line ? ":" + issue.line :
+                    issue.nearLine ? "（第 " + issue.nearLine + " 行附近）" : "") + "｜" : "";
+                const sourceLocation = issue.sourcePath ? "（正式檔 " + issue.sourcePath +
+                    (issue.sourceLine ? ":" + issue.sourceLine : "") + "）" : "";
+                const details = issue.matches?.length ? "｜候選 BIO：" + issue.matches.join("、")
+                    : issue.code === "RAW_ID_REVIEW" ? "｜可在材料審核表確認保留原始 ID" : "";
+                return `- [${issue.code}] ${previewLocation}${issue.message}${sourceLocation}${details}`;
+            }),
+            ...(diagnostics.length > 25 ? [`其餘 ${diagnostics.length - 25} 項見完整報告。`] : []),
+            `完整報告：${report.report}`,
+            ...(report.materialReport ? [`材料勾選表：${report.materialReport}`] : []),
+            ...report.basePreviews.map(file => `已建立 Base 預覽：${file}`)
+        ].join("\n") + "\n");
+        if (report.status !== "READY") process.exitCode = 2;
+    } else if (command === "publish") {
+        if (targets.length || hasFlag("all") || hasFlag("skip-review") || (hasFlag("write") && hasFlag("dry-run"))) throw new Error("發布參數衝突");
+        const manifestPath = selectPublicationManifest(vaultRoot, option("manifest"));
+        const result = publishBIOBatch(vaultRoot, manifestPath, { write: hasFlag("write"), central: true });
+        process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+    } else if (command !== "preview" || (targets.length === 0 && !hasFlag("all"))) {
         usage();
         process.exitCode = 1;
     } else {
+        if (hasFlag("all") && targets.length) throw new Error("--all 不可混用指定 target");
         preview(targets);
     }
 } catch (error) {

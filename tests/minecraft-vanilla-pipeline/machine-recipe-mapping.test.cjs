@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { parseMachineRecipeMappings, classifyMachineRecipe, normalizeMachineRecipeSections } =
+const { RECIPE_MAPPING_FILE, parseMachineDictionary, parseMachineRecipeMappings, classifyMachineRecipe, normalizeMachineRecipeSections } =
     require("../../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
 
 const table = rows => "| provider | machine | sourceType | section | enabled |\n" +
@@ -13,6 +13,31 @@ const rules = parseMachineRecipeMappings(table([
 const route = (machine, item = "鐵原礦", preferred = false) =>
     (preferred ? "<!-- preferred -->\n" : "") + "- **生產設備**：(Machine:: [[" + machine + "]])\n" +
     "\t**合成所需**：\n\t- [item:: [[" + item + "]]] (qty:: 1)\n\t- [output:: 1]\n";
+
+test("shared mapping name and dictionary stay independent of recipe classification", () => {
+    assert.equal(RECIPE_MAPPING_FILE, "Recipe Mapping Draft.md");
+    const dictionary = '<!-- obsf:machine-dictionary:start -->\n' +
+        '| machine_id | machine | enabled |\n| --- | --- | --- |\n' +
+        '| SMELTERY | 自訂冶煉爐 | true |\n| DISABLED | 停用 | false |\n' +
+        '<!-- obsf:machine-dictionary:end -->';
+    const combined = table(['| Minecraft 原版 | 高爐 | | 熔煉配方 | true |']) + dictionary;
+    assert.deepEqual([...parseMachineDictionary(combined).machines], [['SMELTERY', '自訂冶煉爐']]);
+    assert.equal(parseMachineDictionary(combined).diagnostics.length, 0);
+    assert.equal(parseMachineRecipeMappings(combined).rules.length, 1);
+    assert.equal(parseMachineRecipeMappings(combined).rules[0].machine, '高爐');
+});
+
+test("dictionary rejects duplicate active IDs, missing markers and invalid enabled cells", () => {
+    const dictionary = rows => '<!-- obsf:machine-dictionary:start -->\n' +
+        '| machine_id | machine | enabled |\n| --- | --- | --- |\n' + rows + '\n<!-- obsf:machine-dictionary:end -->';
+    for (const text of ['', dictionary('| SMELTERY | A | true |\n| SMELTERY | B | true |'),
+        dictionary('| SMELTERY | A | maybe |'), dictionary('| SMELTERY | [[A]] | true |')]) {
+        assert.ok(parseMachineDictionary(text).diagnostics.some(entry => entry.severity === 'ERROR'));
+    }
+    const disabled = parseMachineDictionary(dictionary('| SMELTERY | A | false |\n| SMELTERY | B | true |'));
+    assert.equal(disabled.machines.get('SMELTERY'), 'B');
+    assert.equal(disabled.diagnostics.length, 0);
+});
 
 test("mapping table supports provider scope, wikilinks and optional source types", () => {
     assert.equal(rules.length, 3);

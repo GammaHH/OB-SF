@@ -546,7 +546,7 @@ Generator 直接使用同一個 Node process 內的 Normalized Item Registry，�
 - Alternative：同色系材料統合成 `obsf:color_family/*` 衍生群組，與 Minecraft item tag 分開。
 - 配方補充資訊：以 `- [note:: 說明]` 顯示經驗、處理時間、材料角色與其他非依賴欄位；未知 metadata 使用原始 key 與值，不靜默丟棄。sourceFile/category/group 為來源或分類資訊，不列為操作備註。
 - result components：Normalized Registry 與生成模型保留原始資料，BIO 正文只以 NOTE 顯示差異，不再輸出「成品 Components」JSON 區塊。例如燉湯顯示 `效果：抗火；持續時間 60 ticks`，效果透過 `zh_tw.json` 的 `effect.*` 翻譯，缺翻譯時保留原 ID；不換算原始 ticks 或猜測缺失值。
-- 人工補充標籤：Base 或無生產配方 BIO 使用 `#待補充`；其餘有配方 BIO 使用 `#未人工檢查`。所有生成 BIO（含 Tag／集合索引）均加 `#需攻略補充`，更新既有 BIO 另加 `#更新需人工解析`。更新時只清除並重建這四種管理標籤，保留其他自訂標籤；標籤不參與 Base 判斷，也不修改 preferred 決策。
+- 人工補充標籤在產生 Preview 時加入。Base 或無生產配方使用 `#待補充`，其餘有配方的 BIO 使用 `#未人工檢查`。所有新產生的 Preview 加入 `#需攻略補充`，更新既有 BIO 另加 `#更新需人工解析`。審查完成後，移除前三種發布阻擋標籤並重跑 SCAN。SCAN 和 PUBLISH 保留審查結果。攻略補充標籤可保留。
 - Preview Manifest 只顯示 Planned Items 數量，不再列出完整 Generation Order；實際產生順序仍採既有 bottom-up planning。
 - existing BIO：只在 preview 目錄產生比較稿，不覆寫正式檔案。
 - leaf／External Base：不自動推測為 `mc-drop`；若沒有既有 type mapping，輸出 `TYPE_REVIEW_REQUIRED` warning。
@@ -569,7 +569,7 @@ Normalized Registry 保留 Minecraft ID，不在 parser 階段套用中文。Gen
 
 ### Templater 正式套用既有 BIO 更新
 
-先重新產生 `preview <target> --update-existing`，再使用 Templater 執行 `MC-BIO套用更新`。依序選更新批次、單一 BIO，可選「開啟測試更新預覽」或「開啟正式候選」；只有檢查並確認正式候選後，才執行寫回。更新審核 JSON 必須有 `mergeVersion: 5`、candidateSHA256 與 machineMappingSHA256，正式候選須有 `#更新需人工解析`。舊預覽必須重建，不直接套用。
+以 `preview <target> --update-existing` 產生更新預覽。審查完成後，在更新 Preview 移除阻擋標籤，再走集中 SCAN → PUBLISH。舊版 Templater 的 `MC-BIO套用更新` 只接受雜湊一致且已清除阻擋標籤的正式候選。可用 Templater 開啟原有候選檢視。
 
 更新模式有兩個獨立輸出接口：`updates/*.update-preview.md` 保留原圖片／人工內容並連到同批 Preview，供測試 V4 與新排版；`formal-candidates/*.formal-candidate.md` 使用正式連結，是唯一可套用的內容。即使正式候選沒有變動，也可產生測試更新預覽。Manifest 的 previewFilename／previewSHA256 與 candidateFilename／candidateSHA256 分開記錄，預覽不能冒充正式候選。
 
@@ -581,7 +581,7 @@ Normalized Registry 保留 Minecraft ID，不在 parser 階段套用中文。Gen
 
 Git 還原點建立成功後，再透過 `app.vault.process` 二次驗證原文並寫入；寫後驗證內容雜湊。成功時顯示 ref，並在 `BIO-輸出報告/BIO Apply-<timestamp>.json` 記錄來源、原檔 hash、候選 hash 與 checkpoint。原檔被其他插件修改時不自動重試或回滾。需要復原時，以報告中的 ref 和 sourcePath 執行 `git restore --source <ref> --worktree -- <sourcePath>`，只復原該份 BIO。
 
-目前入口僅支援既有 Minecraft Item BIO；不建立 NEW、不套用 Tag／衍生群組、不批次寫回。Templater Script folder 維持 `BIO engine`。套用後可重新執行 MC-BIO盤點；`#更新需人工解析` 會標為人工檢查待處理。
+舊版 Templater 入口僅支援既有 Minecraft Item BIO。Templater Script folder 維持 `BIO engine`。套用後可重新執行 MC-BIO盤點。
 
 ### 盤點使用方式
 
@@ -619,9 +619,11 @@ V4 依成品顏色 family 尋找對應 `derived_group` 集合，同一批次資�
 
 指定的小集合於 BIO 顯示階段展開為完整機器配方：`minecraft:soul_fire_base_blocks` 確認恰為靈魂砂／靈魂土時列兩條；`minecraft:stone_tool_materials` 確認恰為鵝卵石／黑石／深板岩碎石時列三條。每條路線只使用一種材料，保留原材料數量與產量，僅代表材料所屬路線繼承 preferred，不另列任意材料或混搭路線。成員變更、同條配方出現多個需展開的集合或其他未指定 Tag 時，不猜測展開組合，保留原集合格式；Registry 不變。
 
-測試 preview 使用當次批次的預覽路徑，正式更新候選則使用正式 BIO 名稱。正式更新仍逐檔驗證並建立 Git 還原點；目前沒有將整批 NEW preview 發布成正式 BIO 的入口。
+測試 preview 使用當次批次的預覽路徑，正式更新候選則使用正式 BIO 名稱。原 Templater 仍限既有 Item／Drop。11/16 新增 `preview --all` 與獨立 `publish --manifest=...` 批次入口：先產生全物品預覽，人工調整 type／排版，再檢查並以 `--write` 發布 NEW Item／集合與更新既有 BIO；會轉正式連結並建立 Git 還原點。REVIEW、原內容保留、身份與集合完整性仍須驗證。新入口尚待使用者執行測試；完整指令與失敗處理見根目錄 `BIO產生流程.md`。
 
-根目錄 `Minecraft Machine Recipe Mapping Draft.md` 管理設備到三級配方分類的對應。只分類含 Machine 的配方，外部取得與 Tag 代表材料維持原樣；唯一匹配的啟用規則才修正標題，缺少或衝突規則列入診斷。預覽後若修改 Mapping，正式套用會停止並要求重建候選。同組設備配方條目緊貼、不留空行；標題與配方之間保留一行空白。分類修正不改材料、產量、NOTE、preferred 或設備配方順序。
+根目錄 `Recipe Mapping Draft.md` 管理設備到三級配方分類的對應；Generator、Publisher 與單檔套用入口共用 `RECIPE_MAPPING_FILE`，改名後不再讀取舊檔名。只分類含 Machine 的配方，外部取得與 Tag 代表材料維持原樣；唯一匹配的啟用規則才修正標題，缺少或衝突規則列入診斷。預覽後若修改 Mapping，正式套用會停止並要求重建候選。同組設備配方條目緊貼、不留空行；標題與配方之間保留一行空白。分類修正不改材料、產量、NOTE、preferred 或設備配方順序。
+
+Mini Parser 另讀取同檔的 Machine Dictionary 與 Provider Headings，每次執行使用同一份表格快照，不保留寫死的設備中文 fallback。重複已啟用設備 ID 或錯誤表格會停止；未知／停用的來源設備 ID 原樣保留並警告。Mini Parser 的新 BIO 不寫 YAML output，Java／YAML／手動仍各自產生配方內 `[output:: N]`；追加既有 BIO 不修改其原 YAML。Mini Parser 仍維持 `### 常規` 和跨插件 `#####` 層級，不自動接入 Machine 分類搬移。11/20 新增相關 mock 與路徑回歸案例，尚待使用者執行與 Obsidian 實測。
 
 新生及更新候選不保留 YAML `output`，舊數值直接移除，不轉為配方產量。V4 只使用選定路線的 `[output:: n]`；未填預設為 1，忽略舊 YAML `output`。解析器仍須明確輸出非 1 的產量。
 

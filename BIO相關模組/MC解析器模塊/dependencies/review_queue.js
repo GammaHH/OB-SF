@@ -17,7 +17,8 @@ function createReviewQueue(options = {}) {
         .sort((left, right) => left.target.localeCompare(right.target))
         .map(entry => {
             const old = previousByTarget.get(entry.target);
-            const status = old && QUEUE_STATUSES.has(old.status)
+            const status = options.reassessReady === true && old?.status === "READY" ? "PENDING"
+                : old && QUEUE_STATUSES.has(old.status)
                 ? old.status
                 : "PENDING";
             return {

@@ -20,7 +20,9 @@ tests/minecraft-vanilla-pipeline/*
 !tests/minecraft-vanilla-pipeline/bio-tags.test.cjs
 !tests/minecraft-vanilla-pipeline/bio-output.test.cjs
 !tests/minecraft-vanilla-pipeline/bio-preview-links.test.cjs
+!tests/minecraft-vanilla-pipeline/bio-publication.test.cjs
 !tests/minecraft-vanilla-pipeline/machine-recipe-mapping.test.cjs
+!tests/minecraft-vanilla-pipeline/mini-parser.test.cjs
 !tests/minecraft-vanilla-pipeline/bio-reader-v4.test.cjs
 !tests/minecraft-vanilla-pipeline/bio-report-v4.test.cjs
 !tests/minecraft-vanilla-pipeline/bio-export-v4.test.cjs

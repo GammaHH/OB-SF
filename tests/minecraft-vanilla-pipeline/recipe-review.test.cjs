@@ -706,6 +706,22 @@ test("upstream route change moves downstream ambiguity to inactive area", () => 
     assert.match(regenerated, /Inactive \/ Historical Ambiguities/);
 });
 
+test("a fresh scan reopens previously READY targets that now require review without losing an active review", () => {
+    const options = { sourceFingerprint: "sha256:same", targets: [
+        { target: "minecraft:campfire", reasons: { tag: 1 } },
+        { target: "minecraft:stick", reasons: { recipe: 1 } }
+    ], previousQueue: { sourceFingerprint: "sha256:same", targets: [
+        { target: "minecraft:campfire", status: "READY" },
+        { target: "minecraft:stick", status: "IN_REVIEW" }
+    ] } };
+    const scanned = vanilla.dependencies.createReviewQueue({ ...options, reassessReady: true });
+    assert.equal(scanned.targets.find(entry => entry.target === "minecraft:campfire").status, "PENDING");
+    assert.equal(scanned.targets.find(entry => entry.target === "minecraft:stick").status, "IN_REVIEW");
+    assert.equal(scanned.stats.pendingReview, 2);
+    const historical = vanilla.dependencies.createReviewQueue(options);
+    assert.equal(historical.targets.find(entry => entry.target === "minecraft:campfire").status, "READY");
+});
+
 test("review queue is deterministic and advances only through explicit state changes", () => {
     const queue = vanilla.dependencies.createReviewQueue({
         sourceFingerprint: "sha256:test",

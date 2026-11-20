@@ -1171,3 +1171,147 @@ test("V3 reads the Tag BIO representative row without machine, qty, or output fi
     const regularPage = { file: { path: "一般 BIO.md" } };
     assert.deepEqual((await parseBio(regularPage)).recipes, []);
 });
+
+test("container recoloring uses each enabled native Tag without excluding its legal same-color input and emits a useful NOTE", () => {
+    const colors = require("../../BIO相關模組/MC解析器模塊/bio/bio_group_mapping").MINECRAFT_COLORS;
+    const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
+    for (const base of ["bundle", "shulker_box"]) for (const color of ["white", "gray"]) {
+        const tagId = base === "bundle" ? "minecraft:bundles" : "minecraft:shulker_boxes";
+        const owner = `minecraft:${color}_${base}`, uncolored = `minecraft:${base}`;
+        const values = [uncolored, ...colors.map(value => `minecraft:${value}_${base}`)];
+        const meta = { sourceFile: `recipe/${color}_${base}.json`, ingredientRoles: ["input", "material"], copiesInputComponents: true,
+            futureMetadata: "still preserved" };
+        const model = vanilla.bio.createBIOGenerationModel(owner, {
+            itemRegistry: registry([[owner, { recipes: [recipe({ sourceType: "minecraft:crafting_transmute", meta,
+                ingredients: [{ kind: "tag", id: tagId, values, qty: 1 }, { kind: "item", id: `minecraft:${color}_dye`, qty: 1 }] })] }]])
+        });
+        const snapshot = JSON.stringify(model);
+        const target = base === "bundle" ? "preview/各色束口袋.preview" : "preview/各色界伏盒.preview";
+        const markdown = vanilla.bio.renderBIOPreview(model, {
+            tagMappings: new Map([[tagId, { generate: true, zhName: base === "bundle" ? "各色束口袋" : "各色界伏盒", representativeItemId: uncolored }]]),
+            tagPreviewTargets: new Map([[tagId, target]]), nativeTagValues: new Map([[tagId, values]]), availableNativeTags: new Set([tagId])
+        });
+        assert.match(markdown, /\[note:: 可以存入物品\]/);
+        assert.doesNotMatch(markdown, /obsf:choices|except self|材料角色|繼承輸入物品 Components/);
+        assert.ok(markdown.includes(`[[${target}|`));
+        assert.match(markdown, /補充資訊（futureMetadata）：still preserved/);
+        assert.equal(JSON.stringify(model), snapshot, "note display cannot mutate normalized input/component semantics");
+        const tagModel = vanilla.bio.createTagBIOGenerationModel(tagId, {
+            resolveTag: () => ({ values, warnings: [] }),
+            tagMappings: new Map([[tagId, { generate: true, zhName: "各色容器", representativeItemId: uncolored }]])
+        });
+        const tag = reader.parseBIO(vanilla.bio.renderTagBIOPreview(tagModel), { tag_identity: "minecraft:item_tag", minecraft_tag: tagId });
+        assert.equal(tag.recipes[0].ingredients[0].choices.length, 17);
+        assert.equal(tag.recipes[0].ingredients[0].name, base.replaceAll("_", " "));
+        assert.ok(tag.recipes[0].ingredients[0].choices.some(choice => choice.name === `${color} ${base.replaceAll("_", " ")}`));
+    }
+});
+
+test("container NOTE compaction does not erase unrelated transmute metadata", () => {
+    const model = vanilla.bio.createBIOGenerationModel("minecraft:stick", { itemRegistry: registry([["minecraft:stick", { recipes: [recipe({
+        sourceType: "minecraft:crafting_transmute", ingredients: [{ kind: "item", id: "minecraft:bamboo", qty: 1 }],
+        meta: { ingredientRoles: ["input", "material"], copiesInputComponents: true }
+    })] }]]) });
+    const markdown = vanilla.bio.renderBIOPreview(model);
+    assert.match(markdown, /材料角色/);
+    assert.match(markdown, /繼承輸入物品 Components/);
+    assert.doesNotMatch(markdown, /可以存入物品/);
+});
+
+test("flat alternatives use lossless readable choices without duplicate JSON and keep the selected representative first", () => {
+    const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
+    for (const fixture of [
+        { id: "minecraft:torch", output: 4, qty: 1, ids: ["minecraft:coal", "minecraft:charcoal"], selected: "minecraft:charcoal" },
+        { id: "minecraft:quartz_slab", output: 6, qty: 3, ids: ["minecraft:chiseled_quartz_block", "minecraft:quartz_block", "minecraft:quartz_pillar"], selected: "minecraft:quartz_block" },
+        { id: "minecraft:gold_nugget", output: 1, qty: 1, ids: ["minecraft:golden_pickaxe", "minecraft:golden_shovel", "minecraft:golden_axe", "minecraft:golden_sword"], selected: "minecraft:golden_axe" }
+    ]) {
+        const model = vanilla.bio.createBIOGenerationModel(fixture.id, { itemRegistry: registry([[fixture.id, { recipes: [recipe({
+            output: fixture.output, ingredients: [{ kind: "alternatives", qty: fixture.qty,
+                alternatives: fixture.ids.map(id => ({ kind: "item", id, qty: 1 })) }]
+        })] }]]) });
+        model.recipes[0].ingredients[0].selectedRepresentative = { kind: "item", id: fixture.selected, qty: 1 };
+        const snapshot = JSON.stringify(model);
+        const markdown = vanilla.bio.renderBIOPreview(model);
+        assert.doesNotMatch(markdown, /obsf:choices/);
+        assert.equal((markdown.match(/Machine::/g) || []).length, 1, "choice lists retain mixing semantics without multiplying machine routes");
+        const parsed = reader.parseBIO(markdown);
+        assert.deepEqual(parsed.diagnostics, []);
+        assert.equal(parsed.recipes[0].output, fixture.output);
+        const ingredient = parsed.recipes[0].ingredients[0];
+        assert.equal(ingredient.qty, fixture.qty);
+        assert.equal(ingredient.name, fixture.selected.slice(10).replaceAll("_", " "));
+        assert.deepEqual(ingredient.choices.map(choice => choice.name).sort(), fixture.ids.map(id => id.slice(10).replaceAll("_", " ")).sort());
+        assert.ok(ingredient.choices.every(choice => choice.qty === 1));
+        assert.equal(JSON.stringify(model), snapshot);
+    }
+});
+
+test("gold tool single material becomes an ingot while coals and nuggets retain explicit mutually exclusive item rows", () => {
+    const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
+    for (const fixture of [
+        { owner: "minecraft:golden_spear", tag: "minecraft:gold_tool_materials", values: ["minecraft:gold_ingot"], selected: "minecraft:gold_ingot" },
+        { owner: "minecraft:campfire", tag: "minecraft:coals", values: ["minecraft:coal", "minecraft:charcoal"], selected: "minecraft:charcoal" },
+        { owner: "minecraft:name_tag", tag: "minecraft:metal_nuggets", values: ["minecraft:copper_nugget", "minecraft:iron_nugget", "minecraft:gold_nugget"], selected: "minecraft:iron_nugget" }
+    ]) {
+        const model = vanilla.bio.createBIOGenerationModel(fixture.owner, { itemRegistry: registry([[fixture.owner, { recipes: [recipe({ ingredients: [
+            { kind: "tag", id: fixture.tag, qty: 1, values: fixture.values }
+        ] })] }]]) });
+        const markdown = vanilla.bio.renderBIOPreview(model, { tagMappings: new Map([[fixture.tag, { generate: false, representativeItemId: fixture.selected }]]) });
+        assert.doesNotMatch(markdown, /obsf:choices|#minecraft:/);
+        const parsed = reader.parseBIO(markdown);
+        assert.deepEqual(parsed.diagnostics, []);
+        const ingredient = parsed.recipes[0].ingredients[0];
+        assert.equal(ingredient.name, fixture.selected.slice(10).replaceAll("_", " "));
+        assert.equal(ingredient.qty, 1);
+        if (fixture.values.length === 1) assert.equal(ingredient.choices, undefined);
+        else assert.equal(ingredient.choices.length, fixture.values.length);
+    }
+});
+
+test("complex alternative quantities and nested choices retain exact JSON", () => {
+    const model = vanilla.bio.createBIOGenerationModel("minecraft:torch", { itemRegistry: registry([["minecraft:torch", { recipes: [recipe({ ingredients: [
+        { kind: "alternatives", qty: 2, alternatives: [{ kind: "item", id: "minecraft:coal", qty: 1 }, { kind: "item", id: "minecraft:charcoal", qty: 3 }] }
+    ] })] }]]) });
+    const markdown = vanilla.bio.renderBIOPreview(model);
+    assert.match(markdown, /obsf:choices/);
+    const metadata = JSON.parse(markdown.match(/<!-- obsf:choices (.+) -->/)[1]);
+    assert.deepEqual(metadata.choices.map(choice => choice.qty), [1, 3]);
+});
+
+test("explicit Base acquisition coexists with every parsed route for formerly ambiguous natural materials", () => {
+    const fixtures = [
+        ["minecraft:leather", ["minecraft:rabbit_hide"]],
+        ["minecraft:andesite", ["minecraft:diorite", "minecraft:cobblestone"]],
+        ["minecraft:melon_seeds", ["minecraft:melon_slice"]],
+        ["minecraft:granite", ["minecraft:diorite", "minecraft:quartz"]]
+    ];
+    const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
+    for (const [id, materials] of fixtures) {
+        const model = vanilla.bio.createBIOGenerationModel(id, { externalBase: true, itemRegistry: registry([[id, { recipes: [recipe({
+            sourceType: "minecraft:crafting_shapeless", ingredients: materials.map(value => ({ kind: "item", id: value, qty: 1 }))
+        })] }]]) });
+        const markdown = vanilla.bio.renderBIOPreview(model);
+        assert.match(markdown, /^base_material: true$/m);
+        const parsed = reader.parseBIO(markdown);
+        assert.deepEqual(parsed.diagnostics, []);
+        assert.equal(parsed.recipes.filter(route => route.external).length, 1);
+        assert.equal(parsed.recipes.filter(route => !route.external).length, 1);
+        assert.equal(parsed.recipes.find(route => route.external).preferred, true);
+        assert.equal(parsed.recipes.find(route => !route.external).preferred, false);
+        assert.equal(parsed.recipes.find(route => !route.external).ingredients.length, materials.length);
+    }
+});
+
+test("item previews retain explicit or existing LEVEL without turning every blank into zero", () => {
+    const existing = bioRegistry([["minecraft:stick", { name: "木棒", type: "mc-item", level: "3" }]]);
+    const make = options => vanilla.bio.createBIOGenerationModel("minecraft:stick", options);
+    assert.match(vanilla.bio.renderBIOPreview(make({})), /^level:$/m);
+    assert.match(vanilla.bio.renderBIOPreview(make({ bioRegistry: existing })), /^level: 3$/m);
+    assert.match(vanilla.bio.renderBIOPreview(make({ bioRegistry: existing, level: 0 })), /^level: 0$/m);
+    assert.match(vanilla.bio.renderBIOPreview(make({ bioRegistry: existing, level: null })), /^level:$/m);
+    for (const invalid of ["null", "~", -1, "custom"]) {
+        const model = make({ level: invalid });
+        assert.equal(model.level, invalid);
+        assert.ok(model.diagnostics.some(entry => entry.code === "BIO_LEVEL_REQUIRES_REVIEW"));
+    }
+});

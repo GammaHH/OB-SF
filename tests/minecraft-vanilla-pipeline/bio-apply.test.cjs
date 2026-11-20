@@ -7,7 +7,7 @@ const { spawnSync } = require("node:child_process");
 const { createHash } = require("node:crypto");
 const { applyReviewedBIO, BIO_UPDATE_MERGE_VERSION } = require("../../scripts/lib/bio-apply.cjs");
 const { rebuildManagedBIOtags } = require("../../BIO相關模組/MC解析器模塊/bio/bio_tags");
-const { parseMachineRecipeMappings, normalizeMachineRecipeSections } =
+const { RECIPE_MAPPING_FILE, parseMachineRecipeMappings, normalizeMachineRecipeSections } =
     require("../../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
 const { normalizeBIOOutput } = require("../../BIO相關模組/MC解析器模塊/bio/bio_output");
 const hash = text => createHash("sha256").update(text).digest("hex");
@@ -49,7 +49,8 @@ async function fixture(t, worktree = false, addMetadata = false, legacyTags = fa
         .replace("### 常規", "### 常規\n##### SF-基礎機器(原版)");
     if (addMetadata) candidate = candidate.replace("id: IRON_INGOT\n", "id: IRON_INGOT\nminecraft_id: minecraft:iron_ingot\n" +
         "base_material: true\ngenerator_schema: 2\naliases:\n  - IRON_INGOT\n  - minecraft:iron_ingot\n");
-    candidate = rebuildManagedBIOtags(candidate, { baseMaterial: addMetadata, hasRecipe: true, updated: true });
+    candidate = rebuildManagedBIOtags(candidate, { baseMaterial: addMetadata, hasRecipe: true, updated: true })
+        .replace(/#(?:待補充|未人工檢查)\n#更新需人工解析\n#需攻略補充/, "#需攻略補充");
     await fs.writeFile(path.join(root, sourcePath), original);
     const folder = "MC-自動化BIO/preview/test";
     await fs.mkdir(path.join(root, folder, "formal-candidates"), { recursive: true });
@@ -156,7 +157,7 @@ test("mapped Machine classification and legacy output removal retain a verified 
     value.manifest.machineMappingSHA256 = hash(mapping);
     value.manifest.plans[0].sourceSHA256 = hash(value.original);
     value.manifest.plans[0].candidateSHA256 = hash(candidate);
-    await fs.writeFile(path.join(value.root, "Minecraft Machine Recipe Mapping Draft.md"), mapping);
+    await fs.writeFile(path.join(value.root, RECIPE_MAPPING_FILE), mapping);
     await fs.writeFile(path.join(value.root, value.sourcePath), value.original);
     await fs.writeFile(path.join(value.root, "MC-自動化BIO/preview/test/formal-candidates/candidate.formal-candidate.md"), candidate);
     await fs.writeFile(path.join(value.root, value.options.manifestPath), JSON.stringify(value.manifest));
@@ -170,7 +171,7 @@ test("mapped Machine classification and legacy output removal retain a verified 
 
 test("changed Machine Mapping blocks stale updates before any Git checkpoint or write", async t => {
     const value = await fixture(t);
-    await fs.writeFile(path.join(value.root, "Minecraft Machine Recipe Mapping Draft.md"), "changed mapping\n");
+    await fs.writeFile(path.join(value.root, RECIPE_MAPPING_FILE), "changed mapping\n");
     await assert.rejects(applyReviewedBIO(value.options), /Machine Mapping 已變更/);
     assert.equal(value.writes(), 0);
     assert.equal(value.refs(), "");
@@ -181,20 +182,21 @@ test("managed status resets preserve custom tags, examples and the exact Git res
     const result = await applyReviewedBIO(value.options);
     const written = await fs.readFile(path.join(value.root, value.sourcePath), "utf8");
     assert.equal(written, value.candidate);
-    assert.match(written, /#未人工檢查\n#更新需人工解析\n#需攻略補充/);
+    assert.match(written, /^#需攻略補充$/m);
+    assert.doesNotMatch(written, /^#更新需人工解析$/m);
     assert.match(written, /tags: \[ 手動\]/);
     assert.match(written, /#自訂/);
     assert.match(written, /```md\n#待補充\n```\n<!-- sample\n#未人工檢查\n-->/);
     assert.equal(git(value.root, "show", result.ref + ":" + value.sourcePath), value.original.trim());
 });
 
-test("a candidate with missing or contradictory managed tags stops before checkpointing", async t => {
+test("a candidate with a publication-blocking tag stops before checkpointing", async t => {
     const value = await fixture(t);
     const invalid = value.candidate.replace("#需攻略補充\n", "#待補充\n");
     await fs.writeFile(path.join(value.root, "MC-自動化BIO/preview/test/formal-candidates/candidate.formal-candidate.md"), invalid);
     value.manifest.plans[0].candidateSHA256 = hash(invalid);
     await fs.writeFile(path.join(value.root, value.options.manifestPath), JSON.stringify(value.manifest));
-    await assert.rejects(applyReviewedBIO(value.options), /管理標籤不符合/);
+    await assert.rejects(applyReviewedBIO(value.options), /仍有待審查標籤/);
     assert.equal(value.writes(), 0);
     assert.equal(value.refs(), "");
 });

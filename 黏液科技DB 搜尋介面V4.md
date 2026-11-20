@@ -1,5 +1,6 @@
 ---
 created: 2026-11-12
+updated: 2026-11-20 23:09:13
 ---
 
 # BIO 搜尋介面 V4
@@ -105,6 +106,10 @@ function getBioType(type) {
 
     if (suffix === "item") {
         return "item";
+    }
+
+    if (type === "mc-tag") {
+        return "tag";
     }
 
     if (suffix === "drop") {
@@ -1539,10 +1544,30 @@ function getAllowedRecipes(parsed) {
         recipe => bioReaderV4.providerAllowed(recipe.provider, selectedFolders));
 }
 
-function chooseRecipe(page, parsed) {
-    return bioReaderV4.chooseRecipe(
-        page.file.path, getAllowedRecipes(parsed), recipeChoices, ingredientChoices
+function isCollectionPath(path, index) {
+    const target = resolveBio(path, index);
+    return bioReaderV4.isTagBIO(target);
+}
+
+function dependencyWouldCycle(target, stack, index) {
+    return bioReaderV4.dependencyWouldCycle(target.file.path, stack, path => isCollectionPath(path, index));
+}
+
+function chooseRecipe(page, parsed, index = null, stack = []) {
+    const path = [...stack, page.file.path];
+    const selected = bioReaderV4.chooseRecipe(
+        page.file.path, getAllowedRecipes(parsed), recipeChoices, ingredientChoices,
+        { isChoiceAllowed: choice => {
+            if (!index) return true;
+            const target = resolveBio(choice.name, index);
+            return !target || !dependencyWouldCycle(target, path, index);
+        } }
     );
+    for (const ingredient of selected?.ingredients || []) if (ingredient.cycleFallback) {
+        analysisWarnings.set('tag-cycle-fallback:' + JSON.stringify([path, ingredient.selectionKey]),
+            'Tag 代表材料遇到循環，改用另一個合法成員：' + ingredient.cycleFallback.from + ' → ' + ingredient.cycleFallback.to);
+    }
+    return selected;
 }
 
 async function parseBio(page) {
@@ -1822,7 +1847,7 @@ async function expandBio(page, requiredQty, index, stack = []) {
     if (!permit.allowed) return truncatedNode(page, requiredQty, permit.reason);
     const parsed = await parseResolvedBio(page, index);
     if (parsed.blockedByLimit) return truncatedNode(page, requiredQty, parsed.blockedByLimit);
-    const selected = chooseRecipe(page, parsed);
+    const selected = chooseRecipe(page, parsed, index, stack);
     const allowed = getAllowedRecipes(parsed);
     const node = treeNode(page, requiredQty, {
         output: selected?.output || parsed.defaultOutput,
@@ -1860,7 +1885,7 @@ async function expandBio(page, requiredQty, index, stack = []) {
         }
         const quantity = ingredient.qty * node.batches;
         const target = resolveBio(ingredient.name, index);
-        if (!target || nextStack.includes(target.file.path)) {
+        if (!target || dependencyWouldCycle(target, nextStack, index)) {
             const childPermit = await admitExpansion(nextStack.length, quantity);
             if (!childPermit.allowed) {
                 node.children.push(truncatedNode(target, quantity, childPermit.reason));
@@ -3051,7 +3076,7 @@ async function expandMachineMaterial(page, requiredQty, index, stack = [], depth
     }
     const parsed = await parseResolvedBio(page, index);
     if (parsed.blockedByLimit) return false;
-    const recipe = chooseRecipe(page, parsed);
+    const recipe = chooseRecipe(page, parsed, index, stack);
     if (!recipe || recipe.external) {
         addLeafTo(machineLeafTotals, page.file.path, page.file.name, getBioType(page.type),
             requiredQty, page, recipe?.sourceText || "無配方 / 未允許取得方式");
@@ -3076,7 +3101,7 @@ async function expandMachineMaterial(page, requiredQty, index, stack = [], depth
             addLeafTo(machineLeafTotals, "unresolved:" + normalize(ingredient.name),
                 ingredient.name, ingredient.type, required, null, "未建立 / 範圍外");
             complete = false;
-        } else if (nextStack.includes(target.file.path)) {
+        } else if (dependencyWouldCycle(target, nextStack, index)) {
             analysisWarnings.set("machine-material-cycle:" + target.file.path,
                 "設備材料遇到循環：" + [...nextStack, target.file.path].join(" → "));
             complete = false;

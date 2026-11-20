@@ -26,7 +26,7 @@ function buildBIOInventory(documents, options = {}) {
             continue;
         }
         const fm = document.frontmatter || {};
-        if (!["mc-item", "mc-drop"].includes(fm.type)) continue;
+        if (!["mc-item", "mc-drop", "mc-tag"].includes(fm.type)) continue;
         let kind = "item";
         let id;
         if (fm.derived_group) {
@@ -35,6 +35,9 @@ function buildBIOInventory(documents, options = {}) {
         } else if (fm.minecraft_tag || fm.tag_identity === "minecraft:item_tag") {
             kind = "tag";
             id = canonicalId(fm.minecraft_tag);
+        } else if (fm.type === "mc-tag") {
+            kind = "tag";
+            id = /^[A-Za-z0-9_.:-]+$/.test(fm.id || "") ? "custom:" + fm.id.toLowerCase() : null;
         } else {
             id = canonicalId(fm.minecraft_id || fm.id);
             // Legacy Tag BIOs such as PLANKS need an explicit tag identity.
@@ -62,7 +65,9 @@ function buildBIOInventory(documents, options = {}) {
     const conflicts = [...byIdentity.entries()].filter(([, values]) => values.length > 1)
         .map(([key, values]) => ({ key, paths: values.map(value => value.path) }));
     const get = (kind, rawId) => {
-        const id = kind === "group" ? rawId : canonicalId(rawId);
+        const id = kind === "group" ? rawId
+            : kind === "tag" && /^custom:[A-Za-z0-9_.:-]+$/.test(rawId || "") ? rawId.toLowerCase()
+            : canonicalId(rawId);
         if (!["item", "tag", "group"].includes(kind) || !id ||
             (kind === "group" && !/^obsf:[a-z0-9_./-]+$/.test(id))) {
             return { kind, id, presence: "INVALID", matches: [] };

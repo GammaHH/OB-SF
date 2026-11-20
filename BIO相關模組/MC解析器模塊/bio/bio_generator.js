@@ -5,7 +5,7 @@
 
 const GENERATOR_SCHEMA_VERSION = 2;
 const { recipeIdentity } = require("../dependencies/recipe_review");
-const { derivedAlternativeGroupId } = require("./bio_group_mapping");
+const { derivedAlternativeGroupId, MINECRAFT_COLORS } = require("./bio_group_mapping");
 const { managedTagsFor } = require("./bio_tags");
 const { classifyMachineRecipe } = require("./machine_recipe_mapping");
 const BIO_RECIPE_TYPE_DICT = Object.freeze({
@@ -93,6 +93,8 @@ function createBIOGenerationModel(itemId, options = {}) {
     if (!canonical) throw new TypeError(`無效 Minecraft item ID：${itemId}`);
     const registryItem = options.itemRegistry?.get?.(canonical) ?? null;
     const existingBIO = options.bioRegistry?.get?.(canonical) ?? null;
+    const requestedLevel = options.level !== undefined ? options.level : existingBIO?.level;
+    const level = requestedLevel == null ? "" : requestedLevel;
     const translatedName = resolveTranslatedName(canonical, options.translations);
     const name = existingBIO?.name ?? translatedName ?? fallbackName(canonical);
     const bioId = bioIdForItem(canonical);
@@ -129,6 +131,11 @@ function createBIOGenerationModel(itemId, options = {}) {
         };
     });
     const diagnostics = [];
+    const levelText = String(level).trim();
+    if (levelText && (!/^\d+$/.test(levelText) || !Number.isSafeInteger(Number(levelText)))) diagnostics.push({
+        code: "BIO_LEVEL_REQUIRES_REVIEW", severity: "WARNING",
+        message: `${canonical} 的既有 LEVEL 不是空白或非負整數；保留原值待人工確認`
+    });
     const type = existingBIO?.type === "mc-drop" ? "mc-drop" : "mc-item";
     if (!existingBIO && recipes.length === 0) {
         diagnostics.push({
@@ -145,6 +152,7 @@ function createBIOGenerationModel(itemId, options = {}) {
         name,
         filename: `${safeFilename(name, bioId)}.preview.md`,
         type,
+        level,
         existingBIO,
         recipes,
         externalBase,
@@ -399,6 +407,29 @@ function renderIngredientChoices(ingredient, context, indent) {
     return [`${indent}<!-- obsf:choices ${metadata} -->`];
 }
 
+// Flat unit choices already have a lossless Markdown grammar in V4. Do not
+// repeat the same candidate set as both JSON and item rows. Complex quantities,
+// nested tags and unverified derived-family shorthand retain precise metadata.
+function simpleItemChoices(choices, qty) {
+    if (!Number.isSafeInteger(qty) || qty <= 0 || !choices.length || choices.some(choice =>
+        choice?.kind !== "item" || !canonicalItemId(choice.id) || Number(choice.qty ?? 1) !== 1)) return null;
+    const ids = choices.map(choice => canonicalItemId(choice.id));
+    return new Set(ids).size === ids.length ? choices : null;
+}
+
+function renderSimpleChoices(choices, qty, selectedId, context, indent) {
+    const selected = choices.find(choice => choice.id === selectedId);
+    const ordered = selected ? [selected, ...choices.filter(choice => choice !== selected)] : choices;
+    if (ordered.length === 1) return renderIngredient({ ...ordered[0], qty }, context, indent);
+    return [`${indent}- **擇一材料** (qty:: ${qty})`, ...ordered.map(choice =>
+        `${indent}\t- [${ingredientField(choice, context)}:: ${itemLink(choice.id, context)}]`)];
+}
+
+const SIMPLE_CHOICE_TAGS = new Set([
+    "minecraft:coals", "minecraft:metal_nuggets", "minecraft:gold_tool_materials",
+    "minecraft:iron_tool_materials", "minecraft:diamond_tool_materials"
+]);
+
 function renderIngredient(ingredient, context, indent = "\t") {
     const qty = Number(ingredient?.qty ?? 1);
     if (ingredient?.kind === "item") {
@@ -406,6 +437,11 @@ function renderIngredient(ingredient, context, indent = "\t") {
         return [`${indent}- [${field}:: ${itemLink(ingredient.id, context)}] (qty:: ${qty})`];
     }
     if (ingredient?.kind === "tag") {
+        if (SIMPLE_CHOICE_TAGS.has(ingredient.id) && !tagBIOTarget(ingredient, context)) {
+            const choices = (ingredient.values ?? []).map(id => ({ kind: "item", id, qty: 1 }));
+            if (simpleItemChoices(choices, qty)) return renderSimpleChoices(choices, qty,
+                normalizedMappings(context.tagMappings).get(ingredient.id)?.representativeItemId, context, indent);
+        }
         return [
             ...renderIngredientChoices(ingredient, context, indent),
             `${indent}- [item:: ${tagLabel(ingredient, context)}] (qty:: ${qty})`
@@ -433,6 +469,8 @@ function renderIngredient(ingredient, context, indent = "\t") {
                 `${indent}- [${field}:: ${target}] (qty:: ${compactQty ?? qty})`
             ];
         }
+        if (simpleItemChoices(choices, qty)) return renderSimpleChoices(choices, qty,
+            ingredient.selectedRepresentative?.id, context, indent);
         const lines = [
             ...renderIngredientChoices(ingredient, context, indent),
             `${indent}- **擇一材料** (qty:: ${qty})`
@@ -450,7 +488,7 @@ function renderIngredient(ingredient, context, indent = "\t") {
 
 // Display supplemental normalized metadata without changing dependency fields.
 // Unknown metadata stays visible under its original key instead of being discarded.
-function renderRecipeNotes(meta = {}, context = {}) {
+function renderRecipeNotes(meta = {}, context = {}, recipe = {}) {
     const lines = [];
     const text = value => (typeof value === "string" ? value : JSON.stringify(value))
         .replace(/[\r\n]+/g, " ").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
@@ -458,8 +496,18 @@ function renderRecipeNotes(meta = {}, context = {}) {
     const labels = {
         ingredientRoles: "材料角色", copiesInputComponents: "繼承輸入物品 Components"
     };
+    const owner = canonicalItemId(context.ownerItemId);
+    const container = ["bundle", "shulker_box"].find(base => owner === `minecraft:${base}` ||
+        MINECRAFT_COLORS.some(color => owner === `minecraft:${color}_${base}`));
+    const containerTransmute = container && recipe.sourceType === "minecraft:crafting_transmute" &&
+        meta.copiesInputComponents === true && Array.isArray(meta.ingredientRoles) &&
+        JSON.stringify(meta.ingredientRoles) === '["input","material"]' &&
+        recipe.ingredients?.[0]?.kind === "tag" && recipe.ingredients[0].id ===
+            (container === "bundle" ? "minecraft:bundles" : "minecraft:shulker_boxes");
+    if (containerTransmute) add("可以存入物品");
     for (const [key, value] of Object.entries(meta)) {
         if (value == null || ["sourceFile", "category", "group", "resultComponents"].includes(key)) continue;
+        if (containerTransmute && ["ingredientRoles", "copiesInputComponents"].includes(key)) continue;
         if (key === "cookingTime") { add(`處理時間 ${text(value)} ticks`); continue; }
         if (key === "experience") { add(`經驗值 ${text(value)}`); continue; }
         add(`${labels[key] ?? `補充資訊（${key}）`}：${text(value)}`);
@@ -493,7 +541,7 @@ function renderRoute(recipe, context) {
         }
     }
     lines.push(`\t- [output:: ${recipe.output}]`);
-    lines.push(...renderRecipeNotes(recipe.meta, context));
+    lines.push(...renderRecipeNotes(recipe.meta, context, recipe));
     return lines;
 }
 
@@ -542,7 +590,7 @@ function renderBIOPreview(model, options = {}) {
         `type: ${model.type}`,
         `id: ${model.bioId}`,
         `minecraft_id: ${model.itemId}`,
-        "level:",
+        `level:${model.level == null || model.level === "" ? "" : " " + model.level}`,
         "aliases:",
         ...model.aliases.map(alias => `  - ${alias}`),
         ...(model.externalBase ? ["base_material: true"] : []),
@@ -603,7 +651,7 @@ function renderTagBIOPreview(model, options = {}) {
     };
     const lines = [
         "---",
-        "type: mc-item",
+        "type: mc-tag",
         `id: ${model.bioId}`,
         ...(model.kind === "minecraft:item_tag"
             ? [`minecraft_tag: ${model.tagId}`, "tag_identity: minecraft:item_tag"]

@@ -8,6 +8,12 @@ function readLink(value) {
         : { name: String(value ?? "").trim(), label: String(value ?? "").trim() };
 }
 
+function readMaterial(value) {
+    const reference = readLink(value);
+    if (/^(?:[A-Z_][A-Z0-9_]*|[a-z0-9_.-]+:[a-z0-9_./-]+)$/.test(value.trim())) reference.rawId = true;
+    return reference;
+}
+
 function positive(value, fallback = 1) {
     const number = Number(value);
     return Number.isFinite(number) && number > 0 ? number : fallback;
@@ -37,6 +43,11 @@ function recipeNoteKey(value) {
     return note.split("：", 1)[0];
 }
 
+function isTagBIO(metadata) {
+    return Boolean(metadata && (metadata.type === "mc-tag" || metadata.tag_identity ||
+        metadata.minecraft_tag || metadata.derived_group));
+}
+
 function parseBIO(text, metadata = {}) {
     // Yield belongs to the selected route. Legacy document-level output is ignored.
     const defaultOutput = 1;
@@ -44,7 +55,7 @@ function parseBIO(text, metadata = {}) {
     const diagnostics = [];
     const tagMembers = [];
     const tagRows = [];
-    const isTag = Boolean(metadata.tag_identity || metadata.minecraft_tag || metadata.derived_group);
+    const isTag = isTagBIO(metadata);
     const body = String(text ?? "").replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, "");
     const lines = body.split(/\r?\n/);
     let section = "";
@@ -177,7 +188,7 @@ function parseBIO(text, metadata = {}) {
             discardExclusion();
             const type = row[1].toLowerCase();
             tagRows.push({
-                ...readLink(row[2]), type: type === "geo" ? "GEO" : type,
+                ...readMaterial(row[2]), type: type === "geo" ? "GEO" : type,
                 qty: 1, preferred
             });
             preferred = false;
@@ -221,7 +232,7 @@ function parseBIO(text, metadata = {}) {
                 continue;
             }
             const type = row[1].toLowerCase();
-            const ingredient = { ...readLink(row[2]), type: type === "geo" ? "GEO" : type, qty: positive(row[3]) };
+            const ingredient = { ...readMaterial(row[2]), type: type === "geo" ? "GEO" : type, qty: positive(row[3]) };
             if (pendingExceptSelf) { ingredient.excludeSelf = true; pendingExceptSelf = false; }
             if (alternative && !row[3]) {
                 if (!alternative.metadataChoices) alternative.choices.push(ingredient);
@@ -298,7 +309,7 @@ function parseBIO(text, metadata = {}) {
 }
 
 function exclusionItemIdentity(page) {
-    if (!page || page.minecraft_tag || page.derived_group || page.tag_identity) return null;
+    if (!page || isTagBIO(page)) return null;
     const raw = String(page.minecraft_id || page.id || "").trim().toLowerCase();
     const id = raw.includes(":") ? raw : "minecraft:" + raw;
     return /^minecraft:[a-z0-9_./-]+$/.test(id) ? id : null;
@@ -396,24 +407,38 @@ function ingredientKey(pagePath, recipeKey, index) {
     return JSON.stringify([pagePath, recipeKey, index]);
 }
 
-function chooseRecipe(pagePath, recipes, routeChoices, ingredientChoices) {
+function dependencyWouldCycle(targetPath, stack, isCollectionPath = () => false) {
+    const previous = stack.lastIndexOf(targetPath);
+    if (previous < 0) return false;
+    if (!isCollectionPath(targetPath)) return true;
+    // Reusing a virtual collection after a new concrete item is not itself a
+    // recipe cycle. Tag-only loops still make no progress and remain blocked.
+    return !stack.slice(previous + 1).some(value => !isCollectionPath(value));
+}
+
+function chooseRecipe(pagePath, recipes, routeChoices, ingredientChoices, { isChoiceAllowed = () => true } = {}) {
     const recipe = recipes.find(value => value.key === routeChoices.get(pagePath)) ||
         recipes.find(value => value.preferred) ||
         recipes[0];
     if (!recipe) return null;
+    let blocked = false;
     const ingredients = recipe.ingredients.map((ingredient, index) => {
         if (!ingredient.choices?.length) return ingredient;
         const key = ingredientKey(pagePath, recipe.key, index);
-        const selected = ingredient.choices.find(choice => choice.name === ingredientChoices.get(key)) ||
+        const preferred = ingredient.choices.find(choice => choice.name === ingredientChoices.get(key)) ||
             ingredient.choices.find(choice => choice.preferred) ||
             ingredient.choices.find(choice => choice.name === (ingredient.defaultName || ingredient.name)) ||
             ingredient.choices[0];
+        const viable = recipe.tagRepresentative ? ingredient.choices.filter(choice => isChoiceAllowed(choice)) : ingredient.choices;
+        if (!viable.length) { blocked = true; return ingredient; }
+        const selected = viable.find(choice => choice.name === preferred.name) || viable[0];
         return {
             ...ingredient, name: selected.name, type: selected.type,
-            qty: ingredient.qty * selected.qty, selectionKey: key
+            qty: ingredient.qty * selected.qty, selectionKey: key,
+            ...(selected.name !== preferred.name ? { cycleFallback: { from: preferred.name, to: selected.name } } : {})
         };
     });
-    return { ...recipe, ingredients };
+    return blocked ? null : { ...recipe, ingredients };
 }
 
 function recipeLabel(recipe, options = {}) {
@@ -454,4 +479,4 @@ function recipeMenuOptions(recipes) {
     return options.map(({ recipe, ...option }) => option);
 }
 
-module.exports = { parseBIO, inferExceptSelfGroupId, resolveRecipeExclusions, allowedRecipes, providerAllowed, chooseRecipe, ingredientKey, recipeLabel, recipeMenuOptions, formatRecipeNote, recipeNoteKey, readLink };
+module.exports = { parseBIO, isTagBIO, inferExceptSelfGroupId, resolveRecipeExclusions, allowedRecipes, providerAllowed, chooseRecipe, dependencyWouldCycle, ingredientKey, recipeLabel, recipeMenuOptions, formatRecipeNote, recipeNoteKey, readLink };

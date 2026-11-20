@@ -1,4 +1,39 @@
 // Pure, editable Machine -> recipe section mapping. Never reads or writes files.
+const RECIPE_MAPPING_FILE = "Recipe Mapping Draft.md";
+
+function formalRoots(mapping) {
+    const block = mapping.match(/<!-- obsf:formal-bio-roots:start -->([\s\S]*?)<!-- obsf:formal-bio-roots:end -->/);
+    return [...(block?.[1] || '').matchAll(/^\s*\|\s*([^|]+?)\s*\|\s*(true|false)\s*\|\s*true\s*\|\s*$/gm)]
+        .map(([, folder, recursive]) => ({ folder, recursive: recursive === 'true' }))
+        .filter(({ folder }) => !/[\\:*?<>|]/.test(folder) && folder.split('/').every(part => part && !part.startsWith('.')));
+}
+
+function isFormalPath(relative, roots) {
+    if (/[\\:*?<>|]/.test(relative) || relative.split('/').some(part => !part || part.startsWith('.') || /[. ]$/.test(part))) return false;
+    if (/(?:^|\/)preview\/|\.(?:preview|update-preview|formal-candidate)\.md$/i.test(relative)) return false;
+    const folder = relative.split('/').slice(0, -1).join('/');
+    return roots.some(root => folder === root.folder || (root.recursive && folder.startsWith(root.folder + '/')));
+}
+
+function providerRecords(mapping) {
+    const block = mapping.match(/<!-- obsf:provider-headings:start -->([\s\S]*?)<!-- obsf:provider-headings:end -->/);
+    const providers = new Map();
+    for (const line of (block?.[1] || '').split(/\r?\n/)) {
+        const cells = tableCells(line);
+        if (!cells || cells.length !== 4 || cells[3] !== 'true') continue;
+        const [folder, configuredId, heading] = cells;
+        let id = configuredId;
+        if (!id && /^[\x20-\x7E]+$/.test(heading)) {
+            id = heading.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        }
+        if (!id || (!configuredId && !/^[a-z]/.test(id)))
+            throw new Error('Provider Headings 請手動填寫 provider_id：' + folder);
+        if (!folder || !/^[a-z][a-z0-9_-]*$/.test(id) || !heading || /[#|]/.test(heading) || providers.has(folder))
+            throw new Error('Provider Headings 欄位無效或資料夾重複：' + folder);
+        providers.set(folder, { id, heading });
+    }
+    return providers;
+}
 const clean = value => String(value ?? "").trim().replace(/^`(.*)`$/, "$1");
 const diagnostic = (code, message, details = {}) => ({ code, severity: "WARNING", message, ...details });
 
@@ -22,6 +57,42 @@ function tableCells(line) {
     }
     cells.push(clean(cell));
     return cells;
+}
+
+// Dictionary and recipe classification are separate tables. This dictionary is
+// read by Mini Parser and must not decide which Markdown section owns a recipe.
+function parseMachineDictionary(markdown) {
+    const text = String(markdown ?? ""), machines = new Map(), diagnostics = [];
+    const start = "<!-- obsf:machine-dictionary:start -->", end = "<!-- obsf:machine-dictionary:end -->";
+    const fail = message => diagnostics.push({ code: "INVALID_MACHINE_DICTIONARY", severity: "ERROR", message });
+    if (text.split(start).length !== 2 || text.split(end).length !== 2 || text.indexOf(end) <= text.indexOf(start)) {
+        fail("Machine Dictionary 必須有唯一且成對的 start/end marker");
+        return { machines, diagnostics };
+    }
+    let columns = null, foundHeader = false;
+    for (const line of text.slice(text.indexOf(start) + start.length, text.indexOf(end)).split(/\r?\n/)) {
+        const cells = tableCells(line);
+        if (!cells) continue;
+        const names = cells.map(value => value.toLowerCase().replace(/\s+/g, ""));
+        if (["machine_id", "machine", "enabled"].every(name => names.includes(name))) {
+            if (foundHeader || new Set(names).size !== names.length) fail("Machine Dictionary 表頭重複");
+            columns = names; foundHeader = true; continue;
+        }
+        if (!columns || cells.every(value => /^:?-+:?$/.test(value))) continue;
+        if (cells.length !== columns.length) { fail("Machine Dictionary 欄位數量不符"); continue; }
+        const get = name => cells[columns.indexOf(name)] || "";
+        const enabled = get("enabled").toLowerCase();
+        if (enabled === "false") continue;
+        if (enabled !== "true") { fail("Machine Dictionary enabled 必須為 true 或 false"); continue; }
+        const id = get("machine_id"), machine = get("machine");
+        if (!/^[A-Za-z0-9_.:-]+$/.test(id) || !machine || /[\[\]|\r\n]/.test(machine)) {
+            fail("Machine Dictionary 須填有效 machine_id 與純名稱 machine"); continue;
+        }
+        if (machines.has(id)) { fail(`重複的已啟用 machine_id：${id}`); continue; }
+        machines.set(id, machine);
+    }
+    if (!foundHeader) fail("找不到 Machine Dictionary 表頭");
+    return { machines, diagnostics };
 }
 
 function parseMachineRecipeMappings(markdown) {
@@ -86,7 +157,7 @@ function normalizeMachineRecipeSections(input, options = {}) {
     let frontmatter = /^\uFEFF?---\r?\n/.test(text), lastMachine = -1, lastTarget = null;
     const bare = line => line.replace(/\r?\n$/, "");
     const blank = line => !bare(line).trim();
-    const recipeRow = line => /^\s*(?:\*\*合成所需|[-*]\s*\[(?:item|drop|GEO|output|note)\s*::|<!-- obsf:choices)/i.test(bare(line));
+    const recipeRow = line => /^\s*(?:\*\*(?:合成所需|所需|批產量)|[-*]\s*\[(?:item|drop|GEO|output|note)\s*::|<!-- (?:obsf:choices|except self)|-\s*\*\*擇一材料)/i.test(bare(line));
     for (let index = 0; index < lines.length; index++) {
         const raw = lines[index], line = bare(raw);
         if (frontmatter) {
@@ -138,7 +209,7 @@ function normalizeMachineRecipeSections(input, options = {}) {
             // Preserve blanks before a pre-existing heading; only replace its
             // own section/provider run. Never cross prose, notes or metadata.
             let firstHeader = suffix.findIndex(value => /^#{3}(?:##)?\s/.test(bare(value)));
-            const leading = firstHeader >= 0 ? suffix.slice(0, firstHeader).filter(blank) : [];
+            const leading = firstHeader >= 0 ? suffix.slice(0, firstHeader).filter(blank).slice(0, 1) : [];
             output.splice(start);
             // Consecutive routes share a tight list; heading spacing stays intact.
             if (!sameGroup) {
@@ -168,4 +239,4 @@ function normalizeMachineRecipeSections(input, options = {}) {
     return { text: output.join(""), diagnostics };
 }
 
-module.exports = { parseMachineRecipeMappings, classifyMachineRecipe, normalizeMachineRecipeSections };
+module.exports = { RECIPE_MAPPING_FILE, formalRoots, isFormalPath, providerRecords, parseMachineDictionary, parseMachineRecipeMappings, classifyMachineRecipe, normalizeMachineRecipeSections };

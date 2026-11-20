@@ -451,7 +451,8 @@ function scan() {
     const registryTargets = [...runtime.pipeline.itemRegistry.entries()]
         .map(([itemId]) => itemId)
         .sort();
-    const requested = new Set(registryTargets.filter(itemId => !bioRegistry.has(itemId)));
+    const includeExisting = hasFlag("all");
+    const requested = new Set(registryTargets.filter(itemId => includeExisting || !bioRegistry.has(itemId)));
     const currentReviewTargets = [];
     for (const reviewFile of [
         safeVaultPath("Minecraft Base Material Review.md", ".md"),
@@ -483,7 +484,8 @@ function scan() {
     }
     const queue = vanilla.dependencies.createReviewQueue({
         sourceFingerprint: fingerprint,
-        scanScope: "missing-bio+current-review",
+        scanScope: includeExisting ? "all-normalized+current-review" : "missing-bio+current-review",
+        reassessReady: true,
         scannedTargets: requested.size,
         existingBIO: bioRegistry.stats.mappedBIOs,
         automaticReady,
@@ -500,6 +502,7 @@ function scan() {
     }
     writeQueue(queue, paths);
     process.stdout.write("Minecraft Decision Review Scan:\n");
+    process.stdout.write(`- scanScope: ${queue.scanScope}\n`);
     process.stdout.write(`- normalizedTargets: ${registryTargets.length}\n`);
     process.stdout.write(`- scannedTargets: ${requested.size}\n`);
     process.stdout.write(`- existingBIO: ${bioRegistry.stats.mappedBIOs}\n`);
@@ -902,7 +905,7 @@ function reopen(decisionId, rawTarget = null) {
 function usage() {
     process.stderr.write(
         "Usage:\n" +
-        "  node scripts/minecraft-review.cjs scan\n" +
+        "  node scripts/minecraft-review.cjs scan [--all]\n" +
         "  node scripts/minecraft-review.cjs migrate-registry\n" +
         "  node scripts/minecraft-review.cjs migrate-legacy\n" +
         "  node scripts/minecraft-review.cjs next\n" +
