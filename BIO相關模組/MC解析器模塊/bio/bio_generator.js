@@ -43,11 +43,18 @@ function aliasesForItem(itemId) {
     return [...new Set([bioId, canonical].filter(Boolean))];
 }
 
+function smithingTemplateName(itemId, translations = {}) {
+    const canonical = canonicalItemId(itemId);
+    if (!/^minecraft:(?:[a-z0-9_]+_armor_trim|netherite_upgrade)_smithing_template$/.test(canonical ?? "")) return null;
+    return translations[`item.${canonical.replace(":", ".")}.new`]?.trim() || null;
+}
+
 function resolveTranslatedName(itemId, translations = {}) {
     const canonical = canonicalItemId(itemId);
     if (!canonical) return null;
     const [namespace, value] = canonical.split(":", 2);
-    return translations[`item.${namespace}.${value}`] ??
+    return smithingTemplateName(canonical, translations) ??
+        translations[`item.${namespace}.${value}`] ??
         translations[`block.${namespace}.${value}`] ??
         null;
 }
@@ -329,12 +336,6 @@ function tagLabel(ingredient, context) {
     return `#${ingredient.id ?? "minecraft:unknown"}`;
 }
 
-function ingredientLabel(ingredient, context) {
-    if (ingredient?.kind === "item") return itemLink(ingredient.id, context);
-    if (ingredient?.kind === "tag") return tagLabel(ingredient, context);
-    return "未知材料";
-}
-
 function exceptSelfChoiceQuantity(ingredient, groupId, context) {
     if (!groupId || !context.ownerItemId || !context.availableAlternativeGroups?.has(groupId)) return null;
     const fullValues = normalizedMappings(context.alternativeGroupValues).get(groupId);
@@ -370,65 +371,32 @@ function ingredientField(ingredient, context) {
     return fieldForBIOType(existingType ?? generatedType);
 }
 
-function renderIngredientChoices(ingredient, context, indent) {
-    if (ingredient.kind === "tag" && tagBIOTarget(ingredient, context)) return [];
-    const values = [];
-    function collect(choice, multiplier = 1) {
-        const quantity = multiplier * Number(choice.qty ?? 1);
-        if (choice.kind === "item") {
-            const link = itemLink(choice.id, context);
-            const target = link.slice(2, -2).split("|", 1)[0];
-            const label = context.bioRegistry?.get?.(choice.id)?.name ??
-                resolveTranslatedName(choice.id, context.translations) ?? fallbackName(choice.id);
-            if (!values.some(value => value.name === target && value.qty === quantity)) {
-                values.push({ name: target, label, type: ingredientField(choice, context), qty: quantity });
+function renderMaterialChoices(ingredient, qty, selectedId, context, indent) {
+    const choices = new Map();
+    function collect(value, multiplier) {
+        const quantity = multiplier * Number(value.qty ?? 1);
+        if (value.kind === "alternatives") {
+            for (const child of value.alternatives ?? []) collect(child, quantity);
+            return;
+        }
+        const ids = value.kind === "tag" ? value.values ?? [] : value.kind === "item" ? [value.id] : [];
+        for (const rawId of ids) {
+            const id = canonicalItemId(rawId);
+            if (id && Number.isSafeInteger(quantity * qty) && quantity * qty > 0) {
+                choices.set(JSON.stringify([id, quantity]), { kind: "item", id, qty: quantity });
             }
-        } else if (choice.kind === "tag") {
-            for (const id of choice.values ?? []) collect({ kind: "item", id }, quantity);
-        } else if (choice.kind === "alternatives") {
-            for (const child of choice.alternatives ?? []) collect(child, quantity);
         }
     }
-    if (ingredient.kind === "tag") {
-        for (const id of ingredient.values ?? []) collect({ kind: "item", id });
-    } else if (ingredient.kind === "alternatives") {
-        for (const child of ingredient.alternatives ?? []) collect(child);
-    }
+    collect({ ...ingredient, qty: 1 }, 1);
+    const values = [...choices.values()];
     if (!values.length) return [];
-    const representativeId = ingredient.kind === "tag"
-        ? normalizedMappings(context.tagMappings).get(ingredient.id)?.representativeItemId
-        : ingredient.selectedRepresentative?.id;
-    const defaultName = representativeId
-        ? itemLink(representativeId, context).slice(2, -2).split("|", 1)[0]
-        : undefined;
-    const metadata = JSON.stringify({
-        kind: ingredient.kind, id: ingredient.id, defaultName, choices: values
-    }).replaceAll("<", "\\u003c");
-    return [`${indent}<!-- obsf:choices ${metadata} -->`];
-}
-
-// Flat unit choices already have a lossless Markdown grammar in V4. Do not
-// repeat the same candidate set as both JSON and item rows. Complex quantities,
-// nested tags and unverified derived-family shorthand retain precise metadata.
-function simpleItemChoices(choices, qty) {
-    if (!Number.isSafeInteger(qty) || qty <= 0 || !choices.length || choices.some(choice =>
-        choice?.kind !== "item" || !canonicalItemId(choice.id) || Number(choice.qty ?? 1) !== 1)) return null;
-    const ids = choices.map(choice => canonicalItemId(choice.id));
-    return new Set(ids).size === ids.length ? choices : null;
-}
-
-function renderSimpleChoices(choices, qty, selectedId, context, indent) {
-    const selected = choices.find(choice => choice.id === selectedId);
-    const ordered = selected ? [selected, ...choices.filter(choice => choice !== selected)] : choices;
-    if (ordered.length === 1) return renderIngredient({ ...ordered[0], qty }, context, indent);
+    const selected = values.find(choice => choice.id === canonicalItemId(selectedId));
+    const ordered = selected ? [selected, ...values.filter(choice => choice !== selected)] : values;
+    if (ordered.length === 1) return renderIngredient({ ...ordered[0], qty: qty * ordered[0].qty }, context, indent);
     return [`${indent}- **擇一材料** (qty:: ${qty})`, ...ordered.map(choice =>
-        `${indent}\t- [${ingredientField(choice, context)}:: ${itemLink(choice.id, context)}]`)];
+        `${indent}\t- [${ingredientField(choice, context)}:: ${itemLink(choice.id, context)}]` +
+        (choice.qty === 1 ? "" : ` (qty:: ${choice.qty})`))];
 }
-
-const SIMPLE_CHOICE_TAGS = new Set([
-    "minecraft:coals", "minecraft:metal_nuggets", "minecraft:gold_tool_materials",
-    "minecraft:iron_tool_materials", "minecraft:diamond_tool_materials"
-]);
 
 function renderIngredient(ingredient, context, indent = "\t") {
     const qty = Number(ingredient?.qty ?? 1);
@@ -437,51 +405,30 @@ function renderIngredient(ingredient, context, indent = "\t") {
         return [`${indent}- [${field}:: ${itemLink(ingredient.id, context)}] (qty:: ${qty})`];
     }
     if (ingredient?.kind === "tag") {
-        if (SIMPLE_CHOICE_TAGS.has(ingredient.id) && !tagBIOTarget(ingredient, context)) {
-            const choices = (ingredient.values ?? []).map(id => ({ kind: "item", id, qty: 1 }));
-            if (simpleItemChoices(choices, qty)) return renderSimpleChoices(choices, qty,
-                normalizedMappings(context.tagMappings).get(ingredient.id)?.representativeItemId, context, indent);
+        if (!tagBIOTarget(ingredient, context)) {
+            const representative = normalizedMappings(context.tagMappings).get(ingredient.id)?.representativeItemId;
+            const fallback = renderMaterialChoices(ingredient, qty, representative, context, indent);
+            if (fallback.length) return fallback;
         }
-        return [
-            ...renderIngredientChoices(ingredient, context, indent),
-            `${indent}- [item:: ${tagLabel(ingredient, context)}] (qty:: ${qty})`
-        ];
+        return [`${indent}- [item:: ${tagLabel(ingredient, context)}] (qty:: ${qty})`];
     }
     if (ingredient?.kind === "alternatives") {
-        const choices = ingredient.alternatives ?? [];
         const groupId = derivedAlternativeGroupId(ingredient);
-        const groupMapping = groupId
-            ? normalizedMappings(context.alternativeGroupMappings).get(groupId)
-            : null;
-        if (groupMapping) {
+        const groupMapping = normalizedMappings(context.alternativeGroupMappings).get(groupId);
+        const compactQty = groupMapping && exceptSelfChoiceQuantity(ingredient, groupId, context);
+        if (compactQty) {
+            const choices = ingredient.alternatives;
             const representative = ingredient.selectedRepresentative ?? choices.find(choice =>
                 choice.id === groupMapping.representativeItemId
             ) ?? choices[0];
-            const target = representative
-                ? aliasedItemLink(representative.id, groupMapping.zhName, context)
-                : "未知材料";
-            const field = representative
-                ? ingredientField(representative, context)
-                : "item";
-            const compactQty = exceptSelfChoiceQuantity(ingredient, groupId, context);
             return [
-                ...(compactQty ? [`${indent}<!-- except self -->`] : renderIngredientChoices(ingredient, context, indent)),
-                `${indent}- [${field}:: ${target}] (qty:: ${compactQty ?? qty})`
+                `${indent}<!-- except self -->`,
+                `${indent}- [${ingredientField(representative, context)}:: ${aliasedItemLink(representative.id, groupMapping.zhName, context)}] (qty:: ${compactQty})`
             ];
         }
-        if (simpleItemChoices(choices, qty)) return renderSimpleChoices(choices, qty,
-            ingredient.selectedRepresentative?.id, context, indent);
-        const lines = [
-            ...renderIngredientChoices(ingredient, context, indent),
-            `${indent}- **擇一材料** (qty:: ${qty})`
-        ];
-        for (const choice of choices) {
-            const field = ingredientField(choice, context);
-            lines.push(
-                `${indent}\t- [${field}:: ${ingredientLabel(choice, context)}]`
-            );
-        }
-        return lines;
+        const fallback = renderMaterialChoices(ingredient, qty,
+            ingredient.selectedRepresentative?.id ?? groupMapping?.representativeItemId, context, indent);
+        if (fallback.length) return fallback;
     }
     return [`${indent}- 未知材料 (qty:: ${qty})`];
 }
@@ -696,6 +643,7 @@ module.exports = {
     canonicalItemId,
     bioIdForItem,
     aliasesForItem,
+    smithingTemplateName,
     resolveTranslatedName,
     safeFilename,
     bioRecipeTypeInfo,

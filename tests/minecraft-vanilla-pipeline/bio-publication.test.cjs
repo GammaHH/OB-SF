@@ -5,7 +5,7 @@ const path = require('node:path');
 const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 const { publicationManifest, publishBIOBatch, preparePublication, scanPublication, selectPublicationManifest, standaloneManifest, formalizePreview, previewSemanticHash, identity, allowPreferredEdits, allowLevelEdits, parseBIOLevel } = require('../../scripts/lib/bio-publication.cjs');
-const { openBatchRefresh, finishBatchRefresh } = require('../../scripts/lib/bio-batch-refresh.cjs');
+const { openBatchRefresh, finishBatchRefresh, renameBatchTemplates } = require('../../scripts/lib/bio-batch-refresh.cjs');
 const { refreshVanillaRecipeBlocks } = require('../../BIO相關模組/MC解析器模塊/bio/bio_update');
 
 const batch = 'MC-自動化BIO/preview/batch/test';
@@ -71,6 +71,39 @@ test('refresh appends only missing collections and changes only the selected rec
     assert.equal(fs.readFileSync(path.join(f.root, written.backup, entry.previewFilename), 'utf8'), original);
     assert.equal(fs.existsSync(path.join(f.root, added.record.targetPath)), false);
     assert.equal(openBatchRefresh(f.root, f.manifestPath, []).byIdentity.has('tag:minecraft:planks'), true);
+});
+
+test('batch template rename keeps distinct identities, rewrites exact links and preserves manual content', t => {
+    const f = fixture(t);
+    const coast = 'coast_armor_trim_smithing_template', bolt = 'bolt_armor_trim_smithing_template';
+    const input = name => '### 合成配方\n- (Machine:: 工作台)\n- [item:: [[' +
+        batch + '/' + name + '.preview|鍛造模板]]] (qty:: 1)\n- [output:: 2]\n\n# 用途\n![[圖片.png]]\n';
+    const coastName = '鍛造模板--COAST', boltName = '鍛造模板';
+    const source = item(coast, input(coastName));
+    f.add(coast, coastName, source);
+    f.add(bolt, boltName, item(bolt, input(boltName)));
+    const armor = f.add('iron_chestplate', '鐵製胸甲', item('iron_chestplate', input(coastName)));
+    f.save();
+    const names = new Map([['minecraft:' + coast, '海岸盔甲紋樣'], ['minecraft:' + bolt, '鑲鉚盔甲紋樣']]);
+    const rename = write => renameBatchTemplates(openBatchRefresh(f.root, f.manifestPath, []), names, write);
+    assert.equal(rename(false).renamed.length, 2);
+    assert.equal(fs.readFileSync(path.join(f.root, batch, coastName + '.preview.md'), 'utf8'), source);
+    const result = rename(true);
+    assert.equal(result.renamed.length, 2);
+    assert.equal(fs.existsSync(path.join(f.root, batch, coastName + '.preview.md')), false);
+    assert.equal(fs.readFileSync(path.join(f.root, result.backup, coastName + '.preview.md'), 'utf8'), source);
+    const refreshed = openBatchRefresh(f.root, f.manifestPath, []);
+    for (const [id, name] of names) {
+        const entry = refreshed.byIdentity.get(id);
+        const text = fs.readFileSync(path.join(f.root, batch, entry.previewFilename), 'utf8');
+        assert.ok(text.includes('minecraft_id: ' + id + '\n'));
+        assert.equal(entry.targetPath, 'MC-物品資料庫/' + name + '.md');
+        assert.ok(text.includes('[[' + batch + '/' + name + '.preview|' + name + ']]'));
+        assert.ok(text.includes('![[圖片.png]]'));
+        assert.equal(entry.baselineSemantic, previewSemanticHash(text));
+    }
+    assert.equal(result.updated.includes(armor.previewFilename), true);
+    assert.equal(rename(false).renamed.length, 0);
 });
 
 test('material report is outside the batch and only checked, verified Vanilla materials create Base previews', t => {

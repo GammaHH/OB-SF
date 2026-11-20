@@ -80,6 +80,85 @@ function finishBatchRefresh(context, updates, additions, write = false) {
     }
     const result = { batch: relative, dryRun: !write, selected: updates.length, updated,
         added: additions.map(value => value.record.previewFilename) };
+    return writeBatchChanges(context, changes, result, write);
+}
+
+function renameBatchTemplates(context, titles, write = false) {
+    const { root, relative, batch, filenames, occupiedTargets, manifest } = context;
+    const renames = new Map(), links = new Map();
+    const originalFiles = [...filenames.values()];
+    for (const entry of manifest.entries) {
+        const title = titles.get(entry.identity);
+        if (!title || entry.kind !== 'item') continue;
+        if (entry.sourcePath || entry.linkFilenames?.length !== 1 || entry.linkFilenames[0] !== entry.previewFilename ||
+            fs.existsSync(publicationPath(root, entry.targetPath, 'MC-物品資料庫')))
+            throw new Error('模板已有正式 BIO 或多份預覽，請先確認：' + entry.identity);
+        const old = entry.previewFilename;
+        const filename = title + '.preview.md';
+        const target = 'MC-物品資料庫/' + title + '.md';
+        if (old === filename && entry.targetPath === target) continue;
+        if (filenames.has(filename.toLowerCase()) || occupiedTargets.has(target.toLowerCase()) ||
+            fs.existsSync(publicationPath(root, batch + '/' + filename, batch)) ||
+            fs.existsSync(publicationPath(root, target, 'MC-物品資料庫'))) {
+            throw new Error('模板名稱已被使用：' + title);
+        }
+        filenames.set(filename.toLowerCase(), { filename, entry });
+        occupiedTargets.add(target.toLowerCase());
+        renames.set(old, { filename, target, entry });
+        for (const prefix of ['', batch + '/']) {
+            for (const extension of ['', '.md']) {
+                links.set(prefix + old.slice(0, -3) + extension, {
+                    path: prefix + filename.slice(0, -3) + extension, title
+                });
+            }
+        }
+    }
+    const result = { batch: relative, dryRun: !write, renamed: [], updated: [] };
+    if (!renames.size) return result;
+    const changes = [], removals = [];
+    for (const { filename, entry } of originalFiles) {
+        const file = batch + '/' + filename;
+        const absolute = publicationPath(root, file, batch);
+        if (!fs.existsSync(absolute)) continue;
+        const original = fs.readFileSync(absolute, 'utf8');
+        const rename = renames.get(filename);
+        if (rename && identity(parseFrontmatter(original)) !== entry.identity)
+            throw new Error('Preview 身分與批次不符：' + filename);
+        const content = original.replace(/\[\[([^|\]#]+)(#[^|\]]*)?(?:\|([^\]]+))?\]\]/g, (match, target, anchor, label) => {
+            const link = links.get(target);
+            return link ? '[[' + link.path + (anchor ?? '') + '|' + (label && label !== '鍛造模板' ? label : link.title) + ']]' : match;
+        }).replace(/<!--\s*obsf:choices\s+[^\n]*?-->/g, comment => comment.replace(
+            /("(?:name|defaultName)"\s*:\s*")([^"]+)(")/g,
+            (match, before, target, after) => links.has(target) ? before + links.get(target).path + after : match
+        ));
+        if (rename) {
+            changes.push({ relative: batch + '/' + rename.filename, original: null, content });
+            removals.push({ relative: file, original, content: null });
+            result.renamed.push({ from: filename, to: rename.filename, identity: entry.identity });
+            entry.previewFilename = rename.filename;
+            entry.linkFilenames = [rename.filename];
+            entry.targetPath = rename.target;
+        } else if (content !== original) {
+            changes.push({ relative: file, original, content });
+            result.updated.push(filename);
+        }
+        if ((rename || content !== original) && entry.previewFilename === (rename?.filename ?? filename)) {
+            for (const [field, options] of [
+                ['baselineSemantic', {}],
+                ['baselineWithoutPreferred', { ignorePreferred: true }],
+                ['baselineWithoutPreferredAndLevel', { ignorePreferred: true, ignoreLevel: true }]
+            ]) {
+                if (entry[field] && previewSemanticHash(original, options) === entry[field])
+                    entry[field] = previewSemanticHash(content, options);
+            }
+        }
+    }
+    if (result.renamed.length !== renames.size) throw new Error('批次缺少待重新命名的模板預覽');
+    return writeBatchChanges(context, [...changes, ...removals], result, write);
+}
+
+function writeBatchChanges(context, changes, result, write) {
+    const { root, relative, batch, manifestPath, manifestText, manifest } = context;
     if (!changes.length) return result;
     const manifestAfter = JSON.stringify(manifest, null, 2);
     if (JSON.stringify(JSON.parse(manifestText)) !== JSON.stringify(manifest))
@@ -93,6 +172,7 @@ function finishBatchRefresh(context, updates, additions, write = false) {
     const applied = [];
     const read = file => fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
     const put = (file, content, fresh) => {
+        if (content === null) { fs.unlinkSync(file); return; }
         const temporary = file + '.' + randomUUID() + '.tmp';
         try {
             fs.writeFileSync(temporary, content, { flag: 'wx' });
@@ -122,8 +202,7 @@ function finishBatchRefresh(context, updates, additions, write = false) {
         for (const change of applied.reverse()) {
             try {
                 if (read(change.absolute) !== change.content) { manual.push(change.relative); continue; }
-                if (change.original === null) fs.unlinkSync(change.absolute);
-                else put(change.absolute, change.original, false);
+                put(change.absolute, change.original, change.content === null);
             } catch { manual.push(change.relative); }
         }
         if (applied.length || fs.existsSync(backupPath)) error.message += '｜備份：' + backup;
@@ -136,4 +215,4 @@ function finishBatchRefresh(context, updates, additions, write = false) {
     return { ...result, backup };
 }
 
-module.exports = { openBatchRefresh, finishBatchRefresh };
+module.exports = { openBatchRefresh, finishBatchRefresh, renameBatchTemplates };

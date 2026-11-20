@@ -64,6 +64,7 @@ function parseBIO(text, metadata = {}) {
     let preferred = false;
     let pendingChoices = null;
     let alternative = null;
+    let alternativeIndent = 0;
     let codeFence = null;
     let codeLines = [];
     let pendingExceptSelf = false;
@@ -212,6 +213,7 @@ function parseBIO(text, metadata = {}) {
         const alternativesHeader = line.match(/^\s*-\s*\*\*擇一材料\*\*\s*\(qty\s*::\s*([0-9.]+)\s*\)/);
         if (alternativesHeader) {
             if (pendingChoices?.invalid) current.invalid = true;
+            alternativeIndent = line.match(/^\s*/)[0].replaceAll("\t", "    ").length;
             alternative = {
                 name: pendingChoices?.defaultName || "", label: "擇一材料",
                 type: "item", qty: positive(alternativesHeader[1]),
@@ -234,7 +236,7 @@ function parseBIO(text, metadata = {}) {
             const type = row[1].toLowerCase();
             const ingredient = { ...readMaterial(row[2]), type: type === "geo" ? "GEO" : type, qty: positive(row[3]) };
             if (pendingExceptSelf) { ingredient.excludeSelf = true; pendingExceptSelf = false; }
-            if (alternative && !row[3]) {
+            if (alternative && (!row[3] || line.match(/^\s*/)[0].replaceAll("\t", "    ").length > alternativeIndent)) {
                 if (!alternative.metadataChoices) alternative.choices.push(ingredient);
                 if (!alternative.name) alternative.name = ingredient.name;
             } else if (row[3]) {
@@ -425,16 +427,21 @@ function chooseRecipe(pagePath, recipes, routeChoices, ingredientChoices, { isCh
     const ingredients = recipe.ingredients.map((ingredient, index) => {
         if (!ingredient.choices?.length) return ingredient;
         const key = ingredientKey(pagePath, recipe.key, index);
-        const preferred = ingredient.choices.find(choice => choice.name === ingredientChoices.get(key)) ||
-            ingredient.choices.find(choice => choice.preferred) ||
-            ingredient.choices.find(choice => choice.name === (ingredient.defaultName || ingredient.name)) ||
-            ingredient.choices[0];
-        const viable = recipe.tagRepresentative ? ingredient.choices.filter(choice => isChoiceAllowed(choice)) : ingredient.choices;
+        const duplicateNames = new Set(ingredient.choices.map(choice => choice.name)).size !== ingredient.choices.length;
+        const choices = duplicateNames ? ingredient.choices.map(choice => ({
+            ...choice, selectionValue: JSON.stringify([choice.name, choice.type, choice.qty])
+        })) : ingredient.choices;
+        const preferred = choices.find(choice => (choice.selectionValue ?? choice.name) === ingredientChoices.get(key)) ||
+            choices.find(choice => choice.preferred) ||
+            choices.find(choice => choice.name === (ingredient.defaultName || ingredient.name)) ||
+            choices[0];
+        const viable = recipe.tagRepresentative ? choices.filter(choice => isChoiceAllowed(choice)) : choices;
         if (!viable.length) { blocked = true; return ingredient; }
-        const selected = viable.find(choice => choice.name === preferred.name) || viable[0];
+        const selected = viable.includes(preferred) ? preferred : viable[0];
         return {
-            ...ingredient, name: selected.name, type: selected.type,
+            ...ingredient, choices, name: selected.name, type: selected.type,
             qty: ingredient.qty * selected.qty, selectionKey: key,
+            ...(selected.selectionValue ? { selectionValue: selected.selectionValue } : {}),
             ...(selected.name !== preferred.name ? { cycleFallback: { from: preferred.name, to: selected.name } } : {})
         };
     });

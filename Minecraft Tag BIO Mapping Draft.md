@@ -32,8 +32,8 @@ created: 2026-08-21 16:00
 | #minecraft:smelts_to_glass          |          | 任意沙類     |           | true     | minecraft:sand         |                                                      |
 | #minecraft:bundles                  |          | 各色束口袋    |           | true     | minecraft:bundle       |                                                      |
 | #minecraft:shulker_boxes            |          | 各色界伏盒    |           | true     | minecraft:shulker_box  |                                                      |
-| #minecraft:stone_crafting_materials |          | 任意石材     |           | false    | minecraft:cobblestone  |                                                      |
-| #minecraft:eggs                     |          | 蛋類       |           | false    | minecraft:egg          |                                                      |
+| #minecraft:stone_crafting_materials |          | 任意石材     |           | true     | minecraft:cobblestone  |                                                      |
+| #minecraft:eggs                     |          | 蛋類       |           | true     | minecraft:egg          |                                                      |
 | #minecraft:logs_that_burn           |          | 可燒製木炭原木  |           | true     | minecraft:oak_log      |                                                      |
 | #minecraft:leaves                   |          |          |           | false    | minecraft:oak_leaves   |                                                      |
 | #minecraft:metal_nuggets            |          |          |           | false    | minecraft:iron_nugget  |                                                      |

@@ -1973,8 +1973,11 @@ function renderRecipeControls(node, parent) {
             : ingredient.label || ingredient.choiceId || "擇一材料";
         addSelect(
             label,
-            ingredient.choices.map(choice => ({ value: choice.name, label: choice.label })),
-            ingredient.name,
+            ingredient.choices.map(choice => ({
+                value: choice.selectionValue ?? choice.name,
+                label: choice.qty === 1 && !choice.selectionValue ? choice.label : `${choice.label} ×${choice.qty}`
+            })),
+            ingredient.selectionValue ?? ingredient.name,
             value => ingredientChoices.set(ingredient.selectionKey, value)
         );
     }

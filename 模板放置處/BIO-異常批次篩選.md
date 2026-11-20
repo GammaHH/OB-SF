@@ -103,11 +103,26 @@ const files = app.vault.getMarkdownFiles()
     .filter(f => f.path.startsWith(folder + "/") && f.path !== reportPath);
 
 const scanned = [];
+const skipped = [];
 let qualifiedCount = 0;
 let reviewCount = 0;
 
 for (const file of files) {
-    const content = await app.vault.read(file);
+    const path = file.path;
+    let content;
+    try {
+        content = await app.vault.read(file);
+    } catch (err) {
+        if (err?.code !== "ENOENT") throw err;
+        skipped.push({
+            path,
+            name: file.basename,
+            group: "需重新掃描",
+            status: "路徑已不存在",
+            reasons: "檔案可能已在 Obsidian 外改名或移動"
+        });
+        continue;
+    }
     const result = reviewBio(content);
 
     if (result.qualified) qualifiedCount++;
@@ -117,7 +132,7 @@ for (const file of files) {
     if (!result.qualified || result.changed) {
         scanned.push({
             file,
-            path: file.path,
+            path,
             name: file.basename,
             ...result,
             originalContent: content
@@ -152,7 +167,7 @@ if (mode == null) {
 
 let successfulChanges = 0;
 let failedChanges = 0;
-const reportRows = [];
+const reportRows = [...skipped];
 
 for (const entry of scanned) {
     let status;
@@ -164,9 +179,9 @@ for (const entry of scanned) {
     } else {
         try {
             // 避免使用者在選單期間修改檔案後被舊掃描覆蓋
-            const latest = await app.vault.read(entry.file);
-            if (latest !== entry.originalContent) {
-                // originalContent 在下方掃描階段存入；若沒有一致，略過防覆寫
+            const currentFile = app.vault.getAbstractFileByPath(entry.path);
+            const latest = currentFile === entry.file ? await app.vault.read(currentFile) : null;
+            if (latest !== entry.originalContent || currentFile?.path !== entry.path) {
                 status = "⚠ 檔案內容已變動，跳過";
                 failedChanges++;
             } else {
@@ -197,11 +212,11 @@ for (const entry of scanned) {
 const code = [
     "```dataviewjs",
     `const rows = ${JSON.stringify(reportRows)};`,
-    "for (const group of ['待人工確認', '標籤清理']) {",
+    "for (const group of ['待人工確認', '標籤清理', '需重新掃描']) {",
     "  const selected = rows.filter(x => x.group === group);",
     "  dv.header(3, `${group}（${selected.length}）`);",
     "  if (!selected.length) { dv.paragraph('無'); continue; }",
-    "  dv.list(selected.map(x => dv.fileLink(x.path, false, `${x.name}｜${x.status}${x.reasons ? '｜' + x.reasons : ''}`)));",
+    "  dv.list(selected.map(x => x.group === '需重新掃描' ? `${x.path}｜${x.reasons}` : dv.fileLink(x.path, false, `${x.name}｜${x.status}${x.reasons ? '｜' + x.reasons : ''}`)));",
     "}",
     "```"
 ].join("\n");
@@ -213,7 +228,8 @@ const report = [
     `> 模式：${mode === "dry" ? "DRY RUN" : "正式修改"}`,
     `> 資料夾：\`${folder}\``,
     "",
-    `- 掃描檔案：${files.length}`,
+    `- 成功掃描：${qualifiedCount + reviewCount}`,
+    `- 路徑失效，需重新掃描：${skipped.length}`,
     `- 通過 Regex 初篩：${qualifiedCount}`,
     `- 待人工確認：${reviewCount}`,
     `- 偵測清單：${reportRows.length}`,
@@ -239,7 +255,7 @@ if (reportFile) {
 await app.workspace.getLeaf(true).openFile(reportFile);
 new Notice(
     `BIO 標籤初篩完成 (${mode.toUpperCase()})\n` +
-    `掃描 ${files.length}｜待確認 ${reviewCount}\n` +
+    `掃描 ${qualifiedCount + reviewCount}｜待確認 ${reviewCount}｜路徑失效 ${skipped.length}\n` +
     `預計修改 ${plannedChanges}｜實際修改 ${successfulChanges}`,
     10000
 );

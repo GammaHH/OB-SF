@@ -4,6 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const vanilla = require("../../BIO相關模組/MC解析器模塊");
+const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
 
 function registry(entries) {
     return new Map(entries);
@@ -47,6 +48,20 @@ test("BIO name resolver supports both item and block translation keys", () => {
         vanilla.bio.resolveTranslatedName("minecraft:piston", translations),
         "活塞"
     );
+});
+
+test("smithing template translations use the specific new name with a base-key fallback", () => {
+    const translations = {
+        "item.minecraft.coast_armor_trim_smithing_template": "鍛造模板",
+        "item.minecraft.coast_armor_trim_smithing_template.new": "海岸盔甲紋樣",
+        "item.minecraft.sentry_armor_trim_smithing_template": "鍛造模板",
+        "item.minecraft.stick": "木棒",
+        "item.minecraft.stick.new": "別名"
+    };
+    const model = vanilla.bio.createBIOGenerationModel("minecraft:coast_armor_trim_smithing_template", { translations });
+    assert.equal(model.filename, "海岸盔甲紋樣.preview.md");
+    assert.equal(vanilla.bio.resolveTranslatedName("minecraft:sentry_armor_trim_smithing_template", translations), "鍛造模板");
+    assert.equal(vanilla.bio.resolveTranslatedName("minecraft:stick", translations), "木棒");
 });
 
 test("BIO preview preserves tag identity, ingredient qty, and recipe output", () => {
@@ -505,7 +520,7 @@ test("the preferred route and its heading come first while every parsed route re
     assert.equal((markdown.match(/Machine::/g) ?? []).length, 3);
 });
 
-test("oak planks link to the reviewed log when the oak_logs Tag BIO is unavailable", () => {
+test("oak planks list the reviewed log first when the oak_logs Tag BIO is unavailable", () => {
     const itemId = "minecraft:oak_planks";
     const model = vanilla.bio.createBIOGenerationModel(itemId, {
         itemRegistry: registry([[itemId, { recipes: [recipe({
@@ -527,7 +542,7 @@ test("oak planks link to the reviewed log when the oak_logs Tag BIO is unavailab
             generate: false
         }]])
     });
-    assert.match(markdown, /\[item:: \[\[preview\/橡木原木\.preview\|任意橡木原木\]\]\] \(qty:: 1\)/);
+    assert.match(markdown, /擇一材料\*\* \(qty:: 1\)\n\t\t- \[item:: \[\[preview\/橡木原木\.preview\|橡木原木\]\]\]/);
     assert.match(markdown, /\[output:: 4\]/);
     assert.equal(model.recipes[0].ingredients[0].kind, "tag");
 
@@ -603,16 +618,16 @@ test("disabled Tag generation preserves choices and resolves only actual uniquel
     assert.equal(disabled.generate, false);
     const preview = vanilla.bio.renderBIOPreview(model, previewOptions);
     assert.equal((preview.match(/Machine::/g) || []).length, 1, "other two-member Tags must not be expanded by the soul-fire allowlist");
-    const choices = JSON.parse(preview.match(/<!-- obsf:choices (.+) -->/)[1]);
-    assert.deepEqual(choices.choices.map(choice => choice.label), ["靈魂砂", "靈魂土"]);
-    assert.equal(choices.defaultName, previewRoot + "/靈魂砂.preview");
+    const choices = reader.parseBIO(preview).recipes[0].ingredients[0].choices;
+    assert.deepEqual(choices.map(choice => choice.label), ["靈魂砂", "靈魂土"]);
+    assert.equal(choices[0].name, previewRoot + "/靈魂砂.preview");
     assert.match(preview, /木棒\.preview\|木棒\]\]\] \(qty:: 3\)/);
 
     // A configured filename or an ordinary same-name item is not a Tag identity.
     const configuredOnly = new Map([[tagId, { ...tagMappings.get(tagId), filename: "任意靈魂營火基材.md" }]]);
     const plainItem = { name: "任意靈魂營火基材", path: "MC-物品資料庫/任意靈魂營火基材.md", normalizedId: "minecraft:soul_sand" };
     const unbuilt = vanilla.bio.renderBIOPreview(model, { translations, tagMappings: configuredOnly, bioRegistry: { entries: [plainItem] } });
-    assert.match(unbuilt, /obsf:choices/);
+    assert.match(unbuilt, /擇一材料/);
     assert.doesNotMatch(unbuilt, /\[\[MC-物品資料庫\/任意靈魂營火基材/);
 
     // Formal links use the stored path, even when filename is blank or the BIO was renamed.
@@ -625,7 +640,7 @@ test("disabled Tag generation preserves choices and resolves only actual uniquel
 
     const conflicting = vanilla.bio.renderBIOPreview(model, { translations, tagMappings,
         bioRegistry: { entries: [formalTag, { ...formalTag, path: "其他/靈魂營火材料.md" }] } });
-    assert.match(conflicting, /obsf:choices/, "ambiguous formal Tag identities must retain exact inline choices");
+    assert.match(conflicting, /擇一材料/, "ambiguous formal Tag identities must retain exact inline choices");
     const generated = vanilla.bio.renderBIOPreview(model, { ...previewOptions, bioRegistry: { entries: [formalTag] },
         tagPreviewTargets: new Map([[tagId, previewRoot + "/任意靈魂營火基材.preview"]]) });
     assert.match(generated, /任意靈魂營火基材\.preview\|任意靈魂營火基材/);
@@ -685,8 +700,8 @@ test("global color groups use full registry membership while keeping each route'
     assert.equal(group.diagnostics.some(entry => entry.severity === "ERROR"), false);
     assert.equal(group.representativeItemId, "minecraft:white_wool");
     const markdown = vanilla.bio.renderBIOPreview(model, { alternativeGroupMappings: groupMappings });
-    const choices = JSON.parse(markdown.match(/<!-- obsf:choices (.+) -->/)[1]);
-    assert.deepEqual(choices.choices.map(choice => choice.name).sort(), ["blue wool", "brown wool"]);
+    const choices = reader.parseBIO(markdown).recipes[0].ingredients.find(ingredient => ingredient.choices).choices;
+    assert.deepEqual(choices.map(choice => choice.name).sort(), ["blue wool", "brown wool"]);
     assert.equal(model.recipes[0].ingredients[0].alternatives.some(choice => choice.id === "minecraft:white_wool"), false);
     const invalid = vanilla.bio.createDerivedGroupBIOGenerationModel(groups[0].groupId, groups[0].values, {
         groupMappings: new Map([[groups[0].groupId, { generate: true, zhName: "任意羊毛", representativeItemId: "minecraft:iron_ingot" }]])
@@ -711,12 +726,11 @@ test("white wool recoloring retains its exact inline list when a formal index la
         bioRegistry: { entries: [{ derived_group: "obsf:color_family/wool", tag_identity: "obsf:derived_ingredient_group",
             name: "任意羊毛", path: "MC-物品資料庫/任意羊毛.md" }] }
     });
-    const choices = JSON.parse(markdown.match(/<!-- obsf:choices (.+) -->/)[1]);
-    assert.equal(choices.choices.length, 15);
-    assert.deepEqual(choices.choices.map(choice => choice.name).sort(), allowed.map(id => id.slice(10).replaceAll("_", " ")).sort());
-    assert.equal(choices.choices.some(choice => choice.name === "white wool"), false);
-    assert.ok(markdown.includes(`[[${choices.choices[0].name}|任意羊毛]]`),
-        "an excluded Mapping representative falls back to the first legal candidate");
+    const choices = reader.parseBIO(markdown).recipes[0].ingredients.find(ingredient => ingredient.choices).choices;
+    assert.equal(choices.length, 15);
+    assert.deepEqual(choices.map(choice => choice.name).sort(), allowed.map(id => id.slice(10).replaceAll("_", " ")).sort());
+    assert.equal(choices.some(choice => choice.name === "white wool"), false);
+    assert.equal(choices[0].name, "orange wool");
     assert.doesNotMatch(markdown, /<!-- except self -->/);
     assert.doesNotMatch(markdown, /\[\[MC-物品資料庫\/任意羊毛/, "a sixteen-color index must not replace a constrained recipe ingredient");
 });
@@ -771,7 +785,7 @@ test("except-self requires an exact complete set and equal positive quantities",
         const fixture = recoloringFixture("wool", "white"); alter(fixture);
         const markdown = vanilla.bio.renderBIOPreview(fixture.model, fixture.options);
         assert.doesNotMatch(markdown, /<!-- except self -->/);
-        assert.match(markdown, /obsf:choices/, "unproved or non-equivalent groups keep precise inline choices");
+        assert.match(markdown, /擇一材料/, "unproved or non-equivalent groups keep precise inline choices");
     }
     const fixture = recoloringFixture("wool", "white", 2, 3);
     const compact = vanilla.bio.renderBIOPreview(fixture.model, fixture.options);
@@ -822,7 +836,7 @@ test("a native wool Tag reuses one verified full derived group without generatin
     assert.doesNotMatch(formal, /obsf:choices|\/preview\/|\.preview/);
     assert.match(vanilla.bio.renderBIOPreview(model, { ...fixture.options, tagMappings,
         bioRegistry: { entries: [formalEntry, { ...formalEntry, path: "其他/任意羊毛.md" }] }
-    }), /obsf:choices/, "duplicate formal collection identities are not a unique reusable target");
+    }), /擇一材料/, "duplicate formal collection identities are not a unique reusable target");
     const previewWithFormal = vanilla.bio.renderBIOPreview(model, { ...options, bioRegistry: { entries: [formalEntry] } });
     assert.match(previewWithFormal, /\/preview\/batch\/test\/任意羊毛\.preview/);
     assert.doesNotMatch(previewWithFormal, /MC-物品資料庫\//);
@@ -830,16 +844,16 @@ test("a native wool Tag reuses one verified full derived group without generatin
     const subset = { ...model, recipes: model.recipes.map(route => ({ ...route,
         ingredients: route.ingredients.map(ingredient => ingredient.kind === "tag" ? { ...ingredient, values: fixture.values.slice(0, 14) } : ingredient)
     })) };
-    assert.match(vanilla.bio.renderBIOPreview(subset, options), /obsf:choices/);
-    assert.match(vanilla.bio.renderBIOPreview(model, { ...options, availableAlternativeGroups: new Set() }), /obsf:choices/);
-    assert.match(vanilla.bio.renderBIOPreview(model, { ...fixture.options, tagMappings }), /obsf:choices/,
+    assert.match(vanilla.bio.renderBIOPreview(subset, options), /擇一材料/);
+    assert.match(vanilla.bio.renderBIOPreview(model, { ...options, availableAlternativeGroups: new Set() }), /擇一材料/);
+    assert.match(vanilla.bio.renderBIOPreview(model, { ...fixture.options, tagMappings }), /擇一材料/,
         "verified values alone cannot substitute for an actual preview or formal group target");
     const otherGroup = "obsf:color_family/another_wool";
     assert.match(vanilla.bio.renderBIOPreview(model, { ...options,
         alternativeGroupValues: new Map([[fixture.groupId, fixture.values], [otherGroup, fixture.values]]),
         availableAlternativeGroups: new Set([fixture.groupId, otherGroup]),
         groupPreviewTargets: new Map([[fixture.groupId, previewTarget], [otherGroup, "preview/另一個任意羊毛.preview"]])
-    }), /obsf:choices/, "two equally matching collections must not be chosen arbitrarily");
+    }), /擇一材料/, "two equally matching collections must not be chosen arbitrarily");
 });
 
 test("stone tools render three complete material routes with unchanged quantities and one preferred", () => {
@@ -870,7 +884,7 @@ test("stone tools render three complete material routes with unchanged quantitie
         assert.equal(JSON.stringify(model), original);
         const incomplete = JSON.parse(original);
         incomplete.recipes[0].ingredients[0].values.pop();
-        assert.match(vanilla.bio.renderBIOPreview(incomplete), /obsf:choices/,
+        assert.match(vanilla.bio.renderBIOPreview(incomplete), /擇一材料/,
             "changed membership must fall back instead of inventing an explicit route");
     }
 });
@@ -926,21 +940,21 @@ test("native Tag alias reuse rejects subsets, missing proof or targets, and conf
     const subset = { ...fixture.model, recipes: fixture.model.recipes.map(route => ({ ...route,
         ingredients: route.ingredients.map(ingredient => ingredient.kind === "tag" ? { ...ingredient, values: fixture.values.slice(0, 11) } : ingredient)
     })) };
-    assert.match(vanilla.bio.renderBIOPreview(subset, fixture.options), /obsf:choices/);
+    assert.match(vanilla.bio.renderBIOPreview(subset, fixture.options), /擇一材料/);
     for (const options of [
         { ...fixture.options, availableNativeTags: new Set() },
         { ...fixture.options, nativeTagValues: new Map() },
         { ...fixture.options, tagPreviewTargets: new Map() }
-    ]) assert.match(vanilla.bio.renderBIOPreview(fixture.model, options), /obsf:choices/);
+    ]) assert.match(vanilla.bio.renderBIOPreview(fixture.model, options), /擇一材料/);
     const formal = { tag_identity: "minecraft:item_tag", minecraft_tag: fixture.targetTag,
         path: "MC-物品資料庫/任意木材.md", name: "任意木材" };
     assert.match(vanilla.bio.renderBIOPreview(fixture.model, { ...fixture.options, tagPreviewTargets: undefined,
         bioRegistry: { entries: [formal, { ...formal, path: "其他/任意木材.md" }] }
-    }), /obsf:choices/);
+    }), /擇一材料/);
     const groupId = "obsf:equivalent_planks";
     const competing = { ...fixture.options, alternativeGroupValues: new Map([[groupId, fixture.values]]),
         availableAlternativeGroups: new Set([groupId]), groupPreviewTargets: new Map([[groupId, "preview/另一份任意木材.preview"]]) };
-    assert.match(vanilla.bio.renderBIOPreview(fixture.model, competing), /obsf:choices/);
+    assert.match(vanilla.bio.renderBIOPreview(fixture.model, competing), /擇一材料/);
     assert.doesNotMatch(vanilla.bio.renderBIOPreview(fixture.model, { ...competing,
         groupPreviewTargets: new Map([[groupId, fixture.target]]) }), /obsf:choices/,
     "different identities pointing to the same verified physical target must not create false ambiguity");
@@ -963,7 +977,7 @@ test("native own preview and verified own formal BIOs take precedence over equiv
     assert.match(validAlias, /\[\[MC-物品資料庫\/任意木材\|任意木材\]\]/,
         "an unverified own formal stub must not override a verified complete equivalent Tag");
     const rejected = vanilla.bio.renderBIOPreview(fixture.model, { ...formalOptions, availableNativeTags: new Set() });
-    assert.match(rejected, /obsf:choices/);
+    assert.match(rejected, /擇一材料/);
     assert.doesNotMatch(rejected, /\[\[MC-物品資料庫\//);
 });
 
@@ -1003,12 +1017,12 @@ test("formal native Tag reuse requires actual complete membership and rejects id
             assert.equal(proof.diagnostics[0].code, "FORMAL_TAG_MEMBERSHIP_UNCONFIRMED");
             const fallback = vanilla.bio.renderBIOPreview(fixture.model, { ...fixture.options,
                 availableNativeTags: proof.available, tagPreviewTargets: undefined, bioRegistry: { entries: [entry, ...items] } });
-            assert.match(fallback, /obsf:choices/);
+            assert.match(fallback, /擇一材料/);
             const ownModel = { ...fixture.model, recipes: fixture.model.recipes.map(route => ({ ...route,
                 ingredients: route.ingredients.map(ingredient => ingredient.kind === "tag" ? { ...ingredient, id: fixture.targetTag } : ingredient)
             })) };
             assert.match(vanilla.bio.renderBIOPreview(ownModel, { ...fixture.options,
-                availableNativeTags: proof.available, tagPreviewTargets: undefined, bioRegistry: { entries: [entry, ...items] } }), /obsf:choices/,
+                availableNativeTags: proof.available, tagPreviewTargets: undefined, bioRegistry: { entries: [entry, ...items] } }), /擇一材料/,
             "strict CLI proof also rejects a direct native reference to the incomplete legacy Tag stub");
         }
     } finally { fs.rmSync(root, { recursive: true, force: true }); }
@@ -1055,7 +1069,8 @@ test("soul campfire renders its two exact base-block alternatives as separate Ma
         })) };
         const fallback = vanilla.bio.renderBIOPreview(uncertain, options);
         assert.equal((fallback.match(/Machine::/g) || []).length, 1);
-        assert.match(fallback, /obsf:choices/);
+        assert.doesNotMatch(fallback, /obsf:choices/);
+        assert.equal(reader.parseBIO(fallback).recipes[0].ingredients[1].choices?.length ?? 1, new Set(values).size);
     }
 });
 
@@ -1093,7 +1108,7 @@ test("formal alternative groups require readable actual membership matching the 
         assert.equal(proof.available.has(fixture.groupId), false);
         assert.equal(proof.diagnostics[0].code, "FORMAL_GROUP_MEMBERSHIP_UNCONFIRMED");
         const fallback = vanilla.bio.renderBIOPreview(fixture.model, { ...fixture.options, availableAlternativeGroups: proof.available });
-        assert.match(fallback, /obsf:choices/);
+        assert.match(fallback, /擇一材料/);
         assert.doesNotMatch(fallback, /<!-- except self -->/);
         assert.equal(verify([group], { entries: [] }, {}).available.size, 0);
         assert.equal(verify([group], { entries: [entry, { ...entry, path: "重複.md" }, ...knownItems] }, {}).available.size, 0);
@@ -1246,12 +1261,13 @@ test("flat alternatives use lossless readable choices without duplicate JSON and
     }
 });
 
-test("gold tool single material becomes an ingot while coals and nuggets retain explicit mutually exclusive item rows", () => {
+test("selected flat native tags fall back to explicit item rows with the representative first", () => {
     const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
     for (const fixture of [
         { owner: "minecraft:golden_spear", tag: "minecraft:gold_tool_materials", values: ["minecraft:gold_ingot"], selected: "minecraft:gold_ingot" },
         { owner: "minecraft:campfire", tag: "minecraft:coals", values: ["minecraft:coal", "minecraft:charcoal"], selected: "minecraft:charcoal" },
-        { owner: "minecraft:name_tag", tag: "minecraft:metal_nuggets", values: ["minecraft:copper_nugget", "minecraft:iron_nugget", "minecraft:gold_nugget"], selected: "minecraft:iron_nugget" }
+        { owner: "minecraft:name_tag", tag: "minecraft:metal_nuggets", values: ["minecraft:copper_nugget", "minecraft:iron_nugget", "minecraft:gold_nugget"], selected: "minecraft:iron_nugget" },
+        { owner: "minecraft:leaf_litter", tag: "minecraft:leaves", values: ["minecraft:jungle_leaves", "minecraft:oak_leaves", "minecraft:spruce_leaves"], selected: "minecraft:oak_leaves" }
     ]) {
         const model = vanilla.bio.createBIOGenerationModel(fixture.owner, { itemRegistry: registry([[fixture.owner, { recipes: [recipe({ ingredients: [
             { kind: "tag", id: fixture.tag, qty: 1, values: fixture.values }
@@ -1268,14 +1284,52 @@ test("gold tool single material becomes an ingot while coals and nuggets retain 
     }
 });
 
-test("complex alternative quantities and nested choices retain exact JSON", () => {
+test("a single-member native Tag without a Tag BIO links directly to its material", () => {
+    const tagId = "minecraft:netherite_tool_materials";
+    const ingot = "minecraft:netherite_ingot";
+    const owner = "minecraft:netherite_spear";
+    const model = vanilla.bio.createBIOGenerationModel(owner, {
+        itemRegistry: registry([[owner, { recipes: [recipe({ ingredients: [
+            { kind: "tag", id: tagId, qty: 2, values: [ingot] }
+        ] })] }]])
+    });
+    const options = {
+        translations: { "item.minecraft.netherite_ingot": "獄髓錠" },
+        itemPreviewTargets: new Map([[ingot, "preview/獄髓錠.preview"]])
+    };
+    const markdown = vanilla.bio.renderBIOPreview(model, options);
+    assert.match(markdown, /\[item:: \[\[preview\/獄髓錠\.preview\|獄髓錠\]\]\] \(qty:: 2\)/);
+    assert.doesNotMatch(markdown, /obsf:choices|擇一材料|#minecraft:netherite_tool_materials/);
+    const linked = vanilla.bio.renderBIOPreview(model, {
+        ...options, tagPreviewTargets: new Map([[tagId, "preview/獄髓工具材料.preview"]])
+    });
+    assert.match(linked, /\[\[preview\/獄髓工具材料\.preview\|#minecraft:netherite_tool_materials\]\]/);
+});
+
+test("nested choices retain exact quantities in Markdown", () => {
     const model = vanilla.bio.createBIOGenerationModel("minecraft:torch", { itemRegistry: registry([["minecraft:torch", { recipes: [recipe({ ingredients: [
-        { kind: "alternatives", qty: 2, alternatives: [{ kind: "item", id: "minecraft:coal", qty: 1 }, { kind: "item", id: "minecraft:charcoal", qty: 3 }] }
+        { kind: "alternatives", qty: 2, alternatives: [{ kind: "item", id: "minecraft:coal", qty: 1 }, { kind: "tag", id: "minecraft:example_charcoal", values: ["minecraft:charcoal"], qty: 3 }] }
     ] })] }]]) });
     const markdown = vanilla.bio.renderBIOPreview(model);
-    assert.match(markdown, /obsf:choices/);
-    const metadata = JSON.parse(markdown.match(/<!-- obsf:choices (.+) -->/)[1]);
-    assert.deepEqual(metadata.choices.map(choice => choice.qty), [1, 3]);
+    assert.doesNotMatch(markdown, /obsf:choices/);
+    const ingredient = reader.parseBIO(markdown).recipes[0].ingredients[0];
+    assert.equal(ingredient.qty, 2);
+    assert.deepEqual(ingredient.choices.map(choice => [choice.name, choice.qty]), [["coal", 1], ["charcoal", 3]]);
+});
+
+test("V4 can select two quantities of the same material independently", () => {
+    const parsed = reader.parseBIO([
+        "### 常規", "- (Machine:: [[工作台]])",
+        "\t- **擇一材料** (qty:: 2)",
+        "\t\t- [item:: [[煤炭]]]", "\t\t- [item:: [[煤炭]]] (qty:: 3)",
+        "\t- [item:: [[木棒]]] (qty:: 1)", "\t- [output:: 4]"
+    ].join("\n"));
+    const choices = new Map();
+    const choose = () => reader.chooseRecipe("test.md", parsed.recipes, new Map(), choices).ingredients;
+    const first = choose()[0];
+    assert.equal(first.qty, 2);
+    choices.set(first.selectionKey, first.choices[1].selectionValue);
+    assert.deepEqual(choose().map(ingredient => [ingredient.name, ingredient.qty]), [["煤炭", 6], ["木棒", 1]]);
 });
 
 test("explicit Base acquisition coexists with every parsed route for formerly ambiguous natural materials", () => {

@@ -10,7 +10,7 @@ const { writeFileWithRetrySync } = require("./lib/file-write-retry.cjs");
 const vanilla = require("../BIO相關模組/MC解析器模塊");
 const { RECIPE_MAPPING_FILE, parseMachineRecipeMappings } = require("../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
 const { mergeBIOPreviewContexts } = require("./lib/bio-preview-batch.cjs");
-const { openBatchRefresh, finishBatchRefresh } = require("./lib/bio-batch-refresh.cjs");
+const { openBatchRefresh, finishBatchRefresh, renameBatchTemplates } = require("./lib/bio-batch-refresh.cjs");
 const { refreshVanillaRecipeBlocks } = require("../BIO相關模組/MC解析器模塊/bio/bio_update");
 const bioReader = require("../BIO相關模組/搜尋介面模塊/bio_reader_v4");
 const { rewriteBIOForPreview } = require("../BIO相關模組/MC解析器模塊/bio/bio_preview");
@@ -416,6 +416,19 @@ function selectedAlternatives(analysis) {
 }
 
 function refreshBatch(rawTargets) {
+    if (hasFlag("rename-smithing-templates")) {
+        if (rawTargets.length || hasFlag("collections")) throw new Error("模板重新命名請單獨執行");
+        const batch = openBatchRefresh(vaultRoot, option("manifest"), []);
+        const translations = loadJSON(path.join(vaultRoot, "參考資料", "Minecraft", "zh_tw.json"));
+        const titles = new Map();
+        for (const { identity } of batch.manifest.entries) {
+            const title = vanilla.bio.smithingTemplateName(identity, translations);
+            if (title) titles.set(identity, vanilla.bio.safeFilename(title, identity));
+        }
+        const result = renameBatchTemplates(batch, titles, hasFlag("write"));
+        process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+        return;
+    }
     if (!rawTargets.length && !hasFlag("collections")) throw new Error("請提供要更新的 Preview 檔名或 --collections");
     const batch = openBatchRefresh(vaultRoot, option("manifest"), rawTargets);
     const shared = loadSharedPlanningContext();
@@ -967,6 +980,7 @@ function usage() {
         + "  node scripts/minecraft-bio-generator.cjs preview minecraft:stick minecraft:soul_campfire --update-existing\n"
         + "  node scripts/minecraft-bio-generator.cjs preview --all\n"
         + "  node scripts/minecraft-bio-generator.cjs refresh-batch [--manifest=<BIO Publication.json>] [--collections] [Preview 檔名 ...] [--write]\n"
+        + "  node scripts/minecraft-bio-generator.cjs refresh-batch --rename-smithing-templates [--manifest=<BIO Publication.json>] [--write]\n"
         + "  node scripts/minecraft-bio-generator.cjs preview minecraft:piston --prepare-publish\n"
         + "  node scripts/minecraft-bio-generator.cjs allow-preferred --manifest=\"MC-自動化BIO/preview/batch/<timestamp>/BIO Publication.json\"\n"
         + "  node scripts/minecraft-bio-generator.cjs scan-publication [--manifest=<BIO Publication.json>]\n"
@@ -984,7 +998,7 @@ try {
         process.stdout.write(JSON.stringify(upgrade(vaultRoot, manifestPath), null, 2) + "\n");
     } else if (command === "refresh-batch") {
         const invalidOptions = process.argv.slice(3).filter(flag => flag.startsWith("--") &&
-            !["--collections", "--write"].includes(flag) && !flag.startsWith("--manifest="));
+            !["--collections", "--rename-smithing-templates", "--write"].includes(flag) && !flag.startsWith("--manifest="));
         if (invalidOptions.length) throw new Error("refresh-batch 未知參數：" + invalidOptions.join("、"));
         refreshBatch(targets);
     } else if (command === "scan-publication") {
