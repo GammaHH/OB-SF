@@ -1,0 +1,25 @@
+{
+  "data_version": 2,
+  "command_timeout": 5,
+  "templates_folder": "模板放置處",
+  "templates_pairs": [],
+  "trigger_on_file_creation_mode": "folder",
+  "only_trigger_for_matching_files": false,
+  "auto_jump_to_cursor": true,
+  "jump_to_cursor_after_file_name": false,
+  "shell_path": "",
+  "user_scripts_folder": "BIO engine",
+  "folder_templates": [],
+  "file_templates": [],
+  "syntax_highlighting": true,
+  "syntax_highlighting_mobile": false,
+  "enabled_templates_hotkeys": [
+    "模板放置處/模板-國考題引用.md",
+    "模板放置處/模板-複製項目框.md",
+    "模板放置處/模板-藥物.md"
+  ],
+  "startup_templates": [],
+  "intellisense_render": "1",
+  "ignore_folders_on_creation": [],
+  "enable_ribbon_icon": true
+}

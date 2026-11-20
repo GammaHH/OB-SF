@@ -1,0 +1,128 @@
+{
+  "strategy": "chinese",
+  "cedictPath": "./cedict_ts.u8",
+  "matchStrategy": "prefix",
+  "fuzzyMatch": true,
+  "minFuzzyMatchScore": 0.5,
+  "matchingWithoutEmoji": true,
+  "treatAccentDiacriticsAsAlphabeticCharacters": false,
+  "treatUnderscoreAsPartOfWord": false,
+  "maxNumberOfSuggestions": 25,
+  "maxNumberOfWordsAsPhrase": 2,
+  "minNumberOfCharactersTriggered": 1,
+  "minNumberOfWordsTriggeredPhrase": 1,
+  "complementAutomatically": true,
+  "delayMilliSeconds": 0,
+  "disableSuggestionsDuringImeOn": false,
+  "disableSuggestionsInMathBlock": false,
+  "disableSuggestionsInCodeBlock": false,
+  "insertSpaceAfterCompletion": false,
+  "firstCharactersDisableSuggestions": "/^",
+  "patternsToSuppressTrigger": [
+    "^~~~.*",
+    "^```.*"
+  ],
+  "phrasePatternsToSuppressTrigger": [],
+  "noAutoFocusUntilCycle": false,
+  "showMatchStrategy": true,
+  "showComplementAutomatically": true,
+  "showIndexingStatus": true,
+  "descriptionOnSuggestion": "Short",
+  "hotkeys": {
+    "select": [
+      {
+        "modifiers": [],
+        "key": "Tab",
+        "hideHotkeyGuide": false
+      },
+      {
+        "modifiers": [],
+        "key": "Space",
+        "hideHotkeyGuide": false
+      }
+    ],
+    "select with custom alias": [],
+    "select with custom alias and add to aliases": [],
+    "select with query alias": [],
+    "up": [
+      {
+        "modifiers": [],
+        "key": "ArrowUp"
+      }
+    ],
+    "down": [
+      {
+        "modifiers": [],
+        "key": "ArrowDown"
+      }
+    ],
+    "select 1st": [],
+    "select 2nd": [],
+    "select 3rd": [],
+    "select 4th": [],
+    "select 5th": [],
+    "select 6th": [],
+    "select 7th": [],
+    "select 8th": [],
+    "select 9th": [],
+    "open": [],
+    "completion": [],
+    "insert as text": []
+  },
+  "propagateEsc": false,
+  "enableCurrentFileComplement": true,
+  "currentFileMinNumberOfCharacters": 0,
+  "onlyComplementEnglishOnCurrentFileComplement": true,
+  "excludeCurrentFileWordPatterns": [],
+  "enableCurrentVaultComplement": true,
+  "currentVaultMinNumberOfCharacters": 5,
+  "includeCurrentVaultPathPrefixPatterns": "",
+  "excludeCurrentVaultPathPrefixPatterns": "",
+  "excludeCurrentVaultPathGlobPatterns": [],
+  "includeCurrentVaultOnlyFilesUnderCurrentDirectory": false,
+  "excludeCurrentVaultWordPatterns": [
+    "\\$(.+?)\\$",
+    "^\\d{1,3}[-−]\\d{1,3}$"
+  ],
+  "enableCustomDictionaryComplement": true,
+  "customDictionaryPaths": "個人辭典放置處/SFDB.md\n個人辭典放置處/regularDB.md\n個人辭典放置處/calloutDB.md",
+  "columnDelimiter": "Pipe",
+  "customDictionaryWordRegexPattern": "",
+  "delimiterToHideSuggestion": "",
+  "delimiterToDivideSuggestionsForDisplayFromInsertion": "=>",
+  "caretLocationSymbolAfterComplement": "$END$",
+  "displayedTextSuffix": " => ...",
+  "enableInternalLinkComplement": true,
+  "suggestInternalLinkWithAlias": true,
+  "preserveFirstLetterCaseOnInternalLink": false,
+  "excludeInternalLinkPathPrefixPatterns": "",
+  "excludeInternalLinkPathGlobPatterns": [],
+  "excludeSelfInternalLink": false,
+  "excludeExistingInActiveFileInternalLinks": false,
+  "excludeUnresolvedInternalLinks": false,
+  "excludeInternalLinksInCode": false,
+  "updateInternalLinksOnSave": true,
+  "insertAliasTransformedFromDisplayedInternalLink": {
+    "enabled": false,
+    "beforeRegExp": "",
+    "after": ""
+  },
+  "frontMatterKeyForExclusionInternalLink": "",
+  "tagsForExclusionInternalLink": [],
+  "enableFrontMatterComplement": true,
+  "frontMatterComplementMatchStrategy": "inherit",
+  "insertCommaAfterFrontMatterCompletion": false,
+  "currentFileMinNumberOfCharactersForTrigger": 0,
+  "currentVaultMinNumberOfCharactersForTrigger": 0,
+  "customDictionaryMinNumberOfCharactersForTrigger": 0,
+  "internalLinkMinNumberOfCharactersForTrigger": 0,
+  "intelligentSuggestionPrioritization": {
+    "enabled": true,
+    "historyFilePath": "",
+    "prettyPrintHistoryFile": false,
+    "maxDaysToKeepHistory": 30,
+    "maxNumberOfHistoryToKeep": 405
+  },
+  "disableOnMobile": true,
+  "showLogAboutPerformanceInConsole": true
+}

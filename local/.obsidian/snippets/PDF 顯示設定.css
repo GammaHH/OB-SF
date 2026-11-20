@@ -1,0 +1,15 @@
+
+
+/* 若主題/外掛會把頁面 margin 也染色，一併統一 */
+.workspace-leaf-content[data-type="pdf"] .pdfViewer .page,
+.internal-embed.pdf-embed .pdfViewer .page {
+  background: hwb(36 43% 0%) !important;
+}
+
+/* （可選）避免濾鏡造成“倒影/灰霧” */
+.theme-dark .workspace-leaf-content[data-type="pdf"] canvas,
+.theme-dark .internal-embed.pdf-embed canvas {
+  mix-blend-mode: normal !important;
+  isolation: isolate !important;
+}
+

@@ -1,0 +1,20 @@
+{
+  "accentColor": "#6432ff",
+  "cssTheme": "Prism",
+  "enabledCssSnippets": [
+    "media-grid-snippet",
+    "Dividing-line",
+    "Table-line",
+    "PDF",
+    "PDF 顯示設定",
+    "反白高亮 - 複製",
+    "反白高亮"
+  ],
+  "theme": "obsidian",
+  "interfaceFontFamily": "",
+  "baseFontSize": 24,
+  "textFontFamily": "隨峰體,標楷體",
+  "monospaceFontFamily": "隨峰體,標楷體",
+  "baseFontSizeAction": true,
+  "showRibbon": true
+}

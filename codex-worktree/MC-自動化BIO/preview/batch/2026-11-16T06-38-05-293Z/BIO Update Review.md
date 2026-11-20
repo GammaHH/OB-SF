@@ -1,0 +1,1335 @@
+# BIO 更新審核
+
+> updates 是保留原內容並連結本批 BIO 的測試預覽；正式套用只讀取 formal-candidates。不寫回正式 BIO。REVIEW 項目需人工確認。
+
+- NEW：minecraft:acacia_log
+- NEW：minecraft:acacia_planks
+- NEW：minecraft:acacia_boat
+- NEW：minecraft:acacia_button
+- REVIEW：minecraft:oak_log（MC-物品資料庫/橡木原木.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/橡木原木.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/橡木原木.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_UNPARSED：原 BIO 部分設備配方未完整解析；保留原文
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_UNPARSED：原 BIO 部分設備配方未完整解析；保留原文
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:oak_planks
+- REVIEW：minecraft:chest（MC-物品資料庫/儲物箱.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/儲物箱.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/儲物箱.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"任意木材","label":"任意木材","type":"item","qty":8}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:acacia_chest_boat
+- NEW：minecraft:acacia_door
+- REVIEW：minecraft:stick（MC-物品資料庫/木棒.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/木棒.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/木棒.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"任意木材","label":"任意木材","type":"item","qty":2}],"output":4,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:acacia_fence
+- NEW：minecraft:acacia_fence_gate
+- NEW：minecraft:raw_iron
+- ADDITIVE_UPDATE：minecraft:iron_ingot（MC-物品資料庫/鐵錠.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵錠.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/鐵錠.formal-candidate|開啟 formal-candidate]]
+  - OTHER_SOURCE_PRESERVED（Slimefun 原版）：其他科技提供的路線已保留，不要求出現在 Vanilla JSON 中；設備 BIO：SF-基礎機器(原版)/冶煉爐.md
+- NEW：minecraft:iron_nugget
+- NEW：minecraft:iron_chain
+- NEW：minecraft:stripped_acacia_log
+- NEW：minecraft:acacia_hanging_sign
+- NEW：minecraft:acacia_pressure_plate
+- NEW：minecraft:acacia_shelf
+- NEW：minecraft:acacia_sign
+- NEW：minecraft:acacia_slab
+- NEW：minecraft:acacia_stairs
+- NEW：minecraft:acacia_trapdoor
+- NEW：minecraft:acacia_wood
+- ADDITIVE_UPDATE：minecraft:redstone（MC-物品資料庫/紅石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/紅石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/紅石.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:redstone_torch
+- NEW：minecraft:activator_rail
+- NEW：minecraft:amethyst_shard
+- NEW：minecraft:amethyst_block
+- ADDITIVE_UPDATE：minecraft:cobblestone（MC-物品資料庫/鵝卵石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鵝卵石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/鵝卵石.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:quartz
+- NEW：minecraft:diorite
+- NEW：minecraft:andesite
+- NEW：minecraft:andesite_slab
+- NEW：minecraft:andesite_stairs
+- NEW：minecraft:andesite_wall
+- ADDITIVE_UPDATE：minecraft:iron_block（MC-物品資料庫/鐵磚.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵磚.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/鐵磚.formal-candidate|開啟 formal-candidate]]
+- ADDITIVE_UPDATE：minecraft:anvil（MC-物品資料庫/鐵砧.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵砧.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/鐵砧.formal-candidate|開啟 formal-candidate]]
+- ADDITIVE_UPDATE：minecraft:stone（MC-物品資料庫/石頭.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/石頭.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/石頭.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:smooth_stone
+- NEW：minecraft:smooth_stone_slab
+- NEW：minecraft:armor_stand
+- NEW：minecraft:flint
+- NEW：minecraft:feather
+- NEW：minecraft:arrow
+- NEW：minecraft:potato
+- NEW：minecraft:baked_potato
+- NEW：minecraft:bamboo
+- NEW：minecraft:bamboo_block
+- NEW：minecraft:bamboo_planks
+- NEW：minecraft:bamboo_button
+- NEW：minecraft:bamboo_raft
+- NEW：minecraft:bamboo_chest_raft
+- NEW：minecraft:bamboo_door
+- NEW：minecraft:bamboo_fence
+- NEW：minecraft:bamboo_fence_gate
+- NEW：minecraft:stripped_bamboo_block
+- NEW：minecraft:bamboo_hanging_sign
+- NEW：minecraft:bamboo_slab
+- NEW：minecraft:bamboo_mosaic
+- NEW：minecraft:bamboo_mosaic_slab
+- NEW：minecraft:bamboo_mosaic_stairs
+- NEW：minecraft:bamboo_pressure_plate
+- NEW：minecraft:bamboo_shelf
+- NEW：minecraft:bamboo_sign
+- NEW：minecraft:bamboo_stairs
+- NEW：minecraft:bamboo_trapdoor
+- NEW：minecraft:oak_slab
+- NEW：minecraft:barrel
+- REVIEW：minecraft:sand（MC-物品資料庫/沙.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/沙.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/沙.formal-candidate|開啟 formal-candidate]]
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - OTHER_SOURCE_PRESERVED（Slimefun 原版）：其他科技提供的路線已保留，不要求出現在 Vanilla JSON 中；設備 BIO：SF-基礎機器(原版)/礦物粉碎機.md
+  - OTHER_SOURCE_PRESERVED（Slimefun 原版）：其他科技提供的路線已保留，不要求出現在 Vanilla JSON 中；設備 BIO：SF-基礎機器(原版)/礦物粉碎機.md
+  - OTHER_SOURCE_PRESERVED（Slimefun 原版）：其他科技提供的路線已保留，不要求出現在 Vanilla JSON 中；設備 BIO：SF-基礎機器(原版)/磨石.md
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- REVIEW：minecraft:glass（MC-物品資料庫/玻璃.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/玻璃.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/玻璃.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"熔爐","ingredients":[{"name":"沙","label":"沙","type":"item","qty":1}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:nether_star
+- ADDITIVE_UPDATE：minecraft:obsidian（MC-物品資料庫/黑曜石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/黑曜石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/黑曜石.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:beacon
+- NEW：minecraft:honeycomb
+- NEW：minecraft:beehive
+- REVIEW：minecraft:bowl（MC-物品資料庫/碗.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/碗.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/碗.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"任意木材","label":"任意木材","type":"item","qty":3}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:beetroot
+- NEW：minecraft:beetroot_soup
+- NEW：minecraft:birch_log
+- NEW：minecraft:birch_planks
+- NEW：minecraft:birch_boat
+- NEW：minecraft:birch_button
+- NEW：minecraft:birch_chest_boat
+- NEW：minecraft:birch_door
+- NEW：minecraft:birch_fence
+- NEW：minecraft:birch_fence_gate
+- NEW：minecraft:stripped_birch_log
+- NEW：minecraft:birch_hanging_sign
+- NEW：minecraft:birch_pressure_plate
+- NEW：minecraft:birch_shelf
+- NEW：minecraft:birch_sign
+- NEW：minecraft:birch_slab
+- NEW：minecraft:birch_stairs
+- NEW：minecraft:birch_trapdoor
+- NEW：minecraft:birch_wood
+- NEW：minecraft:black_banner
+- NEW：minecraft:ink_sac
+- NEW：minecraft:black_dye
+- NEW：minecraft:string
+- NEW：minecraft:white_wool
+- NEW：minecraft:black_wool
+- NEW：minecraft:black_bed
+- NEW：minecraft:rabbit_hide
+- REVIEW：minecraft:leather（MC-物品資料庫/皮革.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/皮革.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/皮革.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_UNPARSED：原 BIO 部分設備配方未完整解析；保留原文
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_UNPARSED：原 BIO 部分設備配方未完整解析；保留原文
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:bundle
+- NEW：minecraft:black_bundle
+- NEW：minecraft:candle
+- NEW：minecraft:black_candle
+- NEW：minecraft:black_carpet
+- ADDITIVE_UPDATE：minecraft:gravel（MC-物品資料庫/礫石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/礫石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/礫石.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:black_concrete_powder
+- NEW：minecraft:clay_ball
+- NEW：minecraft:clay
+- NEW：minecraft:terracotta
+- NEW：minecraft:black_terracotta
+- NEW：minecraft:black_glazed_terracotta
+- NEW：minecraft:black_harness
+- NEW：minecraft:shulker_shell
+- NEW：minecraft:shulker_box
+- NEW：minecraft:black_shulker_box
+- NEW：minecraft:black_stained_glass
+- REVIEW：minecraft:glass_pane（MC-物品資料庫/玻璃片.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/玻璃片.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/玻璃片.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"玻璃","label":"玻璃","type":"item","qty":6}],"output":1,"notes":[]}`
+  - RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"玻璃","label":"玻璃","type":"item","qty":6}],"output":1,"notes":[]}`
+    - 新來源：`{"machine":"工作台","ingredients":[{"name":"玻璃","label":"玻璃","type":"item","qty":6}],"output":16,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:black_stained_glass_pane
+- NEW：minecraft:blackstone
+- NEW：minecraft:blackstone_slab
+- NEW：minecraft:blackstone_stairs
+- NEW：minecraft:blackstone_wall
+- REVIEW：minecraft:furnace（MC-物品資料庫/熔爐.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/熔爐.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/熔爐.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"鵝卵石","label":"鵝卵石","type":"item","qty":8}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:blast_furnace
+- ADDITIVE_UPDATE：minecraft:blaze_rod（MC-物品資料庫/烈焰桿.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烈焰桿.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/烈焰桿.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:blaze_powder
+- NEW：minecraft:blue_banner
+- NEW：minecraft:lapis_lazuli
+- NEW：minecraft:blue_dye
+- NEW：minecraft:white_bed
+- NEW：minecraft:blue_bed
+- NEW：minecraft:blue_bundle
+- NEW：minecraft:blue_candle
+- NEW：minecraft:white_carpet
+- NEW：minecraft:blue_carpet
+- NEW：minecraft:blue_concrete_powder
+- NEW：minecraft:blue_terracotta
+- NEW：minecraft:blue_glazed_terracotta
+- NEW：minecraft:white_harness
+- NEW：minecraft:blue_harness
+- NEW：minecraft:ice
+- NEW：minecraft:packed_ice
+- NEW：minecraft:blue_ice
+- NEW：minecraft:blue_shulker_box
+- NEW：minecraft:blue_stained_glass
+- NEW：minecraft:blue_stained_glass_pane
+- NEW：minecraft:blue_wool
+- NEW：minecraft:bolt_armor_trim_smithing_template
+- NEW：minecraft:bone
+- NEW：minecraft:bone_meal
+- NEW：minecraft:bone_block
+- ADDITIVE_UPDATE：minecraft:sugar_cane（MC-物品資料庫/甘蔗.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/甘蔗.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/甘蔗.formal-candidate|開啟 formal-candidate]]
+- REVIEW：minecraft:paper（MC-物品資料庫/紙.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/紙.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/紙.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"甘蔗","label":"甘蔗","type":"item","qty":3}],"output":1,"notes":[]}`
+  - RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"甘蔗","label":"甘蔗","type":"item","qty":3}],"output":1,"notes":[]}`
+    - 新來源：`{"machine":"工作台","ingredients":[{"name":"甘蔗","label":"甘蔗","type":"item","qty":3}],"output":3,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- ADDITIVE_UPDATE：minecraft:book（MC-物品資料庫/書.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/書.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/書.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:bookshelf
+- NEW：minecraft:vine
+- NEW：minecraft:bordure_indented_banner_pattern
+- NEW：minecraft:bow
+- NEW：minecraft:wheat
+- NEW：minecraft:bread
+- NEW：minecraft:brewing_stand
+- NEW：minecraft:brick
+- NEW：minecraft:bricks
+- NEW：minecraft:brick_slab
+- NEW：minecraft:brick_stairs
+- NEW：minecraft:brick_wall
+- NEW：minecraft:brown_banner
+- NEW：minecraft:cocoa_beans
+- NEW：minecraft:brown_dye
+- NEW：minecraft:brown_bed
+- NEW：minecraft:brown_bundle
+- NEW：minecraft:brown_candle
+- NEW：minecraft:brown_carpet
+- NEW：minecraft:brown_concrete_powder
+- NEW：minecraft:brown_terracotta
+- NEW：minecraft:brown_glazed_terracotta
+- NEW：minecraft:brown_harness
+- NEW：minecraft:brown_shulker_box
+- NEW：minecraft:brown_stained_glass
+- NEW：minecraft:brown_stained_glass_pane
+- NEW：minecraft:brown_wool
+- NEW：minecraft:raw_copper
+- NEW：minecraft:copper_ingot
+- NEW：minecraft:brush
+- NEW：minecraft:bucket
+- NEW：minecraft:milk_bucket
+- REVIEW：minecraft:sugar（MC-物品資料庫/糖.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/糖.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/糖.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"無/手動","ingredients":[{"name":"甘蔗","label":"甘蔗","type":"item","qty":1}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:egg
+- NEW：minecraft:cake
+- NEW：minecraft:sculk_sensor
+- NEW：minecraft:calibrated_sculk_sensor
+- REVIEW：minecraft:coal（MC-物品資料庫/煤炭.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/煤炭.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/煤炭.formal-candidate|開啟 formal-candidate]]
+  - LINKED_SOURCE_UNRESOLVED：裸引用來源無法唯一確認；保留原文並歸入其他，請人工確認
+  - 預覽 LINKED_SOURCE_UNRESOLVED：裸引用來源無法唯一確認；保留原文並歸入其他，請人工確認
+- REVIEW：minecraft:campfire（MC-物品資料庫/營火.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/營火.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/營火.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"橡木原木","label":"橡木原木","type":"item","qty":3},{"name":"木棒","label":"木棒","type":"item","qty":3},{"name":"煤炭","label":"煤炭","type":"item","qty":1}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:fishing_rod
+- NEW：minecraft:carrot
+- NEW：minecraft:carrot_on_a_stick
+- NEW：minecraft:cartography_table
+- NEW：minecraft:cauldron
+- NEW：minecraft:charcoal
+- NEW：minecraft:cherry_log
+- NEW：minecraft:cherry_planks
+- NEW：minecraft:cherry_boat
+- NEW：minecraft:cherry_button
+- NEW：minecraft:cherry_chest_boat
+- NEW：minecraft:cherry_door
+- NEW：minecraft:cherry_fence
+- NEW：minecraft:cherry_fence_gate
+- NEW：minecraft:stripped_cherry_log
+- NEW：minecraft:cherry_hanging_sign
+- NEW：minecraft:cherry_pressure_plate
+- NEW：minecraft:cherry_shelf
+- NEW：minecraft:cherry_sign
+- NEW：minecraft:cherry_slab
+- NEW：minecraft:cherry_stairs
+- NEW：minecraft:cherry_trapdoor
+- NEW：minecraft:cherry_wood
+- NEW：minecraft:minecart
+- NEW：minecraft:chest_minecart
+- NEW：minecraft:chiseled_bookshelf
+- NEW：minecraft:copper_block
+- NEW：minecraft:cut_copper_slab
+- NEW：minecraft:chiseled_copper
+- NEW：minecraft:cobbled_deepslate
+- NEW：minecraft:chiseled_deepslate
+- ADDITIVE_UPDATE：minecraft:netherrack（MC-物品資料庫/地獄石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/地獄石.formal-candidate|開啟 formal-candidate]]
+- ADDITIVE_UPDATE：minecraft:nether_brick（MC-物品資料庫/地獄磚頭.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚頭.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/地獄磚頭.formal-candidate|開啟 formal-candidate]]
+- REVIEW：minecraft:nether_bricks（MC-物品資料庫/地獄磚.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/地獄磚.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"熔爐","ingredients":[{"name":"地獄磚頭","label":"地獄磚頭","type":"item","qty":1}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:chiseled_nether_bricks
+- NEW：minecraft:chiseled_polished_blackstone
+- NEW：minecraft:quartz_block
+- NEW：minecraft:chiseled_quartz_block
+- NEW：minecraft:red_sand
+- NEW：minecraft:red_sandstone
+- NEW：minecraft:chiseled_red_sandstone
+- NEW：minecraft:resin_clump
+- NEW：minecraft:resin_brick
+- NEW：minecraft:resin_bricks
+- NEW：minecraft:chiseled_resin_bricks
+- NEW：minecraft:sandstone
+- NEW：minecraft:chiseled_sandstone
+- NEW：minecraft:chiseled_stone_bricks
+- NEW：minecraft:tuff
+- NEW：minecraft:chiseled_tuff
+- NEW：minecraft:chiseled_tuff_bricks
+- NEW：minecraft:raw_gold
+- NEW：minecraft:gold_ingot
+- NEW：minecraft:clock
+- NEW：minecraft:coal_block
+- NEW：minecraft:dirt
+- NEW：minecraft:coarse_dirt
+- NEW：minecraft:coast_armor_trim_smithing_template
+- NEW：minecraft:cobbled_deepslate_slab
+- NEW：minecraft:cobbled_deepslate_stairs
+- NEW：minecraft:cobbled_deepslate_wall
+- NEW：minecraft:cobblestone_slab
+- NEW：minecraft:cobblestone_stairs
+- NEW：minecraft:cobblestone_wall
+- NEW：minecraft:comparator
+- NEW：minecraft:compass
+- NEW：minecraft:composter
+- NEW：minecraft:nautilus_shell
+- NEW：minecraft:heart_of_the_sea
+- NEW：minecraft:conduit
+- NEW：minecraft:beef
+- ADDITIVE_UPDATE：minecraft:cooked_beef（MC-物品資料庫/牛排.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/牛排.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/牛排.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:chicken
+- ADDITIVE_UPDATE：minecraft:cooked_chicken（MC-物品資料庫/烤雞.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤雞.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/烤雞.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:cod
+- ADDITIVE_UPDATE：minecraft:cooked_cod（MC-物品資料庫/烤鱈魚.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤鱈魚.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/烤鱈魚.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:mutton
+- ADDITIVE_UPDATE：minecraft:cooked_mutton（MC-物品資料庫/烤羊肉.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤羊肉.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/烤羊肉.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:porkchop
+- ADDITIVE_UPDATE：minecraft:cooked_porkchop（MC-物品資料庫/烤豬肉.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤豬肉.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/烤豬肉.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:rabbit
+- ADDITIVE_UPDATE：minecraft:cooked_rabbit（MC-物品資料庫/烤兔肉.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤兔肉.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/烤兔肉.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:salmon
+- NEW：minecraft:cooked_salmon
+- REVIEW：minecraft:cookie（MC-物品資料庫/餅乾.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/餅乾.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/餅乾.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"小麥","label":"小麥","type":"item","qty":2},{"name":"可可豆","label":"可可豆","type":"item","qty":1}],"output":1,"notes":[]}`
+  - RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"小麥","label":"小麥","type":"item","qty":2},{"name":"可可豆","label":"可可豆","type":"item","qty":1}],"output":1,"notes":[]}`
+    - 新來源：`{"machine":"工作台","ingredients":[{"name":"小麥","label":"小麥","type":"item","qty":2},{"name":"可可豆","label":"可可豆","type":"item","qty":1}],"output":8,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:copper_axe
+- NEW：minecraft:copper_bars
+- NEW：minecraft:copper_boots
+- NEW：minecraft:copper_bulb
+- NEW：minecraft:copper_nugget
+- NEW：minecraft:copper_chain
+- NEW：minecraft:copper_chest
+- NEW：minecraft:copper_chestplate
+- NEW：minecraft:copper_door
+- NEW：minecraft:copper_grate
+- NEW：minecraft:copper_helmet
+- NEW：minecraft:copper_hoe
+- NEW：minecraft:copper_torch
+- NEW：minecraft:copper_lantern
+- NEW：minecraft:copper_leggings
+- NEW：minecraft:copper_pickaxe
+- NEW：minecraft:copper_shovel
+- NEW：minecraft:copper_spear
+- NEW：minecraft:copper_sword
+- NEW：minecraft:copper_trapdoor
+- NEW：minecraft:deepslate_bricks
+- NEW：minecraft:cracked_deepslate_bricks
+- NEW：minecraft:deepslate_tiles
+- NEW：minecraft:cracked_deepslate_tiles
+- NEW：minecraft:cracked_nether_bricks
+- NEW：minecraft:polished_blackstone_bricks
+- NEW：minecraft:cracked_polished_blackstone_bricks
+- NEW：minecraft:stone_bricks
+- NEW：minecraft:cracked_stone_bricks
+- REVIEW：minecraft:crafting_table（MC-物品資料庫/工作台.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/工作台.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/工作台.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"無/手動","ingredients":[{"name":"橡木材","label":"橡木材","type":"item","qty":4}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:dropper
+- NEW：minecraft:crafter
+- NEW：minecraft:pale_oak_log
+- NEW：minecraft:resin_block
+- NEW：minecraft:creaking_heart
+- NEW：minecraft:creeper_head
+- NEW：minecraft:creeper_banner_pattern
+- NEW：minecraft:crimson_stem
+- NEW：minecraft:crimson_planks
+- NEW：minecraft:crimson_button
+- NEW：minecraft:crimson_door
+- NEW：minecraft:crimson_fence
+- NEW：minecraft:crimson_fence_gate
+- NEW：minecraft:stripped_crimson_stem
+- NEW：minecraft:crimson_hanging_sign
+- NEW：minecraft:crimson_hyphae
+- NEW：minecraft:crimson_pressure_plate
+- NEW：minecraft:crimson_shelf
+- NEW：minecraft:crimson_sign
+- NEW：minecraft:crimson_slab
+- NEW：minecraft:crimson_stairs
+- NEW：minecraft:crimson_trapdoor
+- NEW：minecraft:tripwire_hook
+- NEW：minecraft:crossbow
+- NEW：minecraft:cut_copper
+- NEW：minecraft:cut_copper_stairs
+- NEW：minecraft:cut_red_sandstone
+- NEW：minecraft:cut_red_sandstone_slab
+- NEW：minecraft:cut_sandstone
+- NEW：minecraft:cut_sandstone_slab
+- NEW：minecraft:cyan_banner
+- NEW：minecraft:cactus
+- NEW：minecraft:green_dye
+- NEW：minecraft:cyan_dye
+- NEW：minecraft:cyan_bed
+- NEW：minecraft:cyan_bundle
+- NEW：minecraft:cyan_candle
+- NEW：minecraft:cyan_wool
+- NEW：minecraft:cyan_carpet
+- NEW：minecraft:cyan_concrete_powder
+- NEW：minecraft:cyan_terracotta
+- NEW：minecraft:cyan_glazed_terracotta
+- NEW：minecraft:cyan_harness
+- NEW：minecraft:cyan_shulker_box
+- NEW：minecraft:cyan_stained_glass
+- NEW：minecraft:cyan_stained_glass_pane
+- NEW：minecraft:dark_oak_log
+- NEW：minecraft:dark_oak_planks
+- NEW：minecraft:dark_oak_boat
+- NEW：minecraft:dark_oak_button
+- NEW：minecraft:dark_oak_chest_boat
+- NEW：minecraft:dark_oak_door
+- NEW：minecraft:dark_oak_fence
+- NEW：minecraft:dark_oak_fence_gate
+- NEW：minecraft:stripped_dark_oak_log
+- NEW：minecraft:dark_oak_hanging_sign
+- NEW：minecraft:dark_oak_pressure_plate
+- NEW：minecraft:dark_oak_shelf
+- NEW：minecraft:dark_oak_sign
+- NEW：minecraft:dark_oak_slab
+- NEW：minecraft:dark_oak_stairs
+- NEW：minecraft:dark_oak_trapdoor
+- NEW：minecraft:dark_oak_wood
+- NEW：minecraft:prismarine_shard
+- NEW：minecraft:dark_prismarine
+- NEW：minecraft:dark_prismarine_slab
+- NEW：minecraft:dark_prismarine_stairs
+- NEW：minecraft:daylight_detector
+- NEW：minecraft:decorated_pot
+- NEW：minecraft:deepslate
+- NEW：minecraft:deepslate_brick_slab
+- NEW：minecraft:deepslate_brick_stairs
+- NEW：minecraft:deepslate_brick_wall
+- NEW：minecraft:deepslate_tile_slab
+- NEW：minecraft:deepslate_tile_stairs
+- NEW：minecraft:deepslate_tile_wall
+- NEW：minecraft:stone_pressure_plate
+- NEW：minecraft:detector_rail
+- NEW：minecraft:diamond
+- NEW：minecraft:diamond_axe
+- NEW：minecraft:diamond_block
+- NEW：minecraft:diamond_boots
+- NEW：minecraft:diamond_chestplate
+- NEW：minecraft:diamond_helmet
+- NEW：minecraft:diamond_hoe
+- NEW：minecraft:diamond_leggings
+- NEW：minecraft:diamond_pickaxe
+- NEW：minecraft:diamond_shovel
+- NEW：minecraft:diamond_spear
+- NEW：minecraft:diamond_sword
+- NEW：minecraft:diorite_slab
+- NEW：minecraft:diorite_stairs
+- NEW：minecraft:diorite_wall
+- ADDITIVE_UPDATE：minecraft:dispenser（MC-物品資料庫/發射器.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/發射器.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/發射器.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:ghast_tear
+- NEW：minecraft:soul_sand
+- NEW：minecraft:dried_ghast
+- NEW：minecraft:kelp
+- ADDITIVE_UPDATE：minecraft:dried_kelp（MC-物品資料庫/海帶乾.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/海帶乾.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/海帶乾.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:dried_kelp_block
+- NEW：minecraft:pointed_dripstone
+- NEW：minecraft:dripstone_block
+- NEW：minecraft:dune_armor_trim_smithing_template
+- ADDITIVE_UPDATE：minecraft:emerald（MC-物品資料庫/綠寶石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/綠寶石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/綠寶石.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:emerald_block
+- NEW：minecraft:enchanting_table
+- ADDITIVE_UPDATE：minecraft:ender_pearl（MC-物品資料庫/終界珍珠.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/終界珍珠.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/終界珍珠.formal-candidate|開啟 formal-candidate]]
+- ADDITIVE_UPDATE：minecraft:ender_eye（MC-物品資料庫/終界之眼.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/終界之眼.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/終界之眼.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:end_crystal
+- NEW：minecraft:chorus_fruit
+- NEW：minecraft:popped_chorus_fruit
+- NEW：minecraft:end_rod
+- NEW：minecraft:end_stone
+- NEW：minecraft:end_stone_brick_slab
+- NEW：minecraft:end_stone_brick_stairs
+- NEW：minecraft:end_stone_brick_wall
+- NEW：minecraft:end_stone_bricks
+- NEW：minecraft:ender_chest
+- NEW：minecraft:exposed_copper
+- NEW：minecraft:exposed_chiseled_copper
+- NEW：minecraft:exposed_copper_bulb
+- NEW：minecraft:exposed_copper_grate
+- NEW：minecraft:exposed_cut_copper
+- NEW：minecraft:exposed_cut_copper_slab
+- NEW：minecraft:exposed_cut_copper_stairs
+- NEW：minecraft:eye_armor_trim_smithing_template
+- NEW：minecraft:spider_eye
+- NEW：minecraft:brown_mushroom
+- NEW：minecraft:fermented_spider_eye
+- NEW：minecraft:field_masoned_banner_pattern
+- NEW：minecraft:filled_map
+- NEW：minecraft:gunpowder
+- NEW：minecraft:fire_charge
+- NEW：minecraft:firework_rocket
+- NEW：minecraft:fletching_table
+- ADDITIVE_UPDATE：minecraft:flint_and_steel（MC-物品資料庫/打火石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/打火石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/打火石.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:flow_armor_trim_smithing_template
+- NEW：minecraft:oxeye_daisy
+- NEW：minecraft:flower_banner_pattern
+- NEW：minecraft:flower_pot
+- NEW：minecraft:furnace_minecart
+- NEW：minecraft:glass_bottle
+- NEW：minecraft:gold_nugget
+- NEW：minecraft:melon_slice
+- NEW：minecraft:glistering_melon_slice
+- NEW：minecraft:item_frame
+- NEW：minecraft:glow_ink_sac
+- NEW：minecraft:glow_item_frame
+- REVIEW：minecraft:glowstone_dust（MC-物品資料庫/螢石粉.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/螢石粉.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/螢石粉.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_UNPARSED：原 BIO 部分設備配方未完整解析；保留原文
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_UNPARSED：原 BIO 部分設備配方未完整解析；保留原文
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- ADDITIVE_UPDATE：minecraft:glowstone（MC-物品資料庫/螢光石.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/螢光石.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/螢光石.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:gold_block
+- NEW：minecraft:apple
+- NEW：minecraft:golden_apple
+- NEW：minecraft:golden_axe
+- NEW：minecraft:golden_boots
+- NEW：minecraft:golden_carrot
+- NEW：minecraft:golden_chestplate
+- NEW：minecraft:dandelion
+- NEW：minecraft:golden_dandelion
+- NEW：minecraft:golden_helmet
+- NEW：minecraft:golden_hoe
+- NEW：minecraft:golden_leggings
+- NEW：minecraft:golden_pickaxe
+- NEW：minecraft:golden_shovel
+- NEW：minecraft:golden_spear
+- NEW：minecraft:golden_sword
+- NEW：minecraft:granite
+- NEW：minecraft:granite_slab
+- NEW：minecraft:granite_stairs
+- NEW：minecraft:granite_wall
+- NEW：minecraft:gray_banner
+- NEW：minecraft:white_dye
+- NEW：minecraft:gray_dye
+- NEW：minecraft:gray_bed
+- NEW：minecraft:gray_bundle
+- NEW：minecraft:gray_candle
+- NEW：minecraft:gray_wool
+- NEW：minecraft:gray_carpet
+- NEW：minecraft:gray_concrete_powder
+- NEW：minecraft:gray_terracotta
+- NEW：minecraft:gray_glazed_terracotta
+- NEW：minecraft:gray_harness
+- NEW：minecraft:gray_shulker_box
+- NEW：minecraft:gray_stained_glass
+- NEW：minecraft:gray_stained_glass_pane
+- NEW：minecraft:green_banner
+- NEW：minecraft:green_bed
+- NEW：minecraft:green_bundle
+- NEW：minecraft:green_candle
+- NEW：minecraft:green_wool
+- NEW：minecraft:green_carpet
+- NEW：minecraft:green_concrete_powder
+- NEW：minecraft:green_terracotta
+- NEW：minecraft:green_glazed_terracotta
+- NEW：minecraft:green_harness
+- NEW：minecraft:green_shulker_box
+- NEW：minecraft:green_stained_glass
+- NEW：minecraft:green_stained_glass_pane
+- NEW：minecraft:stone_slab
+- NEW：minecraft:grindstone
+- NEW：minecraft:hay_block
+- NEW：minecraft:heavy_weighted_pressure_plate
+- NEW：minecraft:honey_bottle
+- NEW：minecraft:honey_block
+- NEW：minecraft:honeycomb_block
+- ADDITIVE_UPDATE：minecraft:hopper（MC-物品資料庫/漏斗.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/漏斗.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/漏斗.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:hopper_minecart
+- NEW：minecraft:host_armor_trim_smithing_template
+- NEW：minecraft:iron_axe
+- REVIEW：minecraft:iron_bars（MC-物品資料庫/鐵欄杆.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵欄杆.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/鐵欄杆.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"鐵錠","label":"鐵錠","type":"item","qty":6}],"output":1,"notes":[]}`
+  - RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"鐵錠","label":"鐵錠","type":"item","qty":6}],"output":1,"notes":[]}`
+    - 新來源：`{"machine":"工作台","ingredients":[{"name":"鐵錠","label":"鐵錠","type":"item","qty":6}],"output":16,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:iron_boots
+- NEW：minecraft:iron_chestplate
+- NEW：minecraft:iron_door
+- NEW：minecraft:iron_helmet
+- NEW：minecraft:iron_hoe
+- NEW：minecraft:iron_leggings
+- NEW：minecraft:iron_pickaxe
+- NEW：minecraft:iron_shovel
+- NEW：minecraft:iron_spear
+- NEW：minecraft:iron_sword
+- NEW：minecraft:iron_trapdoor
+- NEW：minecraft:carved_pumpkin
+- NEW：minecraft:torch
+- NEW：minecraft:jack_o_lantern
+- NEW：minecraft:jukebox
+- NEW：minecraft:jungle_log
+- NEW：minecraft:jungle_planks
+- NEW：minecraft:jungle_boat
+- NEW：minecraft:jungle_button
+- NEW：minecraft:jungle_chest_boat
+- NEW：minecraft:jungle_door
+- NEW：minecraft:jungle_fence
+- NEW：minecraft:jungle_fence_gate
+- NEW：minecraft:stripped_jungle_log
+- NEW：minecraft:jungle_hanging_sign
+- NEW：minecraft:jungle_pressure_plate
+- NEW：minecraft:jungle_shelf
+- NEW：minecraft:jungle_sign
+- NEW：minecraft:jungle_slab
+- NEW：minecraft:jungle_stairs
+- NEW：minecraft:jungle_trapdoor
+- NEW：minecraft:jungle_wood
+- NEW：minecraft:ladder
+- NEW：minecraft:lantern
+- NEW：minecraft:lapis_block
+- NEW：minecraft:lead
+- NEW：minecraft:oak_leaves
+- NEW：minecraft:leaf_litter
+- NEW：minecraft:leather_boots
+- NEW：minecraft:leather_chestplate
+- NEW：minecraft:leather_helmet
+- NEW：minecraft:leather_horse_armor
+- NEW：minecraft:leather_leggings
+- NEW：minecraft:lectern
+- NEW：minecraft:lever
+- NEW：minecraft:light_blue_banner
+- NEW：minecraft:light_blue_dye
+- NEW：minecraft:light_blue_bed
+- NEW：minecraft:light_blue_bundle
+- NEW：minecraft:light_blue_candle
+- NEW：minecraft:light_blue_wool
+- NEW：minecraft:light_blue_carpet
+- NEW：minecraft:light_blue_concrete_powder
+- NEW：minecraft:light_blue_terracotta
+- NEW：minecraft:light_blue_glazed_terracotta
+- NEW：minecraft:light_blue_harness
+- NEW：minecraft:light_blue_shulker_box
+- NEW：minecraft:light_blue_stained_glass
+- NEW：minecraft:light_blue_stained_glass_pane
+- NEW：minecraft:light_gray_banner
+- NEW：minecraft:light_gray_dye
+- NEW：minecraft:light_gray_bed
+- NEW：minecraft:light_gray_bundle
+- NEW：minecraft:light_gray_candle
+- NEW：minecraft:light_gray_carpet
+- NEW：minecraft:light_gray_concrete_powder
+- NEW：minecraft:light_gray_terracotta
+- NEW：minecraft:light_gray_glazed_terracotta
+- NEW：minecraft:light_gray_harness
+- NEW：minecraft:light_gray_shulker_box
+- NEW：minecraft:light_gray_stained_glass
+- NEW：minecraft:light_gray_stained_glass_pane
+- NEW：minecraft:light_gray_wool
+- NEW：minecraft:light_weighted_pressure_plate
+- NEW：minecraft:lightning_rod
+- NEW：minecraft:lime_banner
+- NEW：minecraft:lime_dye
+- NEW：minecraft:lime_bed
+- NEW：minecraft:lime_bundle
+- NEW：minecraft:lime_candle
+- NEW：minecraft:lime_carpet
+- NEW：minecraft:lime_concrete_powder
+- NEW：minecraft:lime_terracotta
+- NEW：minecraft:lime_glazed_terracotta
+- NEW：minecraft:lime_harness
+- NEW：minecraft:lime_shulker_box
+- NEW：minecraft:lime_stained_glass
+- NEW：minecraft:lime_stained_glass_pane
+- NEW：minecraft:lime_wool
+- NEW：minecraft:lodestone
+- NEW：minecraft:loom
+- NEW：minecraft:heavy_core
+- NEW：minecraft:breeze_rod
+- NEW：minecraft:mace
+- NEW：minecraft:magenta_banner
+- NEW：minecraft:poppy
+- NEW：minecraft:red_dye
+- NEW：minecraft:magenta_dye
+- NEW：minecraft:magenta_bed
+- NEW：minecraft:magenta_bundle
+- NEW：minecraft:magenta_candle
+- NEW：minecraft:magenta_carpet
+- NEW：minecraft:magenta_concrete_powder
+- NEW：minecraft:magenta_terracotta
+- NEW：minecraft:magenta_glazed_terracotta
+- NEW：minecraft:magenta_harness
+- NEW：minecraft:magenta_shulker_box
+- NEW：minecraft:magenta_stained_glass
+- NEW：minecraft:magenta_stained_glass_pane
+- NEW：minecraft:magenta_wool
+- ADDITIVE_UPDATE：minecraft:slime_ball（MC-物品資料庫/史萊姆球.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/史萊姆球.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/史萊姆球.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:magma_cream
+- NEW：minecraft:magma_block
+- NEW：minecraft:mangrove_log
+- NEW：minecraft:mangrove_planks
+- NEW：minecraft:mangrove_boat
+- NEW：minecraft:mangrove_button
+- NEW：minecraft:mangrove_chest_boat
+- NEW：minecraft:mangrove_door
+- NEW：minecraft:mangrove_fence
+- NEW：minecraft:mangrove_fence_gate
+- NEW：minecraft:stripped_mangrove_log
+- NEW：minecraft:mangrove_hanging_sign
+- NEW：minecraft:mangrove_pressure_plate
+- NEW：minecraft:mangrove_shelf
+- NEW：minecraft:mangrove_sign
+- NEW：minecraft:mangrove_slab
+- NEW：minecraft:mangrove_stairs
+- NEW：minecraft:mangrove_trapdoor
+- NEW：minecraft:mangrove_wood
+- NEW：minecraft:map
+- NEW：minecraft:melon
+- NEW：minecraft:melon_seeds
+- NEW：minecraft:enchanted_golden_apple
+- NEW：minecraft:mojang_banner_pattern
+- NEW：minecraft:moss_block
+- NEW：minecraft:moss_carpet
+- NEW：minecraft:mossy_cobblestone
+- NEW：minecraft:mossy_cobblestone_slab
+- NEW：minecraft:mossy_cobblestone_stairs
+- NEW：minecraft:mossy_cobblestone_wall
+- NEW：minecraft:mossy_stone_bricks
+- NEW：minecraft:mossy_stone_brick_slab
+- NEW：minecraft:mossy_stone_brick_stairs
+- NEW：minecraft:mossy_stone_brick_wall
+- NEW：minecraft:mud
+- NEW：minecraft:packed_mud
+- NEW：minecraft:mud_bricks
+- NEW：minecraft:mud_brick_slab
+- NEW：minecraft:mud_brick_stairs
+- NEW：minecraft:mud_brick_wall
+- NEW：minecraft:mangrove_roots
+- NEW：minecraft:muddy_mangrove_roots
+- NEW：minecraft:red_mushroom
+- NEW：minecraft:mushroom_stew
+- NEW：minecraft:disc_fragment_5
+- NEW：minecraft:music_disc_5
+- NEW：minecraft:name_tag
+- REVIEW：minecraft:nether_brick_fence（MC-物品資料庫/地獄磚柵欄.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚柵欄.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/地獄磚柵欄.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"地獄磚","label":"地獄磚","type":"item","qty":4},{"name":"地獄磚頭","label":"地獄磚頭","type":"item","qty":2}],"output":1,"notes":[]}`
+  - RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"地獄磚","label":"地獄磚","type":"item","qty":4},{"name":"地獄磚頭","label":"地獄磚頭","type":"item","qty":2}],"output":1,"notes":[]}`
+    - 新來源：`{"machine":"工作台","ingredients":[{"name":"地獄磚","label":"地獄磚","type":"item","qty":4},{"name":"地獄磚頭","label":"地獄磚頭","type":"item","qty":2}],"output":6,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+  - 預覽 EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+  - 預覽 RECIPE_VALUES_DIFFER：相同設備與材料的數量、產量或 Components 不同，不自動追加衝突配方
+  - 預覽 MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:nether_brick_slab
+- NEW：minecraft:nether_brick_stairs
+- NEW：minecraft:nether_brick_wall
+- ADDITIVE_UPDATE：minecraft:nether_wart（MC-物品資料庫/地獄疙瘩.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄疙瘩.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/地獄疙瘩.formal-candidate|開啟 formal-candidate]]
+- NEW：minecraft:nether_wart_block
+- NEW：minecraft:netherite_upgrade_smithing_template
+- NEW：minecraft:ancient_debris
+- NEW：minecraft:netherite_scrap
+- NEW：minecraft:netherite_ingot
+- NEW：minecraft:netherite_axe
+- NEW：minecraft:netherite_block
+- NEW：minecraft:netherite_boots
+- NEW：minecraft:netherite_chestplate
+- NEW：minecraft:netherite_helmet
+- NEW：minecraft:netherite_hoe
+- NEW：minecraft:diamond_horse_armor
+- NEW：minecraft:netherite_horse_armor
+- NEW：minecraft:netherite_leggings
+- NEW：minecraft:diamond_nautilus_armor
+- NEW：minecraft:netherite_nautilus_armor
+- NEW：minecraft:netherite_pickaxe
+- NEW：minecraft:netherite_shovel
+- NEW：minecraft:netherite_spear
+- NEW：minecraft:netherite_sword
+- NEW：minecraft:note_block
+- NEW：minecraft:oak_boat
+- NEW：minecraft:oak_button
+- NEW：minecraft:oak_chest_boat
+- NEW：minecraft:oak_door
+- NEW：minecraft:oak_fence
+- NEW：minecraft:oak_fence_gate
+- NEW：minecraft:stripped_oak_log
+- NEW：minecraft:oak_hanging_sign
+- NEW：minecraft:oak_pressure_plate
+- NEW：minecraft:oak_shelf
+- NEW：minecraft:oak_sign
+- NEW：minecraft:oak_stairs
+- NEW：minecraft:oak_trapdoor
+- NEW：minecraft:oak_wood
+- NEW：minecraft:observer
+- NEW：minecraft:orange_banner
+- NEW：minecraft:orange_tulip
+- NEW：minecraft:orange_dye
+- NEW：minecraft:orange_wool
+- NEW：minecraft:orange_bed
+- NEW：minecraft:orange_bundle
+- NEW：minecraft:orange_candle
+- NEW：minecraft:orange_carpet
+- NEW：minecraft:orange_concrete_powder
+- NEW：minecraft:orange_terracotta
+- NEW：minecraft:orange_glazed_terracotta
+- NEW：minecraft:orange_harness
+- NEW：minecraft:orange_shulker_box
+- NEW：minecraft:orange_stained_glass
+- NEW：minecraft:orange_stained_glass_pane
+- NEW：minecraft:oxidized_copper
+- NEW：minecraft:oxidized_chiseled_copper
+- NEW：minecraft:oxidized_copper_bulb
+- NEW：minecraft:oxidized_copper_grate
+- NEW：minecraft:oxidized_cut_copper
+- NEW：minecraft:oxidized_cut_copper_slab
+- NEW：minecraft:oxidized_cut_copper_stairs
+- NEW：minecraft:painting
+- NEW：minecraft:pale_moss_block
+- NEW：minecraft:pale_moss_carpet
+- NEW：minecraft:pale_oak_planks
+- NEW：minecraft:pale_oak_boat
+- NEW：minecraft:pale_oak_button
+- NEW：minecraft:pale_oak_chest_boat
+- NEW：minecraft:pale_oak_door
+- NEW：minecraft:pale_oak_fence
+- NEW：minecraft:pale_oak_fence_gate
+- NEW：minecraft:stripped_pale_oak_log
+- NEW：minecraft:pale_oak_hanging_sign
+- NEW：minecraft:pale_oak_pressure_plate
+- NEW：minecraft:pale_oak_shelf
+- NEW：minecraft:pale_oak_sign
+- NEW：minecraft:pale_oak_slab
+- NEW：minecraft:pale_oak_stairs
+- NEW：minecraft:pale_oak_trapdoor
+- NEW：minecraft:pale_oak_wood
+- NEW：minecraft:pink_banner
+- NEW：minecraft:pink_dye
+- NEW：minecraft:pink_bed
+- NEW：minecraft:pink_bundle
+- NEW：minecraft:pink_candle
+- NEW：minecraft:pink_wool
+- NEW：minecraft:pink_carpet
+- NEW：minecraft:pink_concrete_powder
+- NEW：minecraft:pink_terracotta
+- NEW：minecraft:pink_glazed_terracotta
+- NEW：minecraft:pink_harness
+- NEW：minecraft:pink_shulker_box
+- NEW：minecraft:pink_stained_glass
+- NEW：minecraft:pink_stained_glass_pane
+- REVIEW：minecraft:piston（MC-物品資料庫/活塞.md）
+  - 測試預覽：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/活塞.update-preview|開啟 update-preview]]
+  - 正式套用候選：[[MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/formal-candidates/活塞.formal-candidate|開啟 formal-candidate]]
+  - EXISTING_ROUTE_NOT_IN_SOURCE：舊路線未出現在本次來源資料，可能是人工／插件配方；保留並請人工審核
+    - 原內容：`{"machine":"工作台","ingredients":[{"name":"任意木材","label":"任意木材","type":"item","qty":3},{"name":"鵝卵石","label":"鵝卵石","type":"item","qty":4},{"name":"鐵錠","label":"鐵錠","type":"item","qty":1},{"name":"紅石","label":"紅石","type":"item","qty":1}],"output":1,"notes":[]}`
+  - MISSING_MACHINE_MAPPING：Machine 無唯一可用分類；保留原分類
+- NEW：minecraft:polished_andesite
+- NEW：minecraft:polished_andesite_slab
+- NEW：minecraft:polished_andesite_stairs
+- NEW：minecraft:basalt
+- NEW：minecraft:polished_basalt
+- NEW：minecraft:polished_blackstone
+- NEW：minecraft:polished_blackstone_brick_slab
+- NEW：minecraft:polished_blackstone_brick_stairs
+- NEW：minecraft:polished_blackstone_brick_wall
+- NEW：minecraft:polished_blackstone_button
+- NEW：minecraft:polished_blackstone_pressure_plate
+- NEW：minecraft:polished_blackstone_slab
+- NEW：minecraft:polished_blackstone_stairs
+- NEW：minecraft:polished_blackstone_wall
+- NEW：minecraft:polished_deepslate
+- NEW：minecraft:polished_deepslate_slab
+- NEW：minecraft:polished_deepslate_stairs
+- NEW：minecraft:polished_deepslate_wall
+- NEW：minecraft:polished_diorite
+- NEW：minecraft:polished_diorite_slab
+- NEW：minecraft:polished_diorite_stairs
+- NEW：minecraft:polished_granite
+- NEW：minecraft:polished_granite_slab
+- NEW：minecraft:polished_granite_stairs
+- NEW：minecraft:polished_tuff
+- NEW：minecraft:polished_tuff_slab
+- NEW：minecraft:polished_tuff_stairs
+- NEW：minecraft:polished_tuff_wall
+- NEW：minecraft:powered_rail
+- NEW：minecraft:prismarine
+- NEW：minecraft:prismarine_bricks
+- NEW：minecraft:prismarine_brick_slab
+- NEW：minecraft:prismarine_brick_stairs
+- NEW：minecraft:prismarine_slab
+- NEW：minecraft:prismarine_stairs
+- NEW：minecraft:prismarine_wall
+- NEW：minecraft:pumpkin
+- NEW：minecraft:pumpkin_pie
+- NEW：minecraft:pumpkin_seeds
+- NEW：minecraft:purple_banner
+- NEW：minecraft:purple_dye
+- NEW：minecraft:purple_bed
+- NEW：minecraft:purple_bundle
+- NEW：minecraft:purple_candle
+- NEW：minecraft:purple_wool
+- NEW：minecraft:purple_carpet
+- NEW：minecraft:purple_concrete_powder
+- NEW：minecraft:purple_terracotta
+- NEW：minecraft:purple_glazed_terracotta
+- NEW：minecraft:purple_harness
+- NEW：minecraft:purple_shulker_box
+- NEW：minecraft:purple_stained_glass
+- NEW：minecraft:purple_stained_glass_pane
+- NEW：minecraft:purpur_block
+- NEW：minecraft:purpur_pillar
+- NEW：minecraft:purpur_slab
+- NEW：minecraft:purpur_stairs
+- NEW：minecraft:quartz_bricks
+- NEW：minecraft:quartz_pillar
+- NEW：minecraft:quartz_slab
+- NEW：minecraft:quartz_stairs
+- NEW：minecraft:rabbit_stew
+- NEW：minecraft:rail
+- NEW：minecraft:raiser_armor_trim_smithing_template
+- NEW：minecraft:raw_copper_block
+- NEW：minecraft:raw_gold_block
+- NEW：minecraft:raw_iron_block
+- NEW：minecraft:echo_shard
+- NEW：minecraft:recovery_compass
+- NEW：minecraft:red_banner
+- NEW：minecraft:red_bed
+- NEW：minecraft:red_bundle
+- NEW：minecraft:red_candle
+- NEW：minecraft:red_wool
+- NEW：minecraft:red_carpet
+- NEW：minecraft:red_concrete_powder
+- NEW：minecraft:red_terracotta
+- NEW：minecraft:red_glazed_terracotta
+- NEW：minecraft:red_harness
+- NEW：minecraft:red_nether_bricks
+- NEW：minecraft:red_nether_brick_slab
+- NEW：minecraft:red_nether_brick_stairs
+- NEW：minecraft:red_nether_brick_wall
+- NEW：minecraft:red_sandstone_slab
+- NEW：minecraft:red_sandstone_stairs
+- NEW：minecraft:red_sandstone_wall
+- NEW：minecraft:red_shulker_box
+- NEW：minecraft:red_stained_glass
+- NEW：minecraft:red_stained_glass_pane
+- NEW：minecraft:redstone_block
+- NEW：minecraft:redstone_lamp
+- NEW：minecraft:repeater
+- NEW：minecraft:resin_brick_slab
+- NEW：minecraft:resin_brick_stairs
+- NEW：minecraft:resin_brick_wall
+- NEW：minecraft:crying_obsidian
+- NEW：minecraft:respawn_anchor
+- NEW：minecraft:rib_armor_trim_smithing_template
+- NEW：minecraft:saddle
+- NEW：minecraft:sandstone_slab
+- NEW：minecraft:sandstone_stairs
+- NEW：minecraft:sandstone_wall
+- NEW：minecraft:scaffolding
+- NEW：minecraft:prismarine_crystals
+- NEW：minecraft:sea_lantern
+- NEW：minecraft:sentry_armor_trim_smithing_template
+- NEW：minecraft:shaper_armor_trim_smithing_template
+- NEW：minecraft:shears
+- NEW：minecraft:shield
+- NEW：minecraft:silence_armor_trim_smithing_template
+- NEW：minecraft:wither_skeleton_skull
+- NEW：minecraft:skull_banner_pattern
+- NEW：minecraft:slime_block
+- NEW：minecraft:smithing_table
+- NEW：minecraft:smoker
+- NEW：minecraft:smooth_basalt
+- NEW：minecraft:smooth_quartz
+- NEW：minecraft:smooth_quartz_slab
+- NEW：minecraft:smooth_quartz_stairs
+- NEW：minecraft:smooth_red_sandstone
+- NEW：minecraft:smooth_red_sandstone_slab
+- NEW：minecraft:smooth_red_sandstone_stairs
+- NEW：minecraft:smooth_sandstone
+- NEW：minecraft:smooth_sandstone_slab
+- NEW：minecraft:smooth_sandstone_stairs
+- NEW：minecraft:snout_armor_trim_smithing_template
+- NEW：minecraft:snowball
+- NEW：minecraft:snow_block
+- NEW：minecraft:snow
+- NEW：minecraft:soul_campfire
+- NEW：minecraft:soul_torch
+- NEW：minecraft:soul_lantern
+- NEW：minecraft:spectral_arrow
+- NEW：minecraft:spire_armor_trim_smithing_template
+- NEW：minecraft:wet_sponge
+- NEW：minecraft:sponge
+- NEW：minecraft:spruce_log
+- NEW：minecraft:spruce_planks
+- NEW：minecraft:spruce_boat
+- NEW：minecraft:spruce_button
+- NEW：minecraft:spruce_chest_boat
+- NEW：minecraft:spruce_door
+- NEW：minecraft:spruce_fence
+- NEW：minecraft:spruce_fence_gate
+- NEW：minecraft:stripped_spruce_log
+- NEW：minecraft:spruce_hanging_sign
+- NEW：minecraft:spruce_pressure_plate
+- NEW：minecraft:spruce_shelf
+- NEW：minecraft:spruce_sign
+- NEW：minecraft:spruce_slab
+- NEW：minecraft:spruce_stairs
+- NEW：minecraft:spruce_trapdoor
+- NEW：minecraft:spruce_wood
+- NEW：minecraft:spyglass
+- NEW：minecraft:sticky_piston
+- NEW：minecraft:stone_axe
+- NEW：minecraft:stone_brick_slab
+- NEW：minecraft:stone_brick_stairs
+- NEW：minecraft:stone_brick_wall
+- NEW：minecraft:stone_button
+- NEW：minecraft:stone_hoe
+- NEW：minecraft:stone_pickaxe
+- NEW：minecraft:stone_shovel
+- NEW：minecraft:stone_spear
+- NEW：minecraft:stone_stairs
+- NEW：minecraft:stone_sword
+- NEW：minecraft:stonecutter
+- NEW：minecraft:stripped_acacia_wood
+- NEW：minecraft:stripped_birch_wood
+- NEW：minecraft:stripped_cherry_wood
+- NEW：minecraft:stripped_crimson_hyphae
+- NEW：minecraft:stripped_dark_oak_wood
+- NEW：minecraft:stripped_jungle_wood
+- NEW：minecraft:stripped_mangrove_wood
+- NEW：minecraft:stripped_oak_wood
+- NEW：minecraft:stripped_pale_oak_wood
+- NEW：minecraft:stripped_spruce_wood
+- NEW：minecraft:stripped_warped_stem
+- NEW：minecraft:stripped_warped_hyphae
+- NEW：minecraft:suspicious_stew
+- NEW：minecraft:target
+- NEW：minecraft:tide_armor_trim_smithing_template
+- NEW：minecraft:tinted_glass
+- NEW：minecraft:tnt
+- NEW：minecraft:tnt_minecart
+- NEW：minecraft:trapped_chest
+- NEW：minecraft:tuff_brick_slab
+- NEW：minecraft:tuff_brick_stairs
+- NEW：minecraft:tuff_brick_wall
+- NEW：minecraft:tuff_bricks
+- NEW：minecraft:tuff_slab
+- NEW：minecraft:tuff_stairs
+- NEW：minecraft:tuff_wall
+- NEW：minecraft:turtle_scute
+- NEW：minecraft:turtle_helmet
+- NEW：minecraft:vex_armor_trim_smithing_template
+- NEW：minecraft:ward_armor_trim_smithing_template
+- NEW：minecraft:warped_stem
+- NEW：minecraft:warped_planks
+- NEW：minecraft:warped_button
+- NEW：minecraft:warped_door
+- NEW：minecraft:warped_fence
+- NEW：minecraft:warped_fence_gate
+- NEW：minecraft:warped_fungus
+- NEW：minecraft:warped_fungus_on_a_stick
+- NEW：minecraft:warped_hanging_sign
+- NEW：minecraft:warped_hyphae
+- NEW：minecraft:warped_pressure_plate
+- NEW：minecraft:warped_shelf
+- NEW：minecraft:warped_sign
+- NEW：minecraft:warped_slab
+- NEW：minecraft:warped_stairs
+- NEW：minecraft:warped_trapdoor
+- NEW：minecraft:waxed_chiseled_copper
+- NEW：minecraft:waxed_copper_bars
+- NEW：minecraft:waxed_copper_block
+- NEW：minecraft:waxed_copper_bulb
+- NEW：minecraft:waxed_copper_chain
+- NEW：minecraft:waxed_copper_chest
+- NEW：minecraft:waxed_copper_door
+- NEW：minecraft:copper_golem_statue
+- NEW：minecraft:waxed_copper_golem_statue
+- NEW：minecraft:waxed_copper_grate
+- NEW：minecraft:waxed_copper_lantern
+- NEW：minecraft:waxed_copper_trapdoor
+- NEW：minecraft:waxed_cut_copper
+- NEW：minecraft:waxed_cut_copper_slab
+- NEW：minecraft:waxed_cut_copper_stairs
+- NEW：minecraft:waxed_exposed_copper
+- NEW：minecraft:waxed_exposed_chiseled_copper
+- NEW：minecraft:exposed_copper_bars
+- NEW：minecraft:waxed_exposed_copper_bars
+- NEW：minecraft:waxed_exposed_copper_bulb
+- NEW：minecraft:exposed_copper_chain
+- NEW：minecraft:waxed_exposed_copper_chain
+- NEW：minecraft:exposed_copper_chest
+- NEW：minecraft:waxed_exposed_copper_chest
+- NEW：minecraft:exposed_copper_door
+- NEW：minecraft:waxed_exposed_copper_door
+- NEW：minecraft:exposed_copper_golem_statue
+- NEW：minecraft:waxed_exposed_copper_golem_statue
+- NEW：minecraft:waxed_exposed_copper_grate
+- NEW：minecraft:exposed_copper_lantern
+- NEW：minecraft:waxed_exposed_copper_lantern
+- NEW：minecraft:exposed_copper_trapdoor
+- NEW：minecraft:waxed_exposed_copper_trapdoor
+- NEW：minecraft:waxed_exposed_cut_copper
+- NEW：minecraft:waxed_exposed_cut_copper_slab
+- NEW：minecraft:waxed_exposed_cut_copper_stairs
+- NEW：minecraft:exposed_lightning_rod
+- NEW：minecraft:waxed_exposed_lightning_rod
+- NEW：minecraft:waxed_lightning_rod
+- NEW：minecraft:waxed_oxidized_copper
+- NEW：minecraft:waxed_oxidized_chiseled_copper
+- NEW：minecraft:oxidized_copper_bars
+- NEW：minecraft:waxed_oxidized_copper_bars
+- NEW：minecraft:waxed_oxidized_copper_bulb
+- NEW：minecraft:oxidized_copper_chain
+- NEW：minecraft:waxed_oxidized_copper_chain
+- NEW：minecraft:oxidized_copper_chest
+- NEW：minecraft:waxed_oxidized_copper_chest
+- NEW：minecraft:oxidized_copper_door
+- NEW：minecraft:waxed_oxidized_copper_door
+- NEW：minecraft:oxidized_copper_golem_statue
+- NEW：minecraft:waxed_oxidized_copper_golem_statue
+- NEW：minecraft:waxed_oxidized_copper_grate
+- NEW：minecraft:oxidized_copper_lantern
+- NEW：minecraft:waxed_oxidized_copper_lantern
+- NEW：minecraft:oxidized_copper_trapdoor
+- NEW：minecraft:waxed_oxidized_copper_trapdoor
+- NEW：minecraft:waxed_oxidized_cut_copper
+- NEW：minecraft:waxed_oxidized_cut_copper_slab
+- NEW：minecraft:waxed_oxidized_cut_copper_stairs
+- NEW：minecraft:oxidized_lightning_rod
+- NEW：minecraft:waxed_oxidized_lightning_rod
+- NEW：minecraft:weathered_copper
+- NEW：minecraft:waxed_weathered_copper
+- NEW：minecraft:waxed_weathered_chiseled_copper
+- NEW：minecraft:weathered_copper_bars
+- NEW：minecraft:waxed_weathered_copper_bars
+- NEW：minecraft:waxed_weathered_copper_bulb
+- NEW：minecraft:weathered_copper_chain
+- NEW：minecraft:waxed_weathered_copper_chain
+- NEW：minecraft:weathered_copper_chest
+- NEW：minecraft:waxed_weathered_copper_chest
+- NEW：minecraft:weathered_copper_door
+- NEW：minecraft:waxed_weathered_copper_door
+- NEW：minecraft:weathered_copper_golem_statue
+- NEW：minecraft:waxed_weathered_copper_golem_statue
+- NEW：minecraft:waxed_weathered_copper_grate
+- NEW：minecraft:weathered_copper_lantern
+- NEW：minecraft:waxed_weathered_copper_lantern
+- NEW：minecraft:weathered_copper_trapdoor
+- NEW：minecraft:waxed_weathered_copper_trapdoor
+- NEW：minecraft:waxed_weathered_cut_copper
+- NEW：minecraft:waxed_weathered_cut_copper_slab
+- NEW：minecraft:waxed_weathered_cut_copper_stairs
+- NEW：minecraft:weathered_lightning_rod
+- NEW：minecraft:waxed_weathered_lightning_rod
+- NEW：minecraft:wayfinder_armor_trim_smithing_template
+- NEW：minecraft:weathered_chiseled_copper
+- NEW：minecraft:weathered_copper_bulb
+- NEW：minecraft:weathered_copper_grate
+- NEW：minecraft:weathered_cut_copper
+- NEW：minecraft:weathered_cut_copper_slab
+- NEW：minecraft:weathered_cut_copper_stairs
+- NEW：minecraft:white_banner
+- NEW：minecraft:white_bundle
+- NEW：minecraft:white_candle
+- NEW：minecraft:white_concrete_powder
+- NEW：minecraft:white_terracotta
+- NEW：minecraft:white_glazed_terracotta
+- NEW：minecraft:white_shulker_box
+- NEW：minecraft:white_stained_glass
+- NEW：minecraft:white_stained_glass_pane
+- NEW：minecraft:wild_armor_trim_smithing_template
+- NEW：minecraft:wind_charge
+- NEW：minecraft:wolf_armor
+- NEW：minecraft:wooden_axe
+- NEW：minecraft:wooden_hoe
+- NEW：minecraft:wooden_pickaxe
+- NEW：minecraft:wooden_shovel
+- NEW：minecraft:wooden_spear
+- NEW：minecraft:wooden_sword
+- NEW：minecraft:writable_book
+- NEW：minecraft:yellow_banner
+- NEW：minecraft:yellow_dye
+- NEW：minecraft:yellow_wool
+- NEW：minecraft:yellow_bed
+- NEW：minecraft:yellow_bundle
+- NEW：minecraft:yellow_candle
+- NEW：minecraft:yellow_carpet
+- NEW：minecraft:yellow_concrete_powder
+- NEW：minecraft:yellow_terracotta
+- NEW：minecraft:yellow_glazed_terracotta
+- NEW：minecraft:yellow_harness
+- NEW：minecraft:yellow_shulker_box
+- NEW：minecraft:yellow_stained_glass
+- NEW：minecraft:yellow_stained_glass_pane

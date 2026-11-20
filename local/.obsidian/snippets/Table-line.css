@@ -1,0 +1,27 @@
+table {
+  width: 100%;
+  border-collapse: separate; /* 讓邊框不合併，確保漸變效果 */
+  border-spacing: 0; /* 確保沒有邊框間距 */
+  background-color: transparent; /* 讓背景透明 */
+  position: relative;
+}
+
+td, th {
+  padding: 10px;
+  text-align: center;
+  background-color: transparent; /* 讓單元格內部透明 */
+  border: none; /* 移除內建邊框，避免影響漸層 */
+  position: relative; /* 讓 `::before` 相對於單元格定位 */
+}
+
+
+/* 讓表格的最外框擁有完整的漸變效果 */
+table::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 2px solid transparent;
+  border-image-source: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, purple);
+  border-image-slice: 1;
+  pointer-events: none;
+}

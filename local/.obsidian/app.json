@@ -1,0 +1,16 @@
+{
+  "newFileLocation": "current",
+  "promptDelete": false,
+  "strictLineBreaks": false,
+  "showLineNumber": true,
+  "rightToLeft": false,
+  "alwaysUpdateLinks": true,
+  "attachmentFolderPath": "./圖片放置處",
+  "pdfExportSettings": {
+    "includeName": false,
+    "pageSize": "A4",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  }
+}

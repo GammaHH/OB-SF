@@ -1,0 +1,118 @@
+@media print {
+  /* 基本設置(行距、字的顏色、背景) */
+  body {
+    background-color: var(--background-primary) !important;
+    color: var(--text-normal) !important;
+    font-family: var(--font-text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* 需要隱藏一些界面元素 */
+  .workspace-leaf-header,
+  .sidebar {
+    display: none !important;
+  }
+
+  /* 調整標題颜色，使其匹配 Prism 主题 */
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #4aa4c5 !important;
+  }
+
+  h2 {
+    font-size: 20px;
+    color: #34b796 !important;
+  }
+
+  h3 {
+    font-size: 18px;
+    color: #57bc5c !important;
+  }
+
+  h4 {
+    font-size: 16px;
+    color: #caa547 !important;
+  }
+
+  h5 {
+    font-size: 14px;
+    color: #e59252 !important;
+  }
+
+  h6 {
+    font-size: 12px;
+    color: #e189b7 !important;
+  }
+
+  /* 表格 */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: var(--background-primary) !important;
+  }
+
+  th, td {
+    border: 1px solid var(--table-border-color, var(--color-accent-base-dt, #FFD800));
+    padding: 8px;
+    color: var(--text-normal) !important;
+  }
+
+  /* 超連結 */
+  a {
+    color: var(--color-accent-text-dt, #D2FF00) !important;
+    text-decoration: none;
+  }
+  
+  /* 相關註記文本 */
+  em {
+    color: var(--text-italic-color-dt, var(--color-orange-text)) !important;
+  }
+
+  strong {
+    color: var(--text-bold-color-dt, #c19e44) !important;
+  }
+
+  em strong,
+  strong em {
+    color: var(--text-bold-italic-color-dt, #e98d86) !important;
+  }
+
+  /* 高亮 + 粗體 */
+  mark strong, .highlight strong,
+  strong mark, strong .highlight {
+    color: var(--text-highlight-bold-color, #c19e44) !important;
+    font-weight: bold;
+  }
+
+  /* 高亮 + 斜體 */
+  mark em, .highlight em,
+  em mark, em .highlight {
+    color: var(--text-highlight-italic-color, var(--color-orange-text)) !important;
+    font-style: italic;
+  }
+
+  /* 高亮 + 斜體 + 粗體 */
+  mark strong em, mark em strong,
+  .highlight strong em, .highlight em strong,
+  strong em mark, em strong mark {
+    color: var(--text-highlight-bold-italic-color, #e98d86) !important;
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  /* 代碼塊背景 */
+  pre {
+    background-color: var(--background-primary) !important;
+    border-radius: 5px;
+    padding: 8px;
+  }
+
+  code {
+    color: var(--color-mint-text) !important;
+    background-color: var(--background-primary) !important;
+    border-radius: 4px;
+    padding: 2px 4px;
+  }
+}

@@ -1,0 +1,15 @@
+Minecraft BIO Generator Preview:
+- target: minecraft:piston
+- targets: minecraft:piston
+- sourceFingerprint: sha256:3d1de5458af845711aad82e53a2a285b0114f0b65e0d129699940e81954544ec
+- readyForBioGeneration: true
+- generationOrder: 7
+- existingBIO: 5
+- missingBIO: 2
+- usedItemTags: 2
+- generatedTagBIOs: 2
+- derivedGroups: 0
+- generatedDerivedBIOs: 0
+- warnings: 1
+- machineMappingDiagnostics: 0
+- output: no (dry-run)

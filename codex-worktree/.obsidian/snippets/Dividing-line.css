@@ -1,0 +1,61 @@
+.markdown-source-view.mod-cm6 hr,
+.markdown-rendered hr {
+  border: 0;
+  height: 2px; /* 可以增加高度讓效果更明顯 */
+  background-image: linear-gradient(to right, 
+    rgba(240, 240, 240, 0) 0%,     /* 完全透明 */
+    rgba(240, 240, 240, 0.6) 10%,  /* 慢慢變灰 */
+    rgba(240, 240, 240, 1) 15%,    /* 變成實體灰 */
+    rgb(255, 126, 126) 20%,
+    red 25%,
+    orange 30%,
+    yellow 40%,
+    #59d941 50%,
+    green 60%,
+    #00b9ff 70%,
+    cyan 75%,
+    rgb(118, 251, 251) 80%,
+    rgba(240, 240, 240, 1) 85%,    /* 變回灰色 */
+    rgba(240, 240, 240, 0.6) 90%,  /* 慢慢變透明 */
+    rgba(240, 240, 240, 0) 100%    /* 完全透明 */
+  );
+}
+
+
+
+/* 章節記號，穩定置中、不會飄 */
+.markdown-source-view.mod-cm6 hr::after,
+.markdown-rendered hr::after {
+  content: "§ §";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -51%) rotate(90deg); /* 穩定置中＋旋轉 */
+  padding: 0 1rem;
+  background-color: var(--background);
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.markdown-source-view.mod-cm6 hr::before,
+.markdown-rendered hr::before {
+  content: "";
+  display: block;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  margin: -2px 0;
+}
+
+/* 匯出 PDF / 列印時隱藏 */
+@media print {
+  .markdown-source-view.mod-cm6 hr::after,
+  .markdown-rendered hr::after,
+  .markdown-source-view.mod-cm6 hr::before,
+  .markdown-rendered hr::before {
+    display: none !important;
+    content: none !important;
+  }
+}

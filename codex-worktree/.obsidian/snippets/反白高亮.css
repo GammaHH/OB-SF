@@ -1,0 +1,36 @@
+/* === 強制覆蓋 Prism/Style Settings 的文字選取顏色 === */
+/* 想換色只改這一行 */
+:root { --my-selection: hsl(51, 100%, 50%); }
+
+/* 編輯/Live Preview：CodeMirror 6 的選取圖層 */
+.theme-dark .workspace-leaf .cm-editor .cm-selectionLayer .cm-selectionBackground,
+.theme-dark .workspace-leaf .cm-editor.cm-focused .cm-selectionBackground,
+.theme-light .workspace-leaf .cm-editor .cm-selectionLayer .cm-selectionBackground,
+.theme-light .workspace-leaf .cm-editor.cm-focused .cm-selectionBackground {
+  background-color: var(--my-selection) !important;
+  /* 避免與主題混色造成發灰或「倒影」 */
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+}
+
+/* 有些主題還會同時畫在這個類名上，保險再蓋一次 */
+.cm-editor .cm-selectionBackground { 
+  background-color: var(--my-selection) !important; 
+}
+
+/* 閱讀模式才吃原生 ::selection（順便統一） */
+.markdown-rendered ::selection,
+.cm-content ::selection {
+  background-color: var(--my-selection) !important;
+  color: black;
+}
+
+/* 內建 PDF 檢視器（你說這個已經有效；留作一致性） */
+.workspace-leaf-content[data-type="pdf"] ::selection {
+  background-color: var(--my-selection) !important;
+  color: transparent;
+}
+.workspace-leaf-content[data-type="pdf"] canvas {
+  isolation: isolate !important;
+  mix-blend-mode: normal !important;
+}

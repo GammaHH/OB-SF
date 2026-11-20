@@ -1,0 +1,4872 @@
+{
+  "schemaVersion": 1,
+  "status": "BLOCKED",
+  "diagnostics": [
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵原礦.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵原礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵錠.update-preview.md",
+      "sourcePath": "MC-物品資料庫/鐵錠.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鐵錠.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵粒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵粒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮相思木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮相思木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紫水晶碎片.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紫水晶碎片.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鵝卵石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/鵝卵石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鵝卵石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#更新需人工解析",
+      "tags": [
+        "#待補充",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/地獄石英.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/地獄石英.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵磚.update-preview.md",
+      "sourcePath": "MC-物品資料庫/鐵磚.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鐵磚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵砧.update-preview.md",
+      "sourcePath": "MC-物品資料庫/鐵砧.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鐵砧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/石頭.update-preview.md",
+      "sourcePath": "MC-物品資料庫/石頭.md",
+      "affectedPaths": [
+        "MC-物品資料庫/石頭.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/燧石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/燧石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/羽毛.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/羽毛.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/馬鈴薯.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/馬鈴薯.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/竹子.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/竹子.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮竹方塊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮竹方塊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/沙.update-preview.md",
+      "sourcePath": "MC-物品資料庫/沙.md",
+      "affectedPaths": [
+        "MC-物品資料庫/沙.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/地獄之星.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/地獄之星.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/黑曜石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/黑曜石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/黑曜石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#更新需人工解析",
+      "tags": [
+        "#待補充",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蜂巢.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蜂巢.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/碗.update-preview.md",
+      "sourcePath": "MC-物品資料庫/碗.md",
+      "affectedPaths": [
+        "MC-物品資料庫/碗.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/甜菜根.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/甜菜根.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/樺木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/樺木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮樺木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮樺木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/墨囊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/墨囊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/線.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/線.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/兔子皮.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/兔子皮.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/皮革.update-preview.md",
+      "sourcePath": "MC-物品資料庫/皮革.md",
+      "affectedPaths": [
+        "MC-物品資料庫/皮革.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/黑色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/黑色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/黏土球.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/黏土球.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/界伏殼.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/界伏殼.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/黑色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/黑色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/玻璃片.update-preview.md",
+      "sourcePath": "MC-物品資料庫/玻璃片.md",
+      "affectedPaths": [
+        "MC-物品資料庫/玻璃片.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/黑石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/黑石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/熔爐.update-preview.md",
+      "sourcePath": "MC-物品資料庫/熔爐.md",
+      "affectedPaths": [
+        "MC-物品資料庫/熔爐.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查、#更新需人工解析",
+      "tags": [
+        "#未人工檢查",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烈焰桿.update-preview.md",
+      "sourcePath": "MC-物品資料庫/烈焰桿.md",
+      "affectedPaths": [
+        "MC-物品資料庫/烈焰桿.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#更新需人工解析",
+      "tags": [
+        "#待補充",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/青金石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/青金石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/藍色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/藍色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/冰.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/冰.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/藍色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/藍色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#未人工檢查",
+      "tags": [
+        "#待補充",
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/骨頭.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/骨頭.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/甘蔗.update-preview.md",
+      "sourcePath": "MC-物品資料庫/甘蔗.md",
+      "affectedPaths": [
+        "MC-物品資料庫/甘蔗.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#更新需人工解析",
+      "tags": [
+        "#待補充",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/紙.update-preview.md",
+      "sourcePath": "MC-物品資料庫/紙.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紙.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/書.update-preview.md",
+      "sourcePath": "MC-物品資料庫/書.md",
+      "affectedPaths": [
+        "MC-物品資料庫/書.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/藤蔓.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/藤蔓.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/小麥.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/小麥.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/釀造台.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/釀造台.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/可可豆.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/可可豆.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/棕色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/棕色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/棕色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/棕色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅原礦.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅原礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鮮奶桶.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鮮奶桶.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/糖.update-preview.md",
+      "sourcePath": "MC-物品資料庫/糖.md",
+      "affectedPaths": [
+        "MC-物品資料庫/糖.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/雞蛋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/雞蛋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蛋糕.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蛋糕.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/伏聆振測器.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/伏聆振測器.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/營火.update-preview.md",
+      "sourcePath": "MC-物品資料庫/營火.md",
+      "affectedPaths": [
+        "MC-物品資料庫/營火.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查、#更新需人工解析",
+      "tags": [
+        "#未人工檢查",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/胡蘿蔔.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/胡蘿蔔.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/櫻花木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/櫻花木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮櫻花木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮櫻花木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/深板岩碎石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩碎石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚頭.update-preview.md",
+      "sourcePath": "MC-物品資料庫/地獄磚頭.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄磚頭.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚.update-preview.md",
+      "sourcePath": "MC-物品資料庫/地獄磚.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄磚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅沙.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅沙.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/樹脂團.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/樹脂團.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/凝灰岩.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/凝灰岩.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金原礦.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金原礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/泥土.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/泥土.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--COAST_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--COAST_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鸚鵡螺殼.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鸚鵡螺殼.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/海洋之心.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/海洋之心.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/生牛肉.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/生牛肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/牛排.update-preview.md",
+      "sourcePath": "MC-物品資料庫/牛排.md",
+      "affectedPaths": [
+        "MC-物品資料庫/牛排.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/生雞肉.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/生雞肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤雞.update-preview.md",
+      "sourcePath": "MC-物品資料庫/烤雞.md",
+      "affectedPaths": [
+        "MC-物品資料庫/烤雞.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/生鱈魚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/生鱈魚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤鱈魚.update-preview.md",
+      "sourcePath": "MC-物品資料庫/烤鱈魚.md",
+      "affectedPaths": [
+        "MC-物品資料庫/烤鱈魚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/生羊肉.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/生羊肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤羊肉.update-preview.md",
+      "sourcePath": "MC-物品資料庫/烤羊肉.md",
+      "affectedPaths": [
+        "MC-物品資料庫/烤羊肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/生豬肉.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/生豬肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤豬肉.update-preview.md",
+      "sourcePath": "MC-物品資料庫/烤豬肉.md",
+      "affectedPaths": [
+        "MC-物品資料庫/烤豬肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/生兔肉.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/生兔肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烤兔肉.update-preview.md",
+      "sourcePath": "MC-物品資料庫/烤兔肉.md",
+      "affectedPaths": [
+        "MC-物品資料庫/烤兔肉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/生鮭魚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/生鮭魚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/餅乾.update-preview.md",
+      "sourcePath": "MC-物品資料庫/餅乾.md",
+      "affectedPaths": [
+        "MC-物品資料庫/餅乾.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅斧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅斧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅粒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅粒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅鋤.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅鋤.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅火把.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅火把.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅鎬.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅鎬.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅鏟.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅鏟.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅矛.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅矛.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅劍.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅劍.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蒼白橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蒼白橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/苦力怕頭顱.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/苦力怕頭顱.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/緋紅蕈柄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/緋紅蕈柄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮緋紅蕈柄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮緋紅蕈柄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/仙人掌.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/仙人掌.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/青色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/青色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/青色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/青色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/黑橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/黑橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮黑橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮黑橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/海磷碎片.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/海磷碎片.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石斧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石斧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石鋤.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石鋤.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石鎬.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石鎬.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石鏟.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石鏟.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石矛.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石矛.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石劍.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石劍.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/發射器.update-preview.md",
+      "sourcePath": "MC-物品資料庫/發射器.md",
+      "affectedPaths": [
+        "MC-物品資料庫/發射器.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/幽靈之淚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/幽靈之淚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/靈魂砂.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/靈魂砂.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/海帶.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/海帶.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/海帶乾.update-preview.md",
+      "sourcePath": "MC-物品資料庫/海帶乾.md",
+      "affectedPaths": [
+        "MC-物品資料庫/海帶乾.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐘乳石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐘乳石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--DUNE_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--DUNE_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/終界之眼.update-preview.md",
+      "sourcePath": "MC-物品資料庫/終界之眼.md",
+      "affectedPaths": [
+        "MC-物品資料庫/終界之眼.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/歌萊果.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/歌萊果.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/終界石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/終界石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅方塊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅方塊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--EYE_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--EYE_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蜘蛛眼.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蜘蛛眼.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/棕色蘑菇.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/棕色蘑菇.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/火藥.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/火藥.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/火焰彈.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/火焰彈.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/打火石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/打火石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/打火石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--FLOW_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--FLOW_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/雛菊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/雛菊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金粒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金粒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/西瓜片.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/西瓜片.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/螢光墨囊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/螢光墨囊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/螢光石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/螢光石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/螢光石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蘋果.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蘋果.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金斧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金斧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蒲公英.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蒲公英.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金鋤.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金鋤.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金鎬.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金鎬.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金鏟.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金鏟.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金矛.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金矛.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/金劍.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/金劍.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/灰色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/灰色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/灰色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/灰色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/綠色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/綠色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/綠色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/綠色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蜂蜜瓶.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蜂蜜瓶.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/漏斗.update-preview.md",
+      "sourcePath": "MC-物品資料庫/漏斗.md",
+      "affectedPaths": [
+        "MC-物品資料庫/漏斗.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--HOST_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--HOST_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵斧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵斧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵鋤.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵鋤.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵鎬.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵鎬.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵鏟.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵鏟.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵矛.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵矛.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鐵劍.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鐵劍.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/雕刻過的南瓜.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/雕刻過的南瓜.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/火把.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/火把.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/叢林木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/叢林木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮叢林木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮叢林木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/橡木樹葉.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/橡木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/枯葉.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/枯葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/淺藍色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/淺藍色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/淺藍色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/淺藍色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/淺灰色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/淺灰色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/淺灰色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/淺灰色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/淺綠色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/淺綠色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/淺綠色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/淺綠色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/沉重核心.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/沉重核心.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/旋風桿.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/旋風桿.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/罌粟花.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/罌粟花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/洋紅色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/洋紅色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/洋紅色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/洋紅色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/史萊姆球.update-preview.md",
+      "sourcePath": "MC-物品資料庫/史萊姆球.md",
+      "affectedPaths": [
+        "MC-物品資料庫/史萊姆球.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#更新需人工解析",
+      "tags": [
+        "#待補充",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅樹林木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅樹林木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮紅樹林木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮紅樹林木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/附魔金蘋果.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/附魔金蘋果.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/苔蘚方塊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/苔蘚方塊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/泥巴.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/泥巴.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅樹林木根.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅樹林木根.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅色蘑菇.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅色蘑菇.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/唱片碎片.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/唱片碎片.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/命名牌.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/命名牌.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚柵欄.update-preview.md",
+      "sourcePath": "MC-物品資料庫/地獄磚柵欄.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄磚柵欄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#更新需人工解析",
+      "tags": [
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄疙瘩.update-preview.md",
+      "sourcePath": "MC-物品資料庫/地獄疙瘩.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄疙瘩.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#更新需人工解析",
+      "tags": [
+        "#待補充",
+        "#更新需人工解析"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--NETHERITE_UPGRADE_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--NETHERITE_UPGRADE_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/遠古遺骸.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/遠古遺骸.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓斧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓斧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓靴子.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓靴子.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓胸甲.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓胸甲.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓頭盔.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓頭盔.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓鋤.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓鋤.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石製馬鎧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石製馬鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓製馬鎧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓製馬鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓護腿.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓護腿.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鑽石製鸚鵡螺鎧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石製鸚鵡螺鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓製鸚鵡螺鎧.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓製鸚鵡螺鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓鎬.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓鎬.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓鏟.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓鏟.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓矛.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓矛.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/獄髓劍.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/獄髓劍.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/橙色鬱金香.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/橙色鬱金香.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/橙色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/橙色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/橙色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/橙色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅方塊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅方塊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/蒼白苔蘚方塊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/蒼白苔蘚方塊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮蒼白橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮蒼白橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/粉紅色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/粉紅色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/粉紅色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/粉紅色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/玄武岩.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/玄武岩.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/南瓜.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/南瓜.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/南瓜派.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/南瓜派.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紫色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紫色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紫色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紫色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紫珀半磚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紫珀半磚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紫珀階梯.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紫珀階梯.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/石英半磚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/石英半磚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/石英階梯.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/石英階梯.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--RAISER_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--RAISER_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/回聲碎片.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/回聲碎片.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅砂岩半磚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅砂岩半磚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅砂岩階梯.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅砂岩階梯.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/紅色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/紅色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/哭泣的黑曜石.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/哭泣的黑曜石.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--RIB_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--RIB_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/砂岩半磚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/砂岩半磚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/砂岩階梯.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/砂岩階梯.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/海磷晶體.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/海磷晶體.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/凋零骷髏頭顱.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/凋零骷髏頭顱.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/雪球.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/雪球.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/靈魂火把.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/靈魂火把.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/濕海綿.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/濕海綿.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/杉木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/杉木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮杉木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮杉木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/剝皮扭曲蕈柄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/剝皮扭曲蕈柄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/可疑的燉湯.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/可疑的燉湯.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--TIDE_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--TIDE_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/TNT.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/TNT.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/海龜鱗甲.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/海龜鱗甲.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--VEX_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--VEX_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--WARD_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--WARD_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/扭曲蕈柄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/扭曲蕈柄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/扭曲蕈菇.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/扭曲蕈菇.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/銅像.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/銅像.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅柵欄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅柵欄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅鏈.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅鏈.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅儲物箱.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅儲物箱.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅門.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅門.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅像.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅像.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅燈籠.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅燈籠.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的銅地板門.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的銅地板門.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/斑駁的避雷針.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/斑駁的避雷針.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅柵欄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅柵欄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅鏈.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅鏈.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅儲物箱.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅儲物箱.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅門.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅門.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅像.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅像.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅燈籠.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅燈籠.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的銅地板門.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的銅地板門.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/氧化的避雷針.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/氧化的避雷針.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅方塊.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅方塊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅柵欄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅柵欄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅鏈.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅鏈.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅儲物箱.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅儲物箱.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅門.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅門.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅像.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅像.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅燈籠.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅燈籠.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的銅地板門.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的銅地板門.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/風化的避雷針.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/風化的避雷針.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/白色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/白色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/白色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/白色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/鍛造模板.preview--WILD_ARMOR_TRIM_SMITHING_TEMPLATE.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/鍛造模板--WILD_ARMOR_TRIM_SMITHING_TEMPLATE.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/黃色束口袋.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/黃色束口袋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/黃色界伏盒.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/黃色界伏盒.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#未人工檢查",
+      "tags": [
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意相思原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意相思原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意竹材.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意竹材.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意樺木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意樺木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意櫻花木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意櫻花木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意緋紅菌柄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意緋紅菌柄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意黑橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意黑橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意叢林木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意叢林木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/可燒製木炭原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/可燒製木炭原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意紅樹林原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意紅樹林原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意蒼白橡木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意蒼白橡木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意足量沙類.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意足量沙類.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意杉木原木.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意杉木原木.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意扭曲菌柄.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意扭曲菌柄.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意木半磚.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意木半磚.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意床.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意床.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意地毯.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意地毯.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意鞍具.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意鞍具.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意羊毛.preview.md",
+      "sourcePath": null,
+      "affectedPaths": [
+        "MC-物品資料庫/任意羊毛.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/mini/鐵粉--2026-11-20T14-07-40-650Z.preview.md",
+      "affectedPaths": [
+        "SF-礦物資源(原版)/鐵粉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充、#未人工檢查",
+      "tags": [
+        "#待補充",
+        "#未人工檢查"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/acacia_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/相思木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/allium.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紫紅球花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/armadillo_scute.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/犰狳鱗甲.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/azalea_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/杜鵑葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/azure_bluet.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/雛草.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/birch_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/樺木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/blue_egg.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/藍色雞蛋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/blue_orchid.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/藍色蝴蝶蘭.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/brown_egg.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/棕色雞蛋.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/cactus_flower.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/仙人掌花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/chainmail_boots.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鎖鏈靴子.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/chainmail_chestplate.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鎖鏈胸甲.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/chainmail_helmet.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鎖鏈頭盔.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/chainmail_leggings.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鎖鏈護腿.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/cherry_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/櫻花木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/closed_eyeblossom.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/閉合的擬目花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/coal_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/煤礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/copper_horse_armor.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/銅製馬鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/copper_nautilus_armor.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/銅製鸚鵡螺鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/copper_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/銅礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/cornflower.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/矢車菊.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/dark_oak_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/黑橡木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_coal_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩煤礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_copper_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩銅礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_diamond_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩鑽石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_emerald_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩綠寶石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_gold_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩金礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_iron_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩鐵礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_lapis_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩青金石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/deepslate_redstone_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/深板岩紅石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/diamond_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鑽石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/emerald_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/綠寶石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/flowering_azalea_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/開花的杜鵑葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/gold_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/金礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/golden_horse_armor.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/黃金製馬鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/golden_nautilus_armor.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/黃金製鸚鵡螺鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/iron_horse_armor.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鐵製馬鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/iron_nautilus_armor.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鐵製鸚鵡螺鎧.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/iron_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鐵礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/jungle_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/叢林木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/lapis_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/青金石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/lilac.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紫丁香.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/lily_of_the_valley.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鈴蘭.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/mangrove_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紅樹林木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/nether_gold_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄金礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/nether_quartz_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄石英礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/open_eyeblossom.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/張開的擬目花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/pale_oak_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/蒼白橡木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/peony.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/牡丹花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/pink_petals.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/粉瓣花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/pink_tulip.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/粉紅色鬱金香.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/pitcher_plant.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/瓶子草.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/red_tulip.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紅色鬱金香.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/redstone_ore.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紅石礦.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/rose_bush.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/玫瑰叢.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/sea_pickle.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/海鞘.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/soul_soil.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/靈魂土.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/spruce_leaves.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/杉木樹葉.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/sunflower.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/向日葵.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/torchflower.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/火把花.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/white_tulip.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/白色鬱金香.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/wildflowers.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/野花簇.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/material-base/wither_rose.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/凋零玫瑰.md"
+      ],
+      "code": "PUBLICATION_TAG_BLOCKED",
+      "message": "Preview 仍有待審查標籤：#待補充",
+      "tags": [
+        "#待補充"
+      ]
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/橡木原木.update-preview.md",
+      "sourcePath": "MC-物品資料庫/橡木原木.md",
+      "affectedPaths": [
+        "MC-物品資料庫/橡木原木.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：### 常規",
+      "approvalKey": "70dbc4db6dc93d76466ffccee8f0a9a2a980df872b9414b7d0d9959b9ce244b7"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/橡木原木.update-preview.md",
+      "sourcePath": "MC-物品資料庫/橡木原木.md",
+      "affectedPaths": [
+        "MC-物品資料庫/橡木原木.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 18,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：- (Machine:: 無/手動)",
+      "approvalKey": "baca19d1158c2d14e103ebeeae0b81f490d95b0af3ae702682364e872343413f"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/橡木原木.update-preview.md",
+      "sourcePath": "MC-物品資料庫/橡木原木.md",
+      "affectedPaths": [
+        "MC-物品資料庫/橡木原木.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 19,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：**合成所需**：擷取失敗",
+      "approvalKey": "9275cc86c03024bd845aa66077187f8a621869acb1dfaa7c1e7d1805a5b4578a"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/紅石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/紅石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紅石.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 18,
+      "message": "更新預覽缺少或改動了正式內容：### 常規",
+      "approvalKey": "daa1e7f3aa7a50339195f7d19c2740f22310e2990251240035389b4f3fa6814f"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/玻璃.update-preview.md",
+      "sourcePath": "MC-物品資料庫/玻璃.md",
+      "affectedPaths": [
+        "MC-物品資料庫/玻璃.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 26,
+      "message": "更新預覽缺少或改動了正式內容：### 農耕工藝",
+      "approvalKey": "0e54d5f117374a50548179774cbbd40fa5398a7892ca66904ee0e763e90bed96"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/玻璃.update-preview.md",
+      "sourcePath": "MC-物品資料庫/玻璃.md",
+      "affectedPaths": [
+        "MC-物品資料庫/玻璃.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 26,
+      "nearLine": 26,
+      "message": "更新預覽缺少或改動了正式內容：- [[沙子 (Sand)]]",
+      "approvalKey": "a4ce9bcb4e6786de56fcb27c68eb4987e568007c6383f24d755277be874b6819"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/皮革.update-preview.md",
+      "sourcePath": "MC-物品資料庫/皮革.md",
+      "affectedPaths": [
+        "MC-物品資料庫/皮革.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 18,
+      "message": "更新預覽缺少或改動了正式內容：### 常規",
+      "approvalKey": "1169bb47e99b51bf04d1fd1117e48712b6176cafa007ebdec4deb269ac75518c"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/礫石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/礫石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/礫石.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：### 農耕工藝",
+      "approvalKey": "68812bcfdc921fb230dc4259431ec789415b1b910f780d2d167fabd801fe122e"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/煤炭.update-preview.md",
+      "sourcePath": "MC-物品資料庫/煤炭.md",
+      "affectedPaths": [
+        "MC-物品資料庫/煤炭.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 18,
+      "message": "更新預覽缺少或改動了正式內容：### 常規",
+      "approvalKey": "7bc66ad849f5baf59327a831eeea06044727b717c1f1ee4c49a71f7d951fdb6f"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/煤炭.update-preview.md",
+      "sourcePath": "MC-物品資料庫/煤炭.md",
+      "affectedPaths": [
+        "MC-物品資料庫/煤炭.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 18,
+      "nearLine": 18,
+      "message": "更新預覽缺少或改動了正式內容：- [[碳源]]",
+      "approvalKey": "a155eb4f1babd38f62cefe28bd3c554a7f75f636a83798bed9b5bde0da27e109"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/地獄石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄石.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：### 農耕工藝",
+      "approvalKey": "1c9d38b86e93da16de2b7bdb820301d64268112562b5596871777ed2b75db6ba"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/綠寶石.update-preview.md",
+      "sourcePath": "MC-物品資料庫/綠寶石.md",
+      "affectedPaths": [
+        "MC-物品資料庫/綠寶石.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 18,
+      "message": "更新預覽缺少或改動了正式內容：### 農耕工藝",
+      "approvalKey": "dbc29b4013df6ba508178ed2bb86dbf9dbe53db77c0b965128cde24ad2d27911"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/終界珍珠.update-preview.md",
+      "sourcePath": "MC-物品資料庫/終界珍珠.md",
+      "affectedPaths": [
+        "MC-物品資料庫/終界珍珠.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：### 農耕工藝",
+      "approvalKey": "567d1797355124a79a84f85f92a793c0711853bccda075a3d32ab2a2c62e153b"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/螢石粉.update-preview.md",
+      "sourcePath": "MC-物品資料庫/螢石粉.md",
+      "affectedPaths": [
+        "MC-物品資料庫/螢石粉.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：### 常規",
+      "approvalKey": "cb9def95bba1accd39b2cb466a9415497d486b5e372c3e4eabcf4c9a6bed763f"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/螢石粉.update-preview.md",
+      "sourcePath": "MC-物品資料庫/螢石粉.md",
+      "affectedPaths": [
+        "MC-物品資料庫/螢石粉.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 18,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：- (Machine:: 無/手動)",
+      "approvalKey": "4c1bfd1cfad9a5a74c05f8830785d2523d0ccbe94b9b1c6eca2c7b203decd387"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/螢石粉.update-preview.md",
+      "sourcePath": "MC-物品資料庫/螢石粉.md",
+      "affectedPaths": [
+        "MC-物品資料庫/螢石粉.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 19,
+      "nearLine": 17,
+      "message": "更新預覽缺少或改動了正式內容：**合成所需**：擷取失敗",
+      "approvalKey": "374ddfd47513a3b67d97b52ce2197cff825befaabcb48e7e385b0e0fa051fda9"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意木材.preview.md",
+      "sourcePath": "MC-物品資料庫/任意木材.md",
+      "affectedPaths": [
+        "MC-物品資料庫/任意木材.md"
+      ],
+      "code": "YAML_DIFF",
+      "field": "created",
+      "line": 13,
+      "sourceLine": 10,
+      "message": "YAML 欄位有歧異：created",
+      "approvalKey": "42ebb4fdb40643b6cc660025a9f79c0b50a451e0ebfe8ac54c0a19a625ccbb13"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意木材.preview.md",
+      "sourcePath": "MC-物品資料庫/任意木材.md",
+      "affectedPaths": [
+        "MC-物品資料庫/任意木材.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 16,
+      "nearLine": null,
+      "message": "更新預覽缺少或改動了正式內容：# 合成/取得",
+      "approvalKey": "1822fec0866d24d39a99cc90acebbd627cb8900a750724abee5e12b9257f922e"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意木材.preview.md",
+      "sourcePath": "MC-物品資料庫/任意木材.md",
+      "affectedPaths": [
+        "MC-物品資料庫/任意木材.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": null,
+      "message": "更新預覽缺少或改動了正式內容：### 常規",
+      "approvalKey": "8f7fd9e08e186584b1788e9c4c255bae3090c216535d28354364469e484a1995"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意木材.preview.md",
+      "sourcePath": "MC-物品資料庫/任意木材.md",
+      "affectedPaths": [
+        "MC-物品資料庫/任意木材.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 20,
+      "nearLine": null,
+      "message": "更新預覽缺少或改動了正式內容：- (Machine:: 無/手動)",
+      "approvalKey": "ea3a12ecee8400d93d3da854e84336465f1d60f54aaa6a05168a006e9fd3d6b5"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意木材.preview.md",
+      "sourcePath": "MC-物品資料庫/任意木材.md",
+      "affectedPaths": [
+        "MC-物品資料庫/任意木材.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": 21,
+      "nearLine": null,
+      "message": "更新預覽缺少或改動了正式內容：**合成所需**：擷取失敗",
+      "approvalKey": "f5b955cc16994a8f97ff770f525709e814bb9f68243ebc367e2e35617ba95b21"
+    },
+    {
+      "path": "MC-物品資料庫/安山岩.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/玻璃.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/碗.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/皮革.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/皮革.md",
+      "code": "UNPARSED_MACHINE_ROUTE",
+      "message": "設備配方缺少可解析的設備或材料"
+    },
+    {
+      "path": "MC-物品資料庫/玻璃片.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/紙.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/餅乾.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/綠寶石.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/終界珍珠.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/鐵欄杆.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/地獄磚柵欄.md",
+      "code": "PREFERRED_REQUIRED",
+      "message": "須恰好一條有效 Preferred 路線"
+    },
+    {
+      "path": "MC-物品資料庫/地圖.md",
+      "code": "DEPENDENCY_BLOCKED",
+      "message": "Preferred 依賴有循環或無有效材料"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/橡木原木.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/橡木原木.md"
+      ],
+      "sourcePath": "MC-物品資料庫/橡木原木.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "9430484b2b61676e34552d5e872f15e687d4d8ea361892f43617dc373ad83df0"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/儲物箱.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/儲物箱.md"
+      ],
+      "sourcePath": "MC-物品資料庫/儲物箱.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "5729251a2efd7d7d455f1b09a4e1ff9b676cac6248a9ddddf1f639b65a62ecae"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/木棒.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/木棒.md"
+      ],
+      "sourcePath": "MC-物品資料庫/木棒.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "3be1a58f228f180cc50db7d5f8c54db9735ca8150e885b5eca36320939cf0809"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/沙.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/沙.md"
+      ],
+      "sourcePath": "MC-物品資料庫/沙.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "16345c48b8adfae986542775c20d39e8033e03fb4ee994395a5e6504b2727a6f"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/玻璃.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/玻璃.md"
+      ],
+      "sourcePath": "MC-物品資料庫/玻璃.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "86d4f6824a91c266c595da4520a16827b706eb3ee74a0d92b75e96b0a49a0a3b"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/碗.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/碗.md"
+      ],
+      "sourcePath": "MC-物品資料庫/碗.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "b164f24a2fb19905012e4e2e34d40609e5ebe4a913fa152bb15445f455038dba"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/皮革.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/皮革.md"
+      ],
+      "sourcePath": "MC-物品資料庫/皮革.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "7993056ce7cc204e557518a0405fb6c7464b96810b451c25b01dea93cb80a40a"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/玻璃片.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/玻璃片.md"
+      ],
+      "sourcePath": "MC-物品資料庫/玻璃片.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "72f702b7487069c871174176a342b24cb0072e2bbb10f40cc4c39f996f0e0ede"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/紙.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/紙.md"
+      ],
+      "sourcePath": "MC-物品資料庫/紙.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "f35394bdf400698651fd718bf8e76cdb9fb896a9bbf66913cfe175a2370a5052"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/糖.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/糖.md"
+      ],
+      "sourcePath": "MC-物品資料庫/糖.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "d565b69c7a172f91c39ef9f1a0abda78b15325de6c90f06c589d348c2f48cc25"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/煤炭.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/煤炭.md"
+      ],
+      "sourcePath": "MC-物品資料庫/煤炭.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "471906f662f5d7b76aea07612a2853edd4bc42b847ee664e00a5856113f79169"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄磚.md"
+      ],
+      "sourcePath": "MC-物品資料庫/地獄磚.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "9434fc087c3495a5f44a4930857b3fedeb3c5b2e0e86d94a8428e8937861a0ae"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/餅乾.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/餅乾.md"
+      ],
+      "sourcePath": "MC-物品資料庫/餅乾.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "8ada059beb97d9d4dd90d8bcc00c93c4e8165e15e561a13c5bcb5d295d5b4f5d"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/工作台.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/工作台.md"
+      ],
+      "sourcePath": "MC-物品資料庫/工作台.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "35b4f465ab7a50502cd0a8c9a8de67d96db3da855dd87ade16850a1b5af90a88"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/螢石粉.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/螢石粉.md"
+      ],
+      "sourcePath": "MC-物品資料庫/螢石粉.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "454757982f54a94a0f62fa023b39c95647046368c355ace20b194e169d5385aa"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/鐵欄杆.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/鐵欄杆.md"
+      ],
+      "sourcePath": "MC-物品資料庫/鐵欄杆.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "f6e8fdcfb433ae8a469844c85c24cce13be0ad056210f8282eeeeb2818c1987d"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/地獄磚柵欄.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/地獄磚柵欄.md"
+      ],
+      "sourcePath": "MC-物品資料庫/地獄磚柵欄.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "951993e3d4ac83e39517a1b51f7a5b1e8df8bfeddb9bd052de48c14f12760623"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/活塞.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/活塞.md"
+      ],
+      "sourcePath": "MC-物品資料庫/活塞.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "b8ce416d2dc418dbadabfcb3a80ac463542402e3caf5e7746c69702a5daad069"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/任意木材.preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/任意木材.md"
+      ],
+      "sourcePath": "MC-物品資料庫/任意木材.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "d7003889c086d1e0ddc0c8aa0ca6bb95209d2eede64e7ae2c9bc85f0048755fb"
+    }
+  ],
+  "approvedIssues": [
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/烈焰桿.update-preview.md",
+      "sourcePath": "MC-物品資料庫/烈焰桿.md",
+      "affectedPaths": [
+        "MC-物品資料庫/烈焰桿.md"
+      ],
+      "code": "PREVIEW_CONTENT_MISSING",
+      "sourceLine": null,
+      "nearLine": 19,
+      "message": "更新預覽缺少或改動了正式內容：### 農耕工藝",
+      "approvalKey": "6034ad9462cc613e7ccaba1ee5b4309dd3bb7466516dc58dea319080ab476fec"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/熔爐.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/熔爐.md"
+      ],
+      "sourcePath": "MC-物品資料庫/熔爐.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "d69d81b4b3fe0b9a0e6dd7ead14c877cd40fd136dd91357c758ffb326c7afbfb"
+    },
+    {
+      "path": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z/updates/營火.update-preview.md",
+      "affectedPaths": [
+        "MC-物品資料庫/營火.md"
+      ],
+      "sourcePath": "MC-物品資料庫/營火.md",
+      "code": "REVIEW_REQUIRED",
+      "message": "確認這筆更新採用目前的 Preview",
+      "approvalKey": "338b3974691a261165cd189d93bfb9d2842826d889253f9994d3c1d7d17849b4"
+    }
+  ],
+  "counts": {
+    "READY": 823,
+    "REVIEW": 4,
+    "BLOCKED": 377
+  },
+  "fingerprint": "8ed56e026ea3aa55a31fb7e0426b66cc963df86b3e3f19d36c76211f33e16158",
+  "candidateCount": 1204,
+  "previousValidation": "CHANGED",
+  "materialReport": "MC-自動化BIO/preview/batch/2026-11-16T06-38-05-293Z - 材料審核.md",
+  "basePreviews": []
+}

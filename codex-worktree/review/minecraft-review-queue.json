@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "sourceFingerprint": "sha256:3d1de5458af845711aad82e53a2a285b0114f0b65e0d129699940e81954544ec",
+  "scanScope": "all-normalized+current-review",
+  "stats": {
+    "scannedTargets": 982,
+    "existingBIO": 51,
+    "automaticReady": 982,
+    "pendingReview": 0
+  },
+  "targets": []
+}

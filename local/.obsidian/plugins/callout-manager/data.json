@@ -1,0 +1,86 @@
+{
+  "callouts": {
+    "custom": [
+      "comment",
+      "reference",
+      "learn"
+    ],
+    "settings": {
+      "done": [
+        {
+          "changes": {
+            "icon": "lucide-laugh"
+          }
+        },
+        {
+          "condition": {
+            "colorScheme": "light"
+          },
+          "changes": {
+            "color": "208, 181, 48"
+          }
+        },
+        {
+          "condition": {
+            "colorScheme": "dark"
+          },
+          "changes": {
+            "color": "208, 181, 48"
+          }
+        }
+      ],
+      "question": [
+        {
+          "changes": {
+            "icon": "lucide-laugh",
+            "color": "208, 181, 48"
+          }
+        }
+      ],
+      "comment": [
+        {
+          "changes": {
+            "icon": "lucide-bot-message-square",
+            "color": "168, 130, 255"
+          }
+        }
+      ],
+      "reference": [
+        {
+          "changes": {
+            "icon": "lucide-arrow-up-left-from-square"
+          }
+        },
+        {
+          "condition": {
+            "colorScheme": "light"
+          },
+          "changes": {
+            "color": "168, 130, 255"
+          }
+        },
+        {
+          "condition": {
+            "colorScheme": "dark"
+          },
+          "changes": {
+            "color": "168, 130, 255"
+          }
+        }
+      ],
+      "learn": [
+        {
+          "changes": {
+            "icon": "lucide-book-marked",
+            "color": "251, 70, 76"
+          }
+        }
+      ]
+    }
+  },
+  "calloutDetection": {
+    "obsidian": true,
+    "theme": true,
+    "snippet": true
+  }
+}
