@@ -9,7 +9,7 @@ const { preservesBIOContent } = require('./bio-apply.cjs');
 const { metadataIsAdditive, extractLegacyRecipeReviews } = require('../../BIO相關模組/MC解析器模塊/bio/bio_update');
 const { formalRoots, isFormalPath, readStandalonePreviews, vanillaBase, reviewCandidates } = require('./bio-review.cjs');
 const { RECIPE_MAPPING_FILE, parseMachineRecipeMappings } = require('../../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping');
-const { publicationBlockingTags } = require('../../BIO相關模組/MC解析器模塊/bio/bio_tags');
+const { publicationBlockingTags, stripManagedBIOtags } = require('../../BIO相關模組/MC解析器模塊/bio/bio_tags');
 const reader = require('../../BIO相關模組/搜尋介面模塊/bio_reader_v4');
 const { colorFamily } = require('../../BIO相關模組/MC解析器模塊/bio/bio_group_mapping');
 const { resolveTranslatedName } = require('../../BIO相關模組/MC解析器模塊/bio/bio_generator');
@@ -401,7 +401,9 @@ function retainsContent(original, candidate, rules, resolveName = () => null, op
         }));
     const compact = value => recipeLayout(canonicalLinks(value)).split(/\r?\n/).map(line => line.trim().replace(/[ \t]+/g, ' ')
         .replace(/\[(?:item|drop)::/gi, '[item::')).filter(Boolean).join('\n');
-    const bodyRetained = preservesBIOContent(compact(stripFM(original)), compact(stripFM(candidate)), rules, (oldBody, newBody) => {
+    // Dropping a terminal review tag can leave a blank line after compaction.
+    const comparableBody = text => compact(stripManagedBIOtags(stripFM(text)));
+    const bodyRetained = preservesBIOContent(comparableBody(original), comparableBody(candidate), rules, (oldBody, newBody) => {
         if (!options.onDifference) return;
         const normalize = line => compact(line).trim();
         const mapLines = text => text.split(/\r?\n/).map((line, index) => ({ value: normalize(line), line: index + 1 }));
