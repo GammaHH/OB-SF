@@ -1,5 +1,5 @@
 ---
-updated: 2026-11-21 00:48:56
+updated: 2026-11-21 03:05:58
 created: 2026-11-16 02:21:06
 ---
 # BIO 產生流程
@@ -107,7 +107,7 @@ Tag／衍生集合名稱與代表材料分別由 `Minecraft Tag BIO Mapping Draf
 
 node 'C:\Users\Owner\.codex\worktrees\cee9\OB-SF\scripts\minecraft-bio-generator.cjs' scan-publication
 
-node 'C:\Users\Owner\.codex\worktrees\cee9\OB-SF\scripts\minecraft-bio-generator.cjs' publish --write
+node 'C:\Users\Owner\.codex\worktrees\cee9\OB-SF\scripts\minecraft-bio-generator.cjs' publish
 -  --write 正式寫入資料庫
 
 ```dataviewjs
@@ -118,7 +118,7 @@ node 'C:\Users\Owner\.codex\worktrees\cee9\OB-SF\scripts\minecraft-bio-generator
 
 const CONFIG = {
     folder: "MC-自動化BIO/preview",
-    maxLength: 300,
+    maxLength: 20,
     onlyPreview: true
 };
 
