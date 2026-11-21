@@ -62,6 +62,7 @@ function parseBIO(text, metadata = {}) {
     let provider = "";
     let current = null;
     let preferred = false;
+    let preferredMarkers = 0;
     let pendingChoices = null;
     let alternative = null;
     let alternativeIndent = 0;
@@ -154,7 +155,11 @@ function parseBIO(text, metadata = {}) {
             pendingChoices = null;
             continue;
         }
-        if (line.trim() === "<!-- preferred -->") { preferred = true; continue; }
+        if (line.trim() === "<!-- preferred -->") {
+            preferredMarkers++;
+            preferred = true;
+            continue;
+        }
         const choiceComment = line.match(/^\s*<!-- obsf:choices (.+) -->\s*$/);
         if (choiceComment) {
             try {
@@ -285,6 +290,8 @@ function parseBIO(text, metadata = {}) {
     const valid = recipes.filter(recipe =>
         !recipe.invalid && (recipe.external || recipe.ingredients.length > 0)
     );
+    const explicitPreferred = valid.filter(recipe => recipe.preferred && !recipe.tagRepresentative).length +
+        tagRows.filter(member => member.preferred).length;
     if (metadata.base_material === true && !valid.some(recipe => recipe.external)) {
         valid.unshift({
             section: "外部取得", machine: "", output: 1, ingredients: [],
@@ -307,7 +314,7 @@ function parseBIO(text, metadata = {}) {
         duplicates.set(identity, ordinal + 1);
         recipe.key = identity + "-" + ordinal;
     }
-    return { defaultOutput, recipes: valid, diagnostics };
+    return { defaultOutput, recipes: valid, diagnostics, preferredMarkers, explicitPreferred };
 }
 
 function exclusionItemIdentity(page) {
@@ -486,4 +493,8 @@ function recipeMenuOptions(recipes) {
     return options.map(({ recipe, ...option }) => option);
 }
 
-module.exports = { parseBIO, isTagBIO, inferExceptSelfGroupId, resolveRecipeExclusions, allowedRecipes, providerAllowed, chooseRecipe, dependencyWouldCycle, ingredientKey, recipeLabel, recipeMenuOptions, formatRecipeNote, recipeNoteKey, readLink };
+function isManualMachine(value) {
+    return !value || ["無/手動", "手動/無", "無/從背包合成", "外部取得"].includes(String(value).trim());
+}
+
+module.exports = { parseBIO, isTagBIO, isManualMachine, inferExceptSelfGroupId, resolveRecipeExclusions, allowedRecipes, providerAllowed, chooseRecipe, dependencyWouldCycle, ingredientKey, recipeLabel, recipeMenuOptions, formatRecipeNote, recipeNoteKey, readLink };

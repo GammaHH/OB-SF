@@ -1,0 +1,27 @@
+Java AST: files=665, registrations=547, syntaxErrors=0, output=C:\Users\Owner\.codex\worktrees\cee9\OB-SF\review\parser-runs\slimefun-preview-pilot-20261121-190853-110\Java AST.json
+{
+  "parsedJavaFiles": 665,
+  "registrations": 547,
+  "resolvedItemIds": 412,
+  "items": 137,
+  "recipes": 137,
+  "unresolved": 421,
+  "missingItemIds": 135,
+  "missingNames": 7,
+  "multipleRecipes": 0,
+  "missingRecipeTypes": 2,
+  "unresolvedConstructors": 25,
+  "unresolvedIngredients": 12,
+  "internalRegistrationCalls": 11,
+  "syntaxErrors": 0,
+  "OK": 0,
+  "OK_BRANCH": 0,
+  "REVIEW": 423,
+  "UNSUPPORTED": 124,
+  "SPECIAL": 11,
+  "ERROR": 0,
+  "normalized": "review\\parser-runs\\slimefun-preview-pilot-20261121-190853-110\\Normalized Recipes.json",
+  "manifest": "review\\parser-runs\\slimefun-preview-pilot-20261121-190853-110\\Slimefun Recipe Manifest.md",
+  "sourceCommit": "5374034c8713248909e60e6855c6f745fd7ca676",
+  "sourceRecipesReviewed": false
+}

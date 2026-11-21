@@ -7,6 +7,14 @@ param(
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression
 
+function Get-StreamSHA256 {
+    param([Parameter(Mandatory = $true)][IO.Stream]$Stream)
+    $Algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        return [BitConverter]::ToString($Algorithm.ComputeHash($Stream)).Replace('-', '')
+    } finally { $Algorithm.Dispose() }
+}
+
 $Root = (Get-Item -LiteralPath $SourceFolder -Force).FullName
 $Directories = [System.Collections.Generic.Stack[string]]::new()
 $Directories.Push($Root)
@@ -51,8 +59,11 @@ try {
             if (!$Files.TryGetValue($Entry.FullName, [ref]$Source)) { throw "Unexpected ZIP entry: $($Entry.FullName)" }
             $EntryStream = $Entry.Open()
             try {
-                if ((Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash -ne
-                    (Get-FileHash -InputStream $EntryStream -Algorithm SHA256).Hash) {
+                $SourceStream = [IO.File]::OpenRead($Source)
+                try { $SourceHash = Get-StreamSHA256 -Stream $SourceStream }
+                finally { $SourceStream.Dispose() }
+                $EntryHash = Get-StreamSHA256 -Stream $EntryStream
+                if ($SourceHash -ne $EntryHash) {
                     throw "ZIP verification failed: $($Entry.FullName)"
                 }
             } finally { $EntryStream.Dispose() }

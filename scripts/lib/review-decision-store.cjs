@@ -75,7 +75,7 @@ function writeReviewDecisionStore(
     const result = writeAtomicJSON(jsonPath, json);
     writeFileWithRetrySync(
         summaryMarkdownPath,
-        vanilla.dependencies.renderReviewDecisionSummary(roundTrip)
+        vanilla.dependencies.renderReviewDecisionSummary(roundTrip, { jsonFilename: path.basename(jsonPath) })
     );
     return result;
 }

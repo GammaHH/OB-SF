@@ -474,7 +474,7 @@ function renderManagedReview(review, existingStates, externalStates, lockedState
         .sort(([left], [right]) => left.localeCompare(right));
     const lines = [
         REVIEW_START,
-        "# Minecraft Base Material Review",
+        "# BIO Base Material Review",
         "",
         `- Target Item ID: \`${review.target}\``,
         `- Schema Version: \`${review.schemaVersion}\``,

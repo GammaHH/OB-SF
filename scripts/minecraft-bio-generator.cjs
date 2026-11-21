@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("node:fs");
+const { workspaceName, collectionTexts } = require('./lib/bio-workspace.cjs');
 const path = require("node:path");
 const { createHash } = require("node:crypto");
 
@@ -11,7 +12,7 @@ const vanilla = require("../BIO相關模組/MC解析器模塊");
 const { RECIPE_MAPPING_FILE, parseMachineRecipeMappings } = require("../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
 const { mergeBIOPreviewContexts } = require("./lib/bio-preview-batch.cjs");
 const { openBatchRefresh, finishBatchRefresh, renameBatchTemplates } = require("./lib/bio-batch-refresh.cjs");
-const { refreshVanillaRecipeBlocks } = require("../BIO相關模組/MC解析器模塊/bio/bio_update");
+const { planVanillaIncrementalUpdate } = require("../BIO相關模組/MC解析器模塊/bio/bio_update");
 const bioReader = require("../BIO相關模組/搜尋介面模塊/bio_reader_v4");
 const { rewriteBIOForPreview } = require("../BIO相關模組/MC解析器模塊/bio/bio_preview");
 const { publicationManifest, publishBIOBatch, scanPublication, selectPublicationManifest, standaloneManifest, previewSemanticHash, allowPreferredEdits, allowLevelEdits } = require("./lib/bio-publication.cjs");
@@ -55,31 +56,6 @@ function loadJSON(absolutePath) {
     return JSON.parse(fs.readFileSync(absolutePath, "utf8"));
 }
 
-function createLinkedSourceClassifier(rootDirectory, sfFolders) {
-    const root = path.resolve(rootDirectory);
-    const realRoot = fs.realpathSync(root);
-    const inside = (base, filename) => {
-        const relative = path.relative(base, filename);
-        return relative !== ".." && !relative.startsWith(".." + path.sep) && !path.isAbsolute(relative);
-    };
-    return linkTarget => {
-        const target = String(linkTarget || "").trim().replaceAll("\\", "/").split("#", 1)[0].replace(/\.md$/i, "");
-        if (!target || path.isAbsolute(target) || path.win32.isAbsolute(target) || target.includes(":")) return null;
-        const candidates = target.includes("/") ? [path.resolve(root, target + ".md")]
-            : sfFolders.map(folder => path.resolve(root, folder, target + ".md"));
-        const matches = candidates.filter(filename => {
-            if (!inside(root, filename)) return false;
-            const relative = path.relative(root, filename).split(path.sep);
-            if (!sfFolders.includes(relative[0])) return false;
-            try { return fs.statSync(filename).isFile() && inside(realRoot, fs.realpathSync(filename)); }
-            catch { return false; }
-        });
-        if (matches.length !== 1) return null;
-        const evidence = path.relative(root, matches[0]).split(path.sep).join("/");
-        return { provider: evidence.split("/")[0], evidence };
-    };
-}
-
 function loadSharedPlanningContext() {
     const runtime = createMinecraftVanillaRuntime(vaultRoot);
     if (runtime.loadErrors.length > 0) {
@@ -97,25 +73,20 @@ function loadSharedPlanningContext() {
         runtime.pipeline.itemRegistry
     );
     const decisionRegistry = readReviewDecisionStore({
-        jsonPath: path.join(vaultRoot, "Minecraft Review Decisions.json"),
-        legacyMarkdownPath: path.join(vaultRoot, "Minecraft Review Decisions.md")
+        jsonPath: path.join(vaultRoot, workspaceName(vaultRoot, 'decisions')),
+        legacyMarkdownPath: path.join(vaultRoot, workspaceName(vaultRoot, 'decisionSummary'))
     }).registry;
     const globalBaseIndex = vanilla.dependencies.createGlobalBaseDecisionIndex(
         decisionRegistry
     );
     const globalDecisionIndex =
         vanilla.dependencies.createGlobalAmbiguityDecisionIndex(decisionRegistry);
-    const tagMappingPath = path.join(vaultRoot, "Minecraft Tag BIO Mapping Draft.md");
-    const tagMapping = fs.existsSync(tagMappingPath)
-        ? vanilla.bio.parseTagBIOMappingMarkdown(
-            fs.readFileSync(tagMappingPath, "utf8")
-        )
+    const collections = collectionTexts(vaultRoot);
+    const tagMapping = collections.tags
+        ? vanilla.bio.parseTagBIOMappingMarkdown(collections.tags)
         : { mappings: new Map(), diagnostics: [] };
-    const groupMappingPath = path.join(vaultRoot, "Minecraft BIO Group Mapping Draft.md");
-    const groupMapping = fs.existsSync(groupMappingPath)
-        ? vanilla.bio.parseBIOGroupMappingMarkdown(
-            fs.readFileSync(groupMappingPath, "utf8")
-        )
+    const groupMapping = collections.groups
+        ? vanilla.bio.parseBIOGroupMappingMarkdown(collections.groups)
         : { mappings: new Map(), diagnostics: [] };
     const machineMappingPath = path.join(vaultRoot, RECIPE_MAPPING_FILE);
     const machineMappingBytes = fs.existsSync(machineMappingPath) ? fs.readFileSync(machineMappingPath) : null;
@@ -311,7 +282,7 @@ function renderTagNameReview(tagModels) {
         "",
         "# Minecraft Tag BIO Name Review",
         "",
-        "> 請在根目錄 `Minecraft Tag BIO Mapping Draft.md` 修改名稱與 generate；本檔是當次 preview 使用到的摘要。",
+        "> 請在根目錄 `BIO Collection Mapping Draft.md` 修改名稱與 generate；本檔是當次 preview 使用到的摘要。",
         "",
         "| Tag ID | BIO ID | 中文名稱 | filename | generate | Representative Item ID | values |",
         "|---|---|---|---|---|---|---|"
@@ -336,7 +307,7 @@ function renderGroupNameReview(groupModels) {
         "",
         "# Derived Ingredient Group BIO Name Review",
         "",
-        "> 請在根目錄 `Minecraft BIO Group Mapping Draft.md` 修改名稱與 generate。",
+        "> 請在根目錄 `BIO Collection Mapping Draft.md` 修改名稱與 generate。",
         "",
         "| Group ID | BIO ID | 中文名稱 | filename | generate | Representative Item ID | values |",
         "|---|---|---|---|---|---|---|"
@@ -519,12 +490,31 @@ function refreshBatch(rawTargets) {
         machineMappings: shared.machineMapping.rules
     };
     const rendered = new Map([...models].map(([id, model]) => [id, vanilla.bio.renderBIOPreview(model, renderOptions)]));
+    const refreshNames = new Map();
+    const register = (name, id) => {
+        if (!name || !id) return;
+        const values = refreshNames.get(name) || new Set();
+        values.add(id);
+        refreshNames.set(name, values);
+    };
+    for (const entry of bioRegistry.entries) {
+        const id = entry.minecraft_tag ? 'tag:' + entry.minecraft_tag : entry.derived_group ? 'group:' + entry.derived_group : entry.normalizedId;
+        for (const name of [entry.name, entry.path?.replace(/\.md$/i, ''), ...[].concat(entry.aliases || [])]) register(name, id);
+    }
+    for (const entry of batch.manifest.entries) {
+        for (const filename of entry.linkFilenames || []) register(target(filename), entry.identity);
+    }
+    for (const [id, name] of [...itemPreviewTargets, ...tagPreviewTargets, ...groupPreviewTargets]) {
+        const identity = tagPreviewTargets.has(id) ? 'tag:' + id : groupPreviewTargets.has(id) ? 'group:' + id : id;
+        register(name, identity);
+    }
+    const resolveName = name => {
+        const values = refreshNames.get(name);
+        return values?.size === 1 ? [...values][0] : name;
+    };
     const updates = batch.selected.map(file => {
-        try {
-            return { ...file, refreshed: refreshVanillaRecipeBlocks(file.text, rendered.get(file.entry.identity)) };
-        } catch (error) {
-            throw new Error(file.filename + "｜" + error.message);
-        }
+        const plan = planVanillaIncrementalUpdate(file.text, rendered.get(file.entry.identity), { resolveName, migrateOutput: true });
+        return { ...file, refreshed: plan.candidate, diagnostics: plan.diagnostics };
     });
     const additions = newCollections.map(({ kind, key, model, filename }) => {
         const content = vanilla.bio.renderTagBIOPreview(model, renderOptions);
@@ -536,14 +526,15 @@ function refreshBatch(rawTargets) {
         } };
     });
     const result = finishBatchRefresh(batch, updates, additions, hasFlag("write"));
-    process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+    process.stdout.write(JSON.stringify({ ...result, review: updates.filter(file => file.diagnostics.length)
+        .map(file => ({ filename: file.filename, diagnostics: file.diagnostics })) }, null, 2) + "\n");
 }
 
 function preview(rawTargets) {
     const shared = loadSharedPlanningContext();
     const all = hasFlag("all");
-    const preparePublish = all || hasFlag("prepare-publish");
-    const updateExisting = preparePublish || hasFlag("update-existing");
+    const preparePublish = all || hasFlag("prepare-publish") || hasFlag("update-existing");
+    const updateExisting = preparePublish;
     const requested = all ? [...shared.runtime.pipeline.itemRegistry.entries()].map(([id]) => id).sort()
         : (Array.isArray(rawTargets) ? rawTargets : [rawTargets]);
     const targets = [...new Set(requested.map(rawTarget => {
@@ -731,35 +722,6 @@ function preview(rawTargets) {
         };
         const resolveName = name => resolveWith(actualNames, name);
         const resolvePreviewName = name => resolveWith(previewNames, name);
-        const sfFolders = fs.readdirSync(vaultRoot, { withFileTypes: true })
-            .filter(entry => entry.isDirectory() && entry.name.startsWith("SF-")).map(entry => entry.name);
-        const classifyLinkedSource = createLinkedSourceClassifier(vaultRoot, sfFolders);
-        const classifyExistingRoute = route => {
-            if (!route.machine || /[\\/]/.test(route.machine)) return null;
-            const matches = sfFolders.map(folder => path.join(vaultRoot, folder, route.machine + ".md"))
-                .filter(filename => fs.existsSync(filename) && fs.statSync(filename).isFile());
-            if (matches.length !== 1) return null;
-            const metadata = vanilla.bio.readFrontmatterPrefix(matches[0]);
-            if (!String(metadata?.type || "").startsWith("sf-")) return null;
-            return { provider: /\(原版\)$/.test(path.basename(path.dirname(matches[0])))
-                ? "Slimefun 原版" : path.basename(path.dirname(matches[0])), evidence: vaultPath(matches[0]) };
-        };
-        const ingredientChoices = resolver => ingredient => {
-            const identity = resolver(ingredient.name);
-            const members = previewTagMembers.get(identity) || (identity.startsWith("tag:") ? nativeTagValues.get(identity.slice(4)) : null);
-            return members?.map(itemId => ({ name: itemId, qty: 1 }));
-        };
-        const legacyReviewAssertion = (sourcePath, resolver) => (route, context) => {
-            // Exact user-reviewed correction, not a blanket inference from a
-            // Minecraft machine name or the #有錯誤配方 body tag.
-            if (sourcePath !== "MC-物品資料庫/地獄磚.md" || context.itemId !== "minecraft:nether_bricks" ||
-                route.ingredients.length !== 1 || Number(route.output) !== 1) return null;
-            const material = route.ingredients[0], machine = resolver(route.machine);
-            if (!["minecraft:furnace", "熔爐"].includes(machine) || material.choices || material.excludeSelf ||
-                Number(material.qty) !== 1 || !["minecraft:nether_brick", "地獄磚頭"].includes(resolver(material.name))) return null;
-            return { reason: "使用者 11/20 審核指出此舊路線錯誤；原版來源為工作台使用地獄磚頭 ×4",
-                evidence: "user-review:2026-11-20:MC-物品資料庫/地獄磚.md" };
-        };
         for (let index = 0; index < models.length; index++) {
             const model = models[index];
             if (!model.existingBIO) {
@@ -783,16 +745,9 @@ function preview(rawTargets) {
                 availableAlternativeGroups: formalGroups.available, itemTypes,
                 machineMappings: planning.machineMappings, machineMappingDiagnostics
             });
-            const plan = vanilla.bio.planBIOUpdate(original, generated, { resolveName, classifyExistingRoute, classifyLinkedSource,
-                groupExistingRoutes: true, machineMappings: planning.machineMappings,
-                resolveIngredientChoices: ingredientChoices(resolveName), canonicalizeLegacyCollections: true,
-                quarantineLegacyRoute: legacyReviewAssertion(sourcePath, resolveName) });
-            const visualPlan = vanilla.bio.planBIOUpdate(original, renderedPreviews[index], {
-                resolveName: resolvePreviewName, classifyExistingRoute, classifyLinkedSource,
-                groupExistingRoutes: true, machineMappings: planning.machineMappings, allowPreviewLinks: true,
-                resolveIngredientChoices: ingredientChoices(resolvePreviewName), canonicalizeLegacyCollections: true,
-                quarantineLegacyRoute: legacyReviewAssertion(sourcePath, resolvePreviewName)
-            });
+            const plan = planVanillaIncrementalUpdate(original, generated, { resolveName, migrateOutput: true });
+            const visualPlan = planVanillaIncrementalUpdate(original, renderedPreviews[index],
+                { resolveName: resolvePreviewName, migrateOutput: true });
             const rewritten = rewriteBIOForPreview(visualPlan.candidate, {
                 resolveName: resolvePreviewName, targets: previewReferenceTargets, tagMembers: previewTagMembers
             });

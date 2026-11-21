@@ -3,6 +3,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { createMinecraftVanillaRuntime } = require("./lib/minecraft-vanilla-runtime.cjs");
+const { resolveLegacyDefault } = require('./lib/bio-workspace.cjs');
 const {
     writeFileWithRetrySync,
     readFileWithRetrySync,
@@ -16,7 +17,7 @@ const vaultRoot = path.resolve(__dirname, "..");
 function option(name, fallback = null) {
     const prefix = `--${name}=`;
     const value = process.argv.find(argument => argument.startsWith(prefix));
-    return value ? value.slice(prefix.length) : fallback;
+    return value ? value.slice(prefix.length) : resolveLegacyDefault(vaultRoot, fallback);
 }
 
 function hasFlag(name) {

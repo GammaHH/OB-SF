@@ -767,7 +767,7 @@ test("review queue is deterministic and advances only through explicit state cha
     ).status, "PENDING");
     assert.match(
         vanilla.dependencies.renderReviewQueueMarkdown(queue),
-        /\[\[Minecraft Recipe Review\]\]/
+        /\[\[BIO Recipe Review\]\]/
     );
 });
 

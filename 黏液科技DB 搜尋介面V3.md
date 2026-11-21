@@ -2445,7 +2445,7 @@ function getRecipeLabel(recipe) {
 
     return (
         `${recipe.section || "未分類"}` +
-        ` ｜ ${recipe.machine || "無/手動"}` +
+        ` ｜ ${recipe.machine || "無/從背包合成包合成"}` +
         ` ｜ output ${formatNumber(recipe.output)}/批`
     );
 }
@@ -3727,7 +3727,7 @@ async function registerMachine(
 
     if (
         !machineName ||
-        ["無/手動", "外部取得"].includes(
+        ["無/從背包合成", "外部取得"].includes(
             String(machineName).trim()
         )
     ) {

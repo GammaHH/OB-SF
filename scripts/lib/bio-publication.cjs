@@ -14,6 +14,8 @@ const reader = require('../../BIO相關模組/搜尋介面模塊/bio_reader_v4')
 const { colorFamily } = require('../../BIO相關模組/MC解析器模塊/bio/bio_group_mapping');
 const { resolveTranslatedName } = require('../../BIO相關模組/MC解析器模塊/bio/bio_generator');
 const { previewRoot, previewRoots, rootForPreview } = require('./bio-preview-paths.cjs');
+const { workspaceName, collectionTexts } = require('./bio-workspace.cjs');
+const { formalBIOIndex } = require('./formal-bio-index.cjs');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const slash = value => value.replaceAll('\\', '/');
 const withoutMD = value => value.replace(/\.md$/i, '');
@@ -22,6 +24,7 @@ const isStandaloneManifest = relative => previewRoots.some(folder => relative ==
 const PUBLICATION_ISSUE_LIMIT = 2000;
 const standaloneGenerators = new Map([
     ['mini', 'obsf-mini-parser'],
+    ['plugin', 'obsf-normalized-generator'],
     ['material-base', 'minecraft-bio-publication-scan']
 ]);
 
@@ -97,6 +100,7 @@ function insidePreview(root, relative, childFolder) {
 }
 
 function identity(metadata) {
+    if (metadata?.type?.startsWith('sf-') && metadata.id) return 'sf:' + metadata.id;
     const explicitTag = metadata?.type === 'mc-tag';
     if ((explicitTag || metadata?.tag_identity === 'minecraft:item_tag') && metadata.minecraft_tag) return 'tag:' + String(metadata.minecraft_tag).replace(/^#/, '');
     if ((explicitTag || metadata?.tag_identity === 'obsf:derived_ingredient_group') && metadata.derived_group) return 'group:' + metadata.derived_group;
@@ -111,8 +115,7 @@ function identity(metadata) {
 }
 
 function inputFingerprint(root) {
-    const names = ['Minecraft Review Decisions.json', 'Minecraft Tag BIO Mapping Draft.md',
-        'Minecraft BIO Group Mapping Draft.md', RECIPE_MAPPING_FILE];
+    const names = [workspaceName(root, 'decisions'), ...collectionTexts(root).files, RECIPE_MAPPING_FILE];
     function visit(directory) {
         if (!fs.existsSync(directory)) return;
         for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -373,6 +376,11 @@ function retainsContent(original, candidate, rules, resolveName = () => null, op
         if (before) delete before.updated;
         if (after) delete after.updated;
     }
+    // Publication preserves an existing created value, but permits a new one
+    // when the official BIO never had it. Other added YAML stays protected.
+    if (options.allowCreatedAddition && before && after && !Object.hasOwn(before, 'created')) {
+        delete after.created;
+    }
     if (options.vanillaBase && before && after) {
         delete before.base_material;
         delete after.base_material;
@@ -481,6 +489,11 @@ function preparePublication(root, manifestRelative, options = {}) {
     const mappings = parseMachineRecipeMappings(mapping);
     if (mappings.diagnostics.some(value => value.severity === 'ERROR')) throw new Error('Machine Mapping 格式錯誤');
     const registry = scanMinecraftBIOs(path.join(root, 'MC-物品資料庫'), { vaultRoot: root });
+    const formalIndex = options.central ? formalBIOIndex(root, mapping) : null;
+    for (const document of formalIndex?.documents || []) if (document.frontmatter?.type?.startsWith('sf-')) {
+        registry.entries.push({ ...document.frontmatter, path: document.path,
+            name: path.posix.basename(document.path,'.md'), aliases: [].concat(document.frontmatter.aliases || []) });
+    }
     if (registry.collisions.length) throw new Error('正式 BIO 含重複身份，停止發布');
     const bindings = new Map(), types = new Map(), targetPaths = new Set(), identityKeys = new Set(), prepared = [], skipped = [];
     const preservationIssues = [];
@@ -488,9 +501,12 @@ function preparePublication(root, manifestRelative, options = {}) {
         preservationIssues.push(issue);
         options.onIssue?.(issue, entry, currentInput);
     }
-    const standalone = options.central ? readStandalonePreviews(root).map(draft => ({
+    const standalone = options.central ? readStandalonePreviews(root)
+        .filter(draft => !draft.metadata.preview_manifest || draft.metadata.preview_manifest === manifestRelative).map(draft => ({
         identity: draft.metadata.type?.startsWith('sf-') ? 'sf:' + draft.metadata.id : identity(draft.metadata),
-        kind: draft.metadata.type === 'mc-tag' ? 'tag' : 'item', targetPath: draft.metadata.publish_target, status: 'NEW', draftSource: draft.source,
+        kind: draft.metadata.type === 'mc-tag' ? 'tag' : 'item', targetPath: draft.metadata.publish_target,
+        sourcePath: draft.source === 'plugin' && formalIndex.documents.some(value => value.path === draft.metadata.publish_target) ? draft.metadata.publish_target : null,
+        status: draft.source === 'plugin' && formalIndex.documents.some(value => value.path === draft.metadata.publish_target) ? 'REVIEW' : 'NEW', draftSource: draft.source,
         draftPath: draft.relative, draftMetadata: draft.metadata, baselineSemantic: previewSemanticHash(draft.text), linkFilenames: []
     })) : [];
     const records = [...manifest.entries, ...standalone];
@@ -584,7 +600,7 @@ function preparePublication(root, manifestRelative, options = {}) {
     for (const entry of prepared) {
         let text = applyTypeFields(formalizePreview(entry.text, bindings), types);
         if (entry.draftSource) text = text.replace(/^(\uFEFF?---\r?\n)([\s\S]*?)(^---(?:\r?\n|$))/m,
-            (_, start, body, end) => start + body.replace(/^(?:preview_source|preview_mode|preview_evidence|publish_target):[^\r\n]*(?:\r?\n|$)/gm, '') + end);
+            (_, start, body, end) => start + body.replace(/^(?:preview_[a-z0-9_]+|publish_target):[^\r\n]*(?:\r?\n|$)/gm, '') + end);
         const deriveBase = options.central && !entry.draftSource && entry.kind === 'item';
         if (deriveBase) text = vanillaBase(text);
         let metadata = parseFrontmatter(text);
@@ -625,7 +641,7 @@ function preparePublication(root, manifestRelative, options = {}) {
                 affectedPaths: [entry.targetPath], ...issue }, entry);
             if (entry.levelIssue) onDifference(entry.levelIssue);
             if (!retainsContent(original, text, mappings.rules, resolveName, {
-                vanillaBase: deriveBase, ignoreUpdated: options.central, previewText: entry.text,
+                vanillaBase: deriveBase, ignoreUpdated: options.central, allowCreatedAddition: true, previewText: entry.text,
                 onDifference: options.central ? onDifference : undefined
             })) {
                 const message = '更新預覽未保留目前正式 BIO 的圖片、人工內容或 YAML';
@@ -938,6 +954,8 @@ function scanPublication(root, manifestRelative, { lookupVanilla, issueLimit = P
                     ' · ' + display(issue.message) + source + marker);
                 if (issue.code === 'AMBIGUOUS_MATERIAL')
                     lines.push(...issue.matches.map(file => '  - 候選 BIO · ' + noteLink(file)));
+                if (issue.code === 'EQUIPMENT_DEPENDENCY_CYCLE')
+                    lines.push(...[...new Set(issue.cycle)].map(file => '  - 循環涉及 BIO · ' + noteLink(file)));
             }
         }
         if (hiddenApprovals.size) {

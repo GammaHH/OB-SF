@@ -3,6 +3,10 @@
 /Minecraft Review Queue.md
 /Minecraft Review Decisions.json.previous
 /Minecraft Review Decisions.json.tmp
+/BIO Review Queue.md
+/BIO Review Decisions.json.previous
+/BIO Review Decisions.json.tmp
+/參考資料/Slimefun4-source/
 /MC-自動化BIO/
 /BIO-輸出報告/
 /@自動化BIO Preview/
@@ -33,3 +37,11 @@ tests/minecraft-vanilla-pipeline/*
 !tests/minecraft-vanilla-pipeline/smoke-all-raw.cjs
 !tests/minecraft-vanilla-pipeline/recipe-review.test.cjs
 !tests/minecraft-vanilla-pipeline/review-decision-store.test.cjs
+!tests/minecraft-vanilla-pipeline/slimefun-parser.test.cjs
+!tests/minecraft-vanilla-pipeline/normalized-pipeline.test.cjs
+!tests/minecraft-vanilla-pipeline/foreground-command.test.cjs
+!tests/minecraft-vanilla-pipeline/bio-dependency-check.test.cjs
+!tests/minecraft-vanilla-pipeline/bio-recovery.test.cjs
+!tests/fixtures/
+!tests/fixtures/slimefun-v1/
+!tests/fixtures/slimefun-v1/SlimefunFixture.java

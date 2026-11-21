@@ -1,6 +1,24 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { planBIOUpdate, routeIsLegalSpecialization, extractLegacyRecipeReviews } = require("../../BIO相關模組/MC解析器模塊/bio/bio_update");
+const { planBIOUpdate, planVanillaIncrementalUpdate, routeIsLegalSpecialization, extractLegacyRecipeReviews } = require("../../BIO相關模組/MC解析器模塊/bio/bio_update");
+
+test('Vanilla incremental update preserves original provider routes and reports a needed Preferred without inventing one', () => {
+    const head = '---\ntype: mc-item\nid: STICK\n---\n# 合成/取得\n### 合成配方\n';
+    const raw = '- (Machine:: 熔爐)\n- [item:: 竹子] (qty:: 1)\n- [output:: 4]\n';
+    const original = head + '##### Addon\n' + raw + '# 用途\n人工筆記\n';
+    const source = head + '##### Minecraft 原版\n<!-- preferred -->\n' + raw;
+    const update = planVanillaIncrementalUpdate(original, source);
+    assert.equal(update.status, 'REVIEW');
+    assert.ok(update.diagnostics.some(issue => issue.code === 'PREFERRED_SELECTION_REQUIRED'));
+    assert.deepEqual(reader.parseBIO(update.candidate).recipes.map(route => [route.provider, route.preferred]),
+        [['Addon', false], ['Minecraft 原版', false]]);
+    assert.match(update.candidate, /人工筆記/);
+    assert.equal(planVanillaIncrementalUpdate(update.candidate, source).candidate, update.candidate);
+    const preferredOriginal = original.replace(raw, '<!-- preferred -->\n' + raw);
+    const retained = reader.parseBIO(planVanillaIncrementalUpdate(preferredOriginal, source).candidate);
+    assert.deepEqual(retained.recipes.map(route => [route.provider, route.preferred]),
+        [['Addon', true], ['Minecraft 原版', false]]);
+});
 const reader = require("../../BIO相關模組/搜尋介面模塊/bio_reader_v4");
 const { addsOnlyLines, preservesBIOContent } = require("../../scripts/lib/bio-apply.cjs");
 const { parseMachineRecipeMappings } = require("../../BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping");
@@ -158,31 +176,23 @@ test("linked-source grouping ignores fences, HTML, inline examples, ingredient r
     for (const row of original.split("\n").filter(line => line.includes("[["))) assert.ok(plan.candidate.includes(row));
 });
 
-test("CLI linked-source resolver requires one existing SF BIO and prevents paths escaping the vault", () => {
-    const fs = require("node:fs"), path = require("node:path"), os = require("node:os");
-    const source = fs.readFileSync(path.resolve(__dirname, "../../scripts/minecraft-bio-generator.cjs"), "utf8");
-    const start = source.indexOf("function createLinkedSourceClassifier(");
-    const end = source.indexOf("\nfunction loadPlanningContext(", start);
-    assert.ok(start >= 0 && end > start);
-    const factory = new Function("fs", "path", source.slice(start, end) + "\nreturn createLinkedSourceClassifier;")(fs, path);
-    const temp = fs.mkdtempSync(path.join(os.tmpdir(), "obsf-linked-source-"));
-    try {
-        const root = path.join(temp, "vault");
-        const folders = ["SF-農耕工藝", "SF-其他"];
-        for (const folder of folders) fs.mkdirSync(path.join(root, folder), { recursive: true });
-        fs.writeFileSync(path.join(root, folders[0], "紅石 (Redstone).md"), "原配方");
-        fs.writeFileSync(path.join(temp, "outside.md"), "外部檔案");
-        const classify = factory(root, folders);
-        assert.deepEqual(classify("紅石 (Redstone)"), { provider: folders[0], evidence: folders[0] + "/紅石 (Redstone).md" });
-        assert.deepEqual(classify(folders[0] + "/紅石 (Redstone).md#段落"), { provider: folders[0], evidence: folders[0] + "/紅石 (Redstone).md" });
-        assert.equal(classify("不存在"), null);
-        assert.equal(classify("../outside"), null);
-        assert.equal(classify(path.join(temp, "outside.md")), null);
-        assert.equal(classify("C:/Windows/example"), null);
-        fs.writeFileSync(path.join(root, folders[1], "紅石 (Redstone).md"), "重複名稱");
-        assert.equal(classify("紅石 (Redstone)"), null);
-        assert.deepEqual(classify(folders[0] + "/紅石 (Redstone)"), { provider: folders[0], evidence: folders[0] + "/紅石 (Redstone).md" });
-    } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+test("Vanilla incremental updates preserve existing linked references without resolving or inferring their provider", () => {
+    const links = "- [[SF-農耕工藝/紅石 (Redstone)#段落]]\n- [[../outside]]\n";
+    const original = bio("### 常規\n" + links + "\n" + route());
+    const generated = bio(route("切石機", "石頭").replace("<!-- preferred -->", "##### Minecraft 原版\n<!-- preferred -->"));
+    const resolvedNames = [];
+    const result = planVanillaIncrementalUpdate(original, generated, {
+        resolveName(name) { resolvedNames.push(name); return name; }
+    });
+
+    assert.equal(result.additions.length, 1);
+    assert.ok(result.candidate.startsWith(original));
+    assert.ok(result.candidate.includes(links));
+    assert.ok(!resolvedNames.some(name => name.includes("outside") || name.includes("紅石")));
+    const routes = reader.parseBIO(result.candidate).recipes;
+    assert.equal(routes.length, 2);
+    assert.equal(routes.find(value => value.preferred).machine, "工作台");
+    assert.equal(routes.find(value => value.machine === "切石機").provider, "Minecraft 原版");
 });
 
 test("update classifies Machine routes and removes legacy YAML output without changing manual content", () => {

@@ -968,7 +968,7 @@ function renderRecipeReview(analysis, existingMarkdown = "") {
     };
     const lines = [
         REVIEW_START,
-        "# Minecraft Recipe Review",
+        "# BIO Recipe Review",
         "",
         `- Target: \`${analysis.target}\``,
         `- Source Fingerprint: \`${analysis.sourceFingerprint}\``,

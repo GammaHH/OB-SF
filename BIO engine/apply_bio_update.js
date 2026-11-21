@@ -5,6 +5,27 @@ module.exports = async function apply_bio_update(tp) {
     if (!root || typeof app.vault.process !== "function") throw new Error("需要桌面 Obsidian 與 Vault.process 接口");
     const Notice = tp.obsidian?.Notice;
     if (typeof Notice !== "function") throw new Error("Templater 未提供 tp.obsidian.Notice，請透過 Templater 執行模板");
+    const availablePublications = app.vault.getFiles().filter(file => file.name === 'BIO Publication.json' &&
+        (file.path.startsWith('@自動化BIO Preview/') || file.path.startsWith('MC-自動化BIO/preview/')));
+    const mode = availablePublications.length ? await tp.system.suggester(['OB-CLI 集中掃描／發布（Minecraft、Slimefun 與其他 Parser）', '相容舊版：單筆 BIO Update Review 套用'],
+        ['publication', 'legacy'], false, '選擇 BIO 套用流程') : 'legacy';
+    if (!mode) return '';
+    if (mode === 'publication') {
+        const manifests = availablePublications
+            .sort((a,b) => b.path.localeCompare(a.path));
+        if (!manifests.length) throw new Error('找不到 Publication Manifest；請先以 OB-CLI preview 產生批次');
+        const manifest = await tp.system.suggester(manifests.map(file=>file.path), manifests, false, '選擇發布批次');
+        if (!manifest) return '';
+        const action = await tp.system.suggester(['SCAN：產生／更新材料審核表', 'PUBLISH：預演', 'PUBLISH --write：正式寫入'],
+            ['scan-publication','publish','write'], false, '只複製前景 PowerShell 指令，不在 Obsidian 內執行');
+        if (!action) return '';
+        const helper = { exports: {} };
+        new Function('module', await app.vault.adapter.read('BIO相關模組/搜尋介面模塊/foreground_command.js'))(helper);
+        await navigator.clipboard.writeText(helper.exports.foregroundCommand(root,
+            ['scripts/ob-cli.cjs',action==='write'?'publish':action,'--manifest='+manifest.path,...(action==='write'?['--write']:[])], 'bio-publication'));
+        new Notice('已複製 PowerShell 前景指令；執行後請檢查日誌與發布收據。',12000);
+        return '';
+    }
     const modulePath = path.join(root, "scripts", "lib", "bio-apply.cjs");
     const nodeRequire = require("node:module").createRequire(modulePath);
     delete nodeRequire.cache[nodeRequire.resolve(modulePath)];

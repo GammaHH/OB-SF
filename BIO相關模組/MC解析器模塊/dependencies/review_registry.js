@@ -120,6 +120,9 @@ function validateReviewDecisionRegistry(parsed) {
     if (!Array.isArray(parsed.revocations)) {
         throw new Error("Minecraft Review Decisions revocations 格式無效");
     }
+    if (parsed.normalizedTargets !== undefined && (!parsed.normalizedTargets || typeof parsed.normalizedTargets !== 'object' || Array.isArray(parsed.normalizedTargets))) {
+        throw new Error('BIO normalizedTargets 格式無效');
+    }
     for (const [target, snapshot] of Object.entries(parsed.targets)) {
         if (!ITEM_ID_PATTERN.test(target)) {
             throw new Error(`Decision Registry target ID 無效：${target}`);
@@ -421,7 +424,8 @@ function renderReviewDecisionRegistry(registry) {
         ],
         globalAlternativePreferences: [...globalIndex.alternativePreferences.values()],
         globalAmbiguityDecisions: [...globalIndex.selections.values()],
-        targets: orderedTargets
+        targets: orderedTargets,
+        ...(registry.normalizedTargets ? { normalizedTargets: registry.normalizedTargets } : {})
     };
     const lines = [
         "---",
@@ -459,11 +463,12 @@ function serializeReviewDecisionRegistryJSON(registry) {
     return `${JSON.stringify({
         schemaVersion: SCHEMA_VERSION,
         revocations: [...(registry.revocations ?? [])],
-        targets: orderedTargets
+        targets: orderedTargets,
+        ...(registry.normalizedTargets ? { normalizedTargets: registry.normalizedTargets } : {})
     }, null, 2)}\n`;
 }
 
-function renderReviewDecisionSummary(registry) {
+function renderReviewDecisionSummary(registry, { jsonFilename = 'BIO Review Decisions.json' } = {}) {
     const targetIds = Object.keys(registry?.targets ?? {}).sort();
     const activeRevocations = (registry?.revocations ?? [])
         .filter(entry => entry.status === "ACTIVE").length;
@@ -473,11 +478,12 @@ function renderReviewDecisionSummary(registry) {
         `schemaVersion: ${SCHEMA_VERSION}`,
         "---",
         "",
-        "# Minecraft Review Decisions",
+        "# BIO Review Decisions",
         "",
-        "> Machine source-of-truth：`Minecraft Review Decisions.json`。本檔僅供 Obsidian 查看摘要，請勿作為 Registry 輸入。",
+        "> Machine source-of-truth：`" + jsonFilename + "`。本檔僅供 Obsidian 查看摘要，請勿作為 Registry 輸入。",
         "",
         `- Saved Targets: ${targetIds.length}`,
+        `- Normalized Source Targets: ${Object.keys(registry.normalizedTargets || {}).length}`,
         `- Active Revocations: ${activeRevocations}`,
         "",
         "## Saved Targets",

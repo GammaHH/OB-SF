@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const { createMinecraftVanillaRuntime } = require("./lib/minecraft-vanilla-runtime.cjs");
+const { workspaceName, resolveLegacyDefault } = require('./lib/bio-workspace.cjs');
 const { writeFileWithRetrySync } = require("./lib/file-write-retry.cjs");
 const {
     readReviewDecisionStore,
@@ -22,7 +23,7 @@ function hasFlag(name) {
 function option(name, fallback) {
     const prefix = `--${name}=`;
     const value = process.argv.find(argument => argument.startsWith(prefix));
-    return value ? value.slice(prefix.length) : fallback;
+    return value ? value.slice(prefix.length) : resolveLegacyDefault(vaultRoot, fallback);
 }
 
 function safeVaultPath(requested, expectedExtension = null) {
@@ -84,7 +85,8 @@ function writeQueue(queue, paths = queuePaths()) {
 function reviewTargetFromMarkdown(absolute) {
     const markdown = readText(absolute);
     if (!markdown) return null;
-    return vanilla.dependencies.parseFrontmatter(markdown).values.target ?? null;
+    const target = vanilla.dependencies.parseFrontmatter(markdown).values.target;
+    return target?.startsWith('minecraft:') ? target : null;
 }
 
 function targetFolder(target) {
@@ -93,8 +95,8 @@ function targetFolder(target) {
 
 function reviewPathsForTarget() {
     return {
-        baseReview: "Minecraft Base Material Review.md",
-        recipeReview: "Minecraft Recipe Review.md"
+        baseReview: workspaceName(vaultRoot, 'baseReview'),
+        recipeReview: workspaceName(vaultRoot, 'recipeReview')
     };
 }
 
@@ -455,8 +457,8 @@ function scan() {
     const requested = new Set(registryTargets.filter(itemId => includeExisting || !bioRegistry.has(itemId)));
     const currentReviewTargets = [];
     for (const reviewFile of [
-        safeVaultPath("Minecraft Base Material Review.md", ".md"),
-        safeVaultPath("Minecraft Recipe Review.md", ".md")
+        safeVaultPath(workspaceName(vaultRoot, 'baseReview'), ".md"),
+        safeVaultPath(workspaceName(vaultRoot, 'recipeReview'), ".md")
     ]) {
         const currentTarget = reviewTargetFromMarkdown(reviewFile);
         if (currentTarget && runtime.pipeline.itemRegistry.has(currentTarget)) {
@@ -747,11 +749,11 @@ function revoke(decisionId) {
             rootSnapshot
         );
         writeText(
-            safeVaultPath("Minecraft Base Material Review.md", ".md"),
+            safeVaultPath(workspaceName(vaultRoot, 'baseReview'), ".md"),
             stripped.baseReview
         );
         writeText(
-            safeVaultPath("Minecraft Recipe Review.md", ".md"),
+            safeVaultPath(workspaceName(vaultRoot, 'recipeReview'), ".md"),
             stripped.recipeReview
         );
     }

@@ -1,0 +1,101 @@
+✔ Templater exporter writes fresh JSON with completion and truncation metadata (9.6016ms)
+✔ PDF exporter requests a hidden window, writes PDF bytes, and closes the window (5.0953ms)
+✔ failed PDF printing closes its hidden window and leaves no output artifact (2.7254ms)
+✔ CSV export writes two BOM-prefixed Excel files in a fresh bundle (5.3054ms)
+✔ Templater export wrapper supports a require without resolve or cache (1.2832ms)
+Error: MC/YAML錯誤.md：YAML 讀取失敗 — Expected property name or '}' in JSON at position 2 (line 1 column 3)
+    at Object.readCatalog (eval at <anonymous> (eval at loadView (C:\Users\Owner\.codex\worktrees\cee9\OB-SF\tests\minecraft-vanilla-pipeline\bio-reader-v4.test.cjs:417:17)), <anonymous>:15:19)
+    at async Object.reloadBIO [as click] (eval at loadView (C:\Users\Owner\.codex\worktrees\cee9\OB-SF\tests\minecraft-vanilla-pipeline\bio-reader-v4.test.cjs:417:17), <anonymous>:2613:25)
+    at async TestContext.<anonymous> (C:\Users\Owner\.codex\worktrees\cee9\OB-SF\tests\minecraft-vanilla-pipeline\bio-reader-v4.test.cjs:492:5)
+    at async Test.run (node:internal/test_runner/test:1389:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+✔ route output defaults to one and ignores legacy YAML output (2.1829ms)
+✔ Tag representative cycle fallback is owner-scoped and preserves the full legal collection (1.0203ms)
+✔ V4 recognizes an mc-tag collection by type alone (0.2707ms)
+✔ shared collections can recur after concrete progress but item cycles and Tag-only loops remain blocked (0.1455ms)
+✔ cycle fallback policy does not silently filter ordinary exact alternatives (0.3104ms)
+✔ multiple preferred routes follow document order after section and provider filtering (0.8803ms)
+✔ unmarked routes retain document order and external acquisition obeys its section filter (0.2787ms)
+✔ multiple preferred Tag members form ordered candidates without a warning (0.1463ms)
+✔ compact route labels group by provider and retain differing output information (0.6991ms)
+✔ V4 reads external source text and moving preferred switches back to crafting (0.2931ms)
+✔ V4 preserves legacy Base YAML and old machine/qty/output fields (0.1973ms)
+✔ multi-block BIOs retain materials and attach assembly notes to a manual route (0.5667ms)
+✔ V4 picks one legacy alternative and preserves the group quantity (0.1904ms)
+✔ V4 reads qty-free Tag member rows and moving preferred changes the representative (0.553ms)
+✔ V4 still reads legacy Tag tables and their separate representative row (0.1049ms)
+✖ V4 consumes Generator metadata without reading raw recipes or decision registry (4.798ms)
+✔ V4 keeps component-dependent stew routes distinct and labels their effects (0.3449ms)
+✔ NOTE-only effects keep identical-material routes independently selectable and visibly distinct (0.4973ms)
+✔ V4 diagnoses malformed choice metadata and excludes the affected recipe (0.2777ms)
+✔ except self derives the color group from canonical owner identity rather than its display name (0.3175ms)
+✔ except self filters a shared collection per owner and retains the legal original representative (1.1826ms)
+✔ except self uses original representative before collection preference and preserves missing BIO candidates (0.9574ms)
+✔ except self stops on unknown owner, unavailable collection, wrong-family member or empty legal set (0.6108ms)
+✔ except self remains compatible with inline choices and multiplies quantities only once (0.537ms)
+✔ dangling except self markers cannot leak across headings, machines, notes or end of file (0.3131ms)
+✔ RELOAD bypasses stale Dataview metadata, repairs equipment cycles and discovers new BIOs (21.2824ms)
+✔ RELOAD invalidates the tree and export when the selected BIO is deleted (5.5631ms)
+✔ RELOAD reports invalid YAML and removes the stale report (1.6707ms)
+✔ actual V4 shows an orange note and retains quantity when all provider routes are excluded (1.7967ms)
+✔ actual V4 except self keeps the representative link, filters the material dropdown and scales batches (2.5746ms)
+✔ V4 collection selection isolates preview batches and rejects ambiguous formal identities (1.2264ms)
+✔ actual V4 preserves demand and orange warning when except self cannot resolve its collection (1.1494ms)
+✔ equipment material expansion and tutorial use the same owner-scoped except self choice (1.5029ms)
+✔ actual V4 renders one technology optgroup for four compact cooking routes (1.7061ms)
+✔ the export button beside Copy invokes the output-only Templater template (1.5228ms)
+✔ V4 keeps multi-block assembly as a note instead of registering an extra device (1.5948ms)
+✔ actual V4 view switches an external leaf to a machine route and recalculates quantities (1.1165ms)
+✔ actual V4 material dropdown switches exactly one Tag ingredient and keeps batch scaling (1.9124ms)
+✔ actual V4 view displays cycles and respects explicit preview paths (0.7488ms)
+✔ actual V4 follows a Tag BIO link and switches its preferred member without inline JSON (1.1454ms)
+✔ V4 stops at the depth limit, flags the report and does not treat the cut branch as a base (1.0361ms)
+✔ V4 counts unresolved branches against the node limit and bounds a wide recipe (1.07ms)
+✔ equipment dependencies share the same depth budget as product dependencies (0.9687ms)
+✔ V4 exposes the requested defaults and clamps user settings with seconds-to-milliseconds conversion (0.8151ms)
+✔ analysis budget bounds depth, total work and elapsed time (1.3927ms)
+✔ Markdown exports Mermaid and numbered task lists in all three inventory sections (1.9749ms)
+✔ Mermaid escapes user labels and clips graph output independently of analysis (0.189ms)
+✔ tutorial is bottom-up, preserves batches, and splits materials into groups of at most five (0.5077ms)
+✔ preparation uses real heading links without repeating inventory quantities (0.6382ms)
+✔ equipment tutorials retain dependency order and parent labels while preview hides deep steps (0.4606ms)
+✔ CSV totals combine identical BIO paths and escape Excel text cells (0.9994ms)
+✔ shared recipes combine already-computed batch requirements without discarding costs (0.3074ms)
+✔ truncated branches make exports incomplete and are never silently counted as base materials (0.7715ms)
+✔ missing BIOs report the absent item and do not claim the engine hit an analysis limit (0.3748ms)
+✔ a clipped Mermaid diagram reports display limits separately from a truncated calculation (0.2228ms)
+✔ pending source descriptions and mixed failure causes remain individually identified (0.2271ms)
+✔ JSON snapshots exclude live Dataview page objects and PDF HTML safely escapes text (0.2195ms)
+ℹ tests 62
+ℹ suites 0
+ℹ pass 61
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 155.5512
+
+✖ failing tests:
+
+test at tests\minecraft-vanilla-pipeline\bio-reader-v4.test.cjs:215:1
+✖ V4 consumes Generator metadata without reading raw recipes or decision registry (4.798ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'minecraft:oak_logs'
+  
+      at TestContext.<anonymous> (C:\Users\Owner\.codex\worktrees\cee9\OB-SF\tests\minecraft-vanilla-pipeline\bio-reader-v4.test.cjs:236:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'minecraft:oak_logs',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

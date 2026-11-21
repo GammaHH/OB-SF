@@ -1,9 +1,10 @@
 // Pure inventory index shared by Node and Obsidian adapters. No BIO body reads.
-function canonicalId(value) {
+function canonicalId(value, namespace = 'minecraft') {
     if (typeof value !== "string" || !value.trim()) return null;
-    const id = value.trim().replace(/^#/, "").toLowerCase();
-    const normalized = id.includes(":") ? id : "minecraft:" + id;
-    return /^minecraft:[a-z0-9_./-]+$/.test(normalized) ? normalized : null;
+    const id = value.trim().replace(/^#/, "");
+    const normalized = id.includes(":") ? id : namespace + ':' + id;
+    if (normalized.startsWith('minecraft:')) return /^minecraft:[a-z0-9_./-]+$/i.test(normalized) ? normalized.toLowerCase() : null;
+    return /^[a-z][a-z0-9_.-]*:[A-Za-z0-9_./-]+$/.test(normalized) ? normalized : null;
 }
 
 function identity(kind, id) { return kind + ":" + id; }
@@ -16,7 +17,7 @@ function buildBIOInventory(documents, options = {}) {
     const legacyTagIds = new Set(options.legacyTagIds || []);
     for (const document of [...documents].sort((a, b) => a.path.localeCompare(b.path, "en"))) {
         const filePath = document.path.replaceAll("\\", "/");
-        if (/(^|\/)preview(\/|$)/i.test(filePath) || /\.preview\.md$/i.test(filePath)) {
+        if (filePath.startsWith('@自動化BIO Preview/') || /(^|\/)preview(\/|$)/i.test(filePath) || /\.(?:preview|update-preview|formal-candidate)\.md$/i.test(filePath)) {
             previewsExcluded++;
             continue;
         }
@@ -26,7 +27,7 @@ function buildBIOInventory(documents, options = {}) {
             continue;
         }
         const fm = document.frontmatter || {};
-        if (!["mc-item", "mc-drop", "mc-tag"].includes(fm.type)) continue;
+        if (!["mc-item", "mc-drop", "mc-tag", "sf-item", "sf-drop", "sf-GEO"].includes(fm.type)) continue;
         let kind = "item";
         let id;
         if (fm.derived_group) {
@@ -39,9 +40,9 @@ function buildBIOInventory(documents, options = {}) {
             kind = "tag";
             id = /^[A-Za-z0-9_.:-]+$/.test(fm.id || "") ? "custom:" + fm.id.toLowerCase() : null;
         } else {
-            id = canonicalId(fm.minecraft_id || fm.id);
+            id = fm.type.startsWith('sf-') ? canonicalId(fm.id, 'slimefun') : canonicalId(fm.minecraft_id || fm.id);
             // Legacy Tag BIOs such as PLANKS need an explicit tag identity.
-            if (!fm.minecraft_id && legacyTagIds.has(String(fm.id || "").toUpperCase())) {
+            if (fm.type.startsWith('mc-') && !fm.minecraft_id && legacyTagIds.has(String(fm.id || "").toUpperCase())) {
                 diagnostics.push({ code: "LEGACY_TAG_ID_REQUIRES_IDENTITY", path: filePath, bioId: fm.id });
                 continue;
             }

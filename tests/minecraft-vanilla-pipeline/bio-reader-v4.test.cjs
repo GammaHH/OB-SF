@@ -149,7 +149,7 @@ test("multi-block BIOs retain materials and attach assembly notes to a manual ro
     for (const filename of ["磨石.md", "進階工作台.md"]) {
         const text = fs.readFileSync(path.resolve(__dirname, "../../SF-基礎機器(原版)", filename), "utf8");
         const selected = select(reader.parseBIO(text, { output: 1 }));
-        assert.equal(selected.machine, "無/手動");
+        assert.equal(reader.isManualMachine(selected.machine), true);
         assert.equal(selected.preferred, true);
         assert.equal(selected.output, 1);
         assert.equal(selected.ingredients.length, 2);
@@ -440,6 +440,21 @@ function page(name, properties = {}) {
     return { type: "mc-item", id: name, ...properties, file: { path: "MC/" + name + ".md", name, folder: "MC" } };
 }
 
+test('V4 produces the same Preferred and tree with or without a decision registry in the vault fixture', async () => {
+    const target = page('登錄庫獨立測試');
+    const files = new Map([[target.file.path,
+        '### 外部取得\n<!-- preferred -->\n- 採集：森林\n- 交易：村民']]);
+    files.set('BIO Review Decisions.json', '{ deliberately unreadable registry }');
+    const first = await loadView(files, [target]);
+    await first.view.analyzePage(target);
+    files.delete('BIO Review Decisions.json');
+    const second = await loadView(files, [target]);
+    await second.view.analyzePage(target);
+    assert.deepEqual(second.view.latestReport().tree, first.view.latestReport().tree);
+    assert.equal(second.view.currentTree().acquisition, '採集：森林');
+    assert.deepEqual(second.notices, []);
+});
+
 function savedBio(metadata, body) {
     return "---\n" + JSON.stringify(metadata) + "\n---\n" + body;
 }
@@ -473,6 +488,29 @@ test("RELOAD bypasses stale Dataview metadata, repairs equipment cycles and disc
     const equipment = view.latestReport().equipmentSteps.find(step => step.name === "工作台");
     assert.ok(equipment);
     assert.equal(equipment.materials[0].name, "新木材");
+});
+
+test("equipment cycles identify the intervening Tag and the material recipe requiring the machine", async () => {
+    const target = page("終界水晶");
+    const table = page("工作台");
+    const group = page("任意木材", { type: "mc-tag" });
+    const planks = page("橡木材");
+    const log = page("橡木原木");
+    const files = new Map([
+        [target.file.path, "### 合成配方\n- (Machine:: [[工作台]])\n- [item:: [[橡木原木]]] (qty:: 1)"],
+        [table.file.path, "### 合成配方\n- (Machine:: 無/手動)\n- [item:: [[任意木材]]] (qty:: 4)"],
+        [group.file.path, "### Tag 代表材料\n- [item:: [[橡木材]]]"],
+        [planks.file.path, "### 合成配方\n- (Machine:: [[工作台]])\n- [item:: [[橡木原木]]] (qty:: 1)\n- [output:: 4]"],
+        [log.file.path, "### 外部取得\n- 採集：森林"]
+    ]);
+    const { view } = await loadView(files, [target, table, group, planks, log]);
+    await view.analyzePage(target);
+    const warning = view.latestReport().warnings.find(value => value.startsWith("設備建造遇到循環："));
+    assert.equal(warning, "設備建造遇到循環：MC/工作台.md → MC/任意木材.md → MC/橡木材.md → MC/工作台.md（請檢查 MC/橡木材.md 的生產設備設定）");
+    assert.ok(view.latestReport().assessment.cycles.includes(warning));
+    files.set(planks.file.path, files.get(planks.file.path).replace("(Machine:: [[工作台]])", "(Machine:: 無/手動)"));
+    await view.recalculateCurrentAnalysis();
+    assert.deepEqual(view.latestReport().assessment.cycles, []);
 });
 
 test("RELOAD invalidates the tree and export when the selected BIO is deleted", async () => {
