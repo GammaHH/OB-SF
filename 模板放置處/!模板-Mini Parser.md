@@ -70,7 +70,7 @@ let itemName, itemId, nameAliases = [];
 const formal = [];
 const byId = new Map(), byMinecraftId = new Map();
 const identities = new Map();
-const isPreviewFile = path => /(^|\/)preview(\/|$)/i.test(path) || /\.preview\.md$/i.test(path);
+const isPreviewFile = path => path.startsWith("@自動化BIO Preview/") || /(^|\/)preview(\/|$)/i.test(path) || /\.preview\.md$/i.test(path);
 const isAuxiliaryFile = path => /\.(?:update-preview|formal-candidate)\.md$/i.test(path);
 const normalizeName = value => String(value || "").trim().normalize("NFKC").toLocaleLowerCase();
 const looksLikeId = value => /^[A-Za-z0-9_:.-]+$/.test(String(value || "").trim());
@@ -618,9 +618,9 @@ while (true) {
 }
 if (!confirmed) return;
 // 使用獨立路徑，不覆蓋其他同 ID Preview，交由集中 SCAN 報告重複。
-const previewRoot = "MC-自動化BIO/preview/mini";
+const previewRoot = "@自動化BIO Preview/mini";
 try {
-    for (const folder of ["MC-自動化BIO", "MC-自動化BIO/preview", previewRoot]) {
+    for (const folder of ["@自動化BIO Preview", previewRoot]) {
         if (!app.vault.getAbstractFileByPath(folder)) await app.vault.createFolder(folder);
     }
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");

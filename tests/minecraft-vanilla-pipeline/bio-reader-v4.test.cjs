@@ -212,7 +212,7 @@ test("V4 still reads legacy Tag tables and their separate representative row", (
     assert.equal(selected.ingredients[0].choices.length, 2);
 });
 
-test("V4 consumes Generator metadata without reading raw recipes or decision registry", () => {
+test("V4 consumes Generator material choices without reading raw recipes or decision registry", () => {
     const id = "minecraft:oak_planks";
     const sourceRoot = path.resolve(__dirname, "../../參考資料/Minecraft");
     const pipeline = vanilla.createVanillaPipeline({
@@ -233,8 +233,13 @@ test("V4 consumes Generator metadata without reading raw recipes or decision reg
     });
     const selected = select(reader.parseBIO(markdown));
     assert.equal(selected.output, 4);
-    assert.equal(selected.ingredients[0].choiceId, "minecraft:oak_logs");
-    assert.equal(selected.ingredients[0].choices.length, 4);
+    // No Tag BIO was supplied: the generator writes visible alternatives,
+    // with the reviewed representative first, rather than obsf:choices metadata.
+    assert.match(markdown, /\*\*擇一材料\*\*/);
+    assert.doesNotMatch(markdown, /<!-- obsf:choices /);
+    assert.deepEqual(selected.ingredients[0].choices.map(choice => choice.name).sort(), [
+        "oak log", "oak wood", "stripped oak log", "stripped oak wood"
+    ]);
     assert.equal(selected.ingredients[0].name, "oak log");
     assert.equal(selected.ingredients[0].qty, 1);
 });
@@ -399,6 +404,9 @@ async function loadView(files, pages) {
     const app = {
         vault: {
             getName: () => "test",
+            getMarkdownFiles: () => [...files.keys()].map(value => ({
+                path: value, basename: path.posix.basename(value, ".md")
+            })),
             adapter: { read: async relative => fs.readFileSync(path.join(vaultRoot, relative), "utf8") },
             getAbstractFileByPath: value => files.has(value) ||
                 ["模板放置處/V4-輸出製作報告.md", "黏液科技DB 搜尋介面V4.md"].includes(value)
@@ -411,21 +419,87 @@ async function loadView(files, pages) {
         plugins: { getPlugin: id => id === "templater-obsidian" ? { templater } : null }
     };
     const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-    const run = new AsyncFunction("app", "dv", "document", "localStorage", "Notice", "navigator",
-        code + "\nreturn { analyzePage, currentTree: () => currentTree, recipeChoices, ingredientChoices, leafTotals, parseCache, resolvedParseCache, buildBioIndex, resolveBio, resolveExceptSelfCollection, buildPlainTextReport, recalculateCurrentAnalysis, analysisContainer, targetQtyInput, limitInputs, latestReport: () => latestReport };");
+    const run = new AsyncFunction("app", "dv", "document", "localStorage", "Notice", "navigator", "require",
+        code + "\nreturn { analyzePage, currentTree: () => currentTree, recipeChoices, ingredientChoices, leafTotals, parseCache, resolvedParseCache, buildBioIndex, resolveBio, resolveExceptSelfCollection, buildPlainTextReport, recalculateCurrentAnalysis, analysisContainer, targetQtyInput, limitInputs, latestReport: () => latestReport, reloadButton, reloadStatus, bioPages: () => bioPages, recipeSections: () => recipeSections, selectedFolders: () => selectedFolders, selectedRecipeSections: () => selectedRecipeSections }; ");
     const view = await run(app, {
         pages: () => ({ array: () => pages }),
         el: tag => new Element(tag)
     }, {
         createElement: tag => new Element(tag),
         createTextNode: text => ({ textContent: text })
-    }, { getItem: () => null, setItem: () => {} }, function (message) { notices.push(message); }, {});
+    }, { getItem: () => null, setItem: () => {} }, function (message) { notices.push(message); }, {},
+    name => {
+        assert.equal(name, "obsidian");
+        // JSON is a YAML subset; fixtures isolate refresh behavior from YAML parsing.
+        return { parseYaml: JSON.parse };
+    });
     return { view, notices, exportCalls };
 }
 
 function page(name, properties = {}) {
     return { type: "mc-item", id: name, ...properties, file: { path: "MC/" + name + ".md", name, folder: "MC" } };
 }
+
+function savedBio(metadata, body) {
+    return "---\n" + JSON.stringify(metadata) + "\n---\n" + body;
+}
+
+test("RELOAD bypasses stale Dataview metadata, repairs equipment cycles and discovers new BIOs", async () => {
+    const target = page("終界水晶");
+    const table = page("工作台");
+    const targetBody = "### 合成配方\n- (Machine:: [[工作台]])\n- [item:: [[木材]]] (qty:: 1)";
+    const files = new Map([
+        [target.file.path, savedBio(target, targetBody)],
+        [table.file.path, savedBio(table, "### 合成配方\n- (Machine:: [[工作台]])\n- [item:: [[木材]]] (qty:: 4)")]
+    ]);
+    const { view } = await loadView(files, [target, table]);
+    await view.analyzePage(target);
+    assert.ok(view.latestReport().warnings.some(warning => /設備建造遇到循環/.test(warning)));
+    const wood = page("新木材", { aliases: ["木材"] });
+    files.set(wood.file.path, savedBio(wood, "### 外部取得\n- 採集：森林"));
+    files.set(table.file.path, savedBio(table,
+        "### 手動製作\n- (Machine:: 無/手動)\n- [item:: [[木材]]] (qty:: 4)"));
+    view.targetQtyInput.value = "3";
+    await view.analyzePage(target);
+    await view.reloadButton.listeners.click();
+    assert.match(view.reloadStatus.textContent, /已重讀 3 個 BIO/);
+    assert.match(view.reloadStatus.textContent, /目前目標已重算/);
+    assert.equal(view.reloadButton.disabled, false);
+    assert.ok(view.bioPages().some(value => value.file.path === wood.file.path));
+    assert.ok(view.recipeSections().includes("手動製作"));
+    assert.ok(view.selectedRecipeSections().has("手動製作"));
+    assert.equal(view.currentTree().required, 3);
+    assert.equal(view.latestReport().warnings.some(warning => /設備建造遇到循環/.test(warning)), false);
+    const equipment = view.latestReport().equipmentSteps.find(step => step.name === "工作台");
+    assert.ok(equipment);
+    assert.equal(equipment.materials[0].name, "新木材");
+});
+
+test("RELOAD invalidates the tree and export when the selected BIO is deleted", async () => {
+    const target = page("已刪除目標");
+    const files = new Map([[target.file.path, savedBio(target, "### 外部取得\n- 採集：測試")]]);
+    const { view } = await loadView(files, [target]);
+    await view.analyzePage(target);
+    files.delete(target.file.path);
+    await view.reloadButton.listeners.click();
+    assert.equal(view.currentTree(), null);
+    assert.equal(view.latestReport(), null);
+    assert.match(view.reloadStatus.textContent, /原目標已刪除/);
+    assert.equal(view.analysisContainer.children.length, 0);
+});
+
+test("RELOAD reports invalid YAML and removes the stale report", async () => {
+    const target = page("YAML錯誤");
+    const files = new Map([[target.file.path, savedBio(target, "### 外部取得\n- 採集：測試")]]);
+    const { view } = await loadView(files, [target]);
+    await view.analyzePage(target);
+    files.set(target.file.path, "---\n{ broken\n---\n");
+    await view.reloadButton.listeners.click();
+    assert.equal(view.latestReport(), null);
+    assert.equal(view.currentTree(), null);
+    assert.match(view.reloadStatus.textContent, /RELOAD 失敗.*YAML 讀取失敗/);
+    assert.equal(view.reloadButton.disabled, false);
+});
 
 function findSelect(element) {
     if (element.tag === "select") return element;

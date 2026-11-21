@@ -3,6 +3,7 @@ const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { parseFrontmatter } = require('../../BIO相關模組/MC解析器模塊/bio/bio_scanner');
 const reader = require('../../BIO相關模組/搜尋介面模塊/bio_reader_v4');
+const { previewRoots } = require('./bio-preview-paths.cjs');
 const stableHash = value => createHash('sha256').update(value).digest('hex');
 const key = value => String(value).replace(/\\/g, '/').replace(/\.md$/i, '').normalize('NFC').toLowerCase();
 
@@ -31,7 +32,7 @@ function readStandalonePreviews(root) {
         if (receipt.status !== 'COMPLETE') continue;
         for (const file of receipt.files || []) if (file.written && file.draftPath) published.add(file.draftPath + '\0' + file.previewSHA256);
     }
-    for (const source of ['mini', 'plugin', 'material-base']) walkMarkdown(root, 'MC-自動化BIO/preview/' + source, (relative, text) => {
+    for (const folder of previewRoots) for (const source of ['mini', 'plugin', 'material-base']) walkMarkdown(root, folder + '/' + source, (relative, text) => {
         if (!relative.endsWith('.preview.md')) return;
         if (published.has(relative + '\0' + stableHash(text))) return;
         const metadata = parseFrontmatter(text);
@@ -123,7 +124,8 @@ function reviewCandidates(plan, mapping, onIssue) {
             for (const diagnostic of parsed.diagnostics) issue(file, diagnostic.code, diagnostic.message);
             const validMarker = collection ? parsed.recipes[0]?.ingredients[0]?.choices?.filter(choice => choice.preferred).length === 1 : preferred.length === 1;
             if (!parsed.recipes.length || preferred.length > 1 || markerCount !== 1 || !validMarker)
-                issue(file, 'PREFERRED_REQUIRED', '須恰好一條有效 Preferred 路線');
+                issue(file, 'PREFERRED_REQUIRED', '須恰好一條有效 Preferred 路線', undefined,
+                    { previewPath: path.relative(plan.root, candidate.previewPath).split(path.sep).join('/') });
             if (!collection) {
                 const machineRows = body.filter(line => /^\s*-.*\(Machine\s*::/i.test(line));
                 const machineRecipes = parsed.recipes.filter(route => !route.external && !route.tagRepresentative);
@@ -216,7 +218,10 @@ function reviewCandidates(plan, mapping, onIssue) {
         previous = resolved.size;
         for (const [file, groups] of dependencies) if (groups.every(group => group.some(target => resolved.has(target)))) resolved.add(file);
     } while (resolved.size !== previous);
-    for (const entry of plan.entries) if (!resolved.has(entry.targetPath)) issue(entry.targetPath, 'DEPENDENCY_BLOCKED', 'Preferred 依賴有循環或無有效材料');
+    for (const entry of plan.entries) if (!resolved.has(entry.targetPath)) {
+        issue(entry.targetPath, 'DEPENDENCY_BLOCKED', 'Preferred 依賴有循環或無有效材料', undefined,
+            { previewPath: path.relative(plan.root, entry.previewPath).split(path.sep).join('/') });
+    }
     return { diagnostics, formal: [...formal, ...sources].sort(([a], [b]) => a.localeCompare(b)) };
 }
 

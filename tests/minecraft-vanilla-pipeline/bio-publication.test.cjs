@@ -3,9 +3,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+const { createHash } = require('node:crypto');
 const { spawnSync } = require('node:child_process');
 const { publicationManifest, publishBIOBatch, preparePublication, scanPublication, selectPublicationManifest, standaloneManifest, formalizePreview, previewSemanticHash, identity, allowPreferredEdits, allowLevelEdits, parseBIOLevel } = require('../../scripts/lib/bio-publication.cjs');
 const { openBatchRefresh, finishBatchRefresh, renameBatchTemplates } = require('../../scripts/lib/bio-batch-refresh.cjs');
+const { archivePublication } = require('../../scripts/lib/bio-publication-archive.cjs');
 const { refreshVanillaRecipeBlocks } = require('../../BIO相關模組/MC解析器模塊/bio/bio_update');
 
 const batch = 'MC-自動化BIO/preview/batch/test';
@@ -124,6 +126,8 @@ test('material report is outside the batch and only checked, verified Vanilla ma
     assert.equal(first.materialReport, 'MC-自動化BIO/preview/batch/test - 材料審核.md');
     const report = path.join(f.root, first.materialReport);
     const text = fs.readFileSync(report, 'utf8');
+    assert.equal(text.split('\n')[0],
+        '**' + ['READY', 'REVIEW', 'BLOCKED'].map(key => first.counts[key] + ' ' + key).join('、') + '**');
     assert.match(text, /- \[ \] 鐵礦 /);
     assert.match(text, /- \[ \] 深板岩鐵礦 /);
     assert.match(text, /- \[ \] 鐵粉 · 需人工處理/);
@@ -136,8 +140,10 @@ test('material report is outside the batch and only checked, verified Vanilla ma
         /<!-- obsf:material-base minecraft:iron_ore -->\n  - /,
         '<!-- obsf:material-base minecraft:iron_ore -->\n  - 使用絲綢之觸挖掘鐵礦方塊。\n  - 從舊地圖採集。'));
     const second = scanPublication(f.root, f.manifestPath, options);
-    assert.deepEqual(second.basePreviews, ['MC-自動化BIO/preview/material-base/iron_ore.preview.md']);
+    assert.deepEqual(second.basePreviews, ['MC-自動化BIO/preview/material-base/鐵礦.preview.md']);
     const draftText = fs.readFileSync(path.join(f.root, second.basePreviews[0]), 'utf8');
+    assert.match(draftText, /^minecraft_id: minecraft:iron_ore$/m);
+    assert.match(draftText, /^publish_target: "MC-物品資料庫\/鐵礦\.md"$/m);
     assert.match(draftText, /^base_material: true$/m);
     assert.match(draftText, /^generated_by: minecraft-bio-publication-scan$/m);
     assert.doesNotMatch(draftText, /^#待補充$/m);
@@ -163,8 +169,8 @@ test('material report is outside the batch and only checked, verified Vanilla ma
     assert.equal(fs.existsSync(path.join(f.root, 'MC-物品資料庫/鐵礦.md')), false);
 });
 
-function draft(f, id, material) {
-    const name = 'MC-自動化BIO/preview/mini/' + id + '.preview.md';
+function draft(f, id, material, root = 'MC-自動化BIO/preview') {
+    const name = root + '/mini/' + id + '.preview.md';
     const file = path.join(f.root, name);
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, '---\ntype: sf-item\nid: ' + id +
@@ -293,6 +299,7 @@ test('any active review tag blocks publication and SCAN never restores removed t
         const report = path.join(f.root, scan.materialReport);
         const markdown = fs.readFileSync(report, 'utf8');
         assert.match(markdown, /^- \[ \] \[PUBLICATION_TAG_BLOCKED\].*obsf:tag-progress /m);
+        assert.ok(markdown.includes('[[' + batch + '/木棒.preview|木棒.preview.md]]'));
         fs.writeFileSync(report, markdown.replace('- [ ] [PUBLICATION_TAG_BLOCKED]', '- [x] [PUBLICATION_TAG_BLOCKED]'));
         const rescanned = scanPublication(f.root, f.manifestPath);
         assert.equal(rescanned.status, 'BLOCKED');
@@ -385,12 +392,12 @@ test('central scan compares updated official files with the edited preview witho
     assert.equal(scanPublication(f.root, f.manifestPath).status, 'READY');
 });
 
-test('individual Preview approvals require re-scan and expire when the Preview changes', t => {
+test('accepted Preview differences disappear from the checklist and expire when the Preview changes', t => {
     const f = fixture(t);
     centralMapping(f);
     const draftText = item('stick', '### 外部取得\n<!-- preferred -->\n- 採集：拾取。\n\n# 用途\n');
     const original = draftText + '人工說明甲\n人工說明乙\n';
-    const entry = f.add('stick', '木棒', draftText, original);
+    const entry = f.add('stick', '木棒', draftText, original, { status: 'REVIEW' });
     f.save();
     const first = scanPublication(f.root, f.manifestPath);
     const missing = first.diagnostics.filter(issue => issue.code === 'PREVIEW_CONTENT_MISSING');
@@ -398,8 +405,8 @@ test('individual Preview approvals require re-scan and expire when the Preview c
     assert.ok(missing.every(issue => issue.approvalKey));
     const report = path.join(f.root, first.materialReport);
     const markdown = fs.readFileSync(report, 'utf8');
-    assert.ok(markdown.includes('[[' + batch + '/' + entry.previewFilename + '|' + entry.previewFilename + ']]'));
-    assert.ok(markdown.includes('[[' + entry.targetPath + '|木棒.md]]:' + missing[0].sourceLine));
+    assert.ok(markdown.includes('[[' + batch + '/木棒.preview|' + entry.previewFilename + ']]'));
+    assert.ok(markdown.includes('[[MC-物品資料庫/木棒|木棒.md]]:' + missing[0].sourceLine));
     const mark = only => {
         const text = fs.readFileSync(report, 'utf8').replace(/^(- )\[ \]( .*obsf:accept-preview .*)$/gm,
             (line, prefix, remainder) => !only || remainder.includes(only) ? prefix + '[x]' + remainder : line);
@@ -407,40 +414,60 @@ test('individual Preview approvals require re-scan and expire when the Preview c
     };
     mark('人工說明甲');
     assert.equal(scanPublication(f.root, f.manifestPath).status, 'BLOCKED');
-    mark();
+    const partial = fs.readFileSync(report, 'utf8');
+    assert.doesNotMatch(partial, /\[PREVIEW_CONTENT_MISSING\].*人工說明甲/);
+    assert.match(partial, /\[PREVIEW_CONTENT_MISSING\].*人工說明乙/);
+    mark('PREVIEW_CONTENT_MISSING');
+    assert.equal(scanPublication(f.root, f.manifestPath).status, 'REVIEW');
+    const pendingOverwrite = fs.readFileSync(report, 'utf8');
+    assert.doesNotMatch(pendingOverwrite, /\[PREVIEW_CONTENT_MISSING\]/);
+    assert.match(pendingOverwrite, /^- \[ \] \[REVIEW_REQUIRED\]/m);
+    assert.equal([...pendingOverwrite.matchAll(/<!-- obsf:approved-missing-content /g)].length, 2);
+    mark('REVIEW_REQUIRED');
     assert.throws(() => publishBIOBatch(f.root, f.manifestPath, { central: true, write: true }), /重新執行 scan-publication/);
     const accepted = scanPublication(f.root, f.manifestPath);
     assert.equal(accepted.status, 'READY');
-    assert.equal(accepted.approvedIssues.length, 2);
+    assert.equal(accepted.approvedIssues.length, 3);
+    assert.equal(scanPublication(f.root, f.manifestPath).previousValidation, 'UNCHANGED');
     assert.equal(fs.readFileSync(path.join(f.root, entry.targetPath), 'utf8'), original);
     fs.appendFileSync(path.join(f.root, batch, entry.previewFilename), '新預覽內容\n');
     assert.equal(scanPublication(f.root, f.manifestPath).status, 'BLOCKED');
+    assert.match(fs.readFileSync(report, 'utf8'), /^- \[ \] \[PREVIEW_CONTENT_MISSING\]/m);
     assert.throws(() => publishBIOBatch(f.root, f.manifestPath, { central: true, write: true }), /重新執行 scan-publication/);
 });
 
-test('central scan preserves the latest updated timestamp and locates YAML conflicts in both files', t => {
+test('central scan inherits official timestamps and still locates other YAML conflicts in both files', t => {
     const f = fixture(t);
     centralMapping(f);
     const old = item('stick', '### 外部取得\n<!-- preferred -->\n- 採集：拾取。\n')
-        .replace('id: STICK\n', 'id: STICK\nupdated: 2026-11-18 12:00\ncreated: 2026-11-17 12:00\n');
+        .replace('id: STICK\n', 'id: STICK\nupdated: 2026-11-18 12:00\ncreated: "2026-11-17 12:00"\nsource_note: 手動\n');
     const entry = f.add('stick', '木棒', old, old);
+    const piston = item('piston', '### 外部取得\n<!-- preferred -->\n- 採集：拾取。\n');
+    f.add('piston', '活塞', piston.replace('id: PISTON\n', 'id: PISTON\ncreated: 2026-11-21 12:00\n'), piston);
     f.save();
     const formal = path.join(f.root, entry.targetPath);
     const preview = path.join(f.root, batch, entry.previewFilename);
     const latest = old.replace('updated: 2026-11-18', 'updated: 2026-11-20');
     fs.writeFileSync(formal, latest);
-    assert.equal(scanPublication(f.root, f.manifestPath).status, 'READY');
-    assert.match(preparePublication(f.root, f.manifestPath, { central: true }).entries[0].text, /^updated: 2026-11-20 12:00$/m);
-    assert.equal(fs.readFileSync(preview, 'utf8'), old);
-    fs.writeFileSync(preview, old.replace('created: 2026-11-17', 'created: 2026-11-16'));
+    for (const edited of [old.replace('2026-11-17', '2026-11-16'), old.replace(/^created:.*\n/m, '')]) {
+        fs.writeFileSync(preview, edited);
+        assert.equal(scanPublication(f.root, f.manifestPath).status, 'READY');
+        const entries = preparePublication(f.root, f.manifestPath, { central: true }).entries;
+        assert.match(entries[0].text, /^updated: 2026-11-20 12:00$/m);
+        assert.match(entries[0].text, /^created: "2026-11-17 12:00"$/m);
+        assert.match(entries[1].text, /^created: 2026-11-21 12:00$/m);
+        assert.equal(fs.readFileSync(preview, 'utf8'), edited);
+        assert.equal(fs.readFileSync(formal, 'utf8'), latest);
+    }
+    fs.writeFileSync(preview, old.replace('source_note: 手動', 'source_note: 自動'));
     const report = scanPublication(f.root, f.manifestPath);
     assert.equal(report.status, 'BLOCKED');
     const issue = report.diagnostics.find(value => value.code === 'YAML_DIFF');
-    assert.equal(issue.field, 'created');
+    assert.equal(issue.field, 'source_note');
     assert.equal(issue.path, batch + '/' + entry.previewFilename);
-    assert.equal(issue.line, 5);
+    assert.equal(issue.line, 6);
     assert.equal(issue.sourcePath, entry.targetPath);
-    assert.equal(issue.sourceLine, 5);
+    assert.equal(issue.sourceLine, 6);
 });
 
 test('central scan reports duplicate identity, multi-preferred and cycles without writing official BIOs', t => {
@@ -451,7 +478,8 @@ test('central scan reports duplicate identity, multi-preferred and cycles withou
     const mini = draft(f, 'HM_TEST', 'minecraft:stick');
     let result = scanPublication(f.root, f.manifestPath);
     assert.equal(result.status, 'BLOCKED');
-    assert.ok(result.diagnostics.some(item => item.code === 'DEPENDENCY_BLOCKED'));
+    const dependency = result.diagnostics.find(issue => issue.code === 'DEPENDENCY_BLOCKED' && issue.path === vanilla.targetPath);
+    assert.equal(dependency?.previewPath, batch + '/' + vanilla.previewFilename);
     fs.appendFileSync(mini, '\n<!-- preferred -->\n');
     result = scanPublication(f.root, f.manifestPath);
     assert.ok(result.diagnostics.some(item => item.code === 'PREFERRED_REQUIRED'));
@@ -466,7 +494,7 @@ function git(root, ...args) {
     assert.equal(run.status, 0, run.error?.message || run.stderr);
     return run.stdout.trim();
 }
-function fixture(t) {
+function fixture(t, batchDirectory = batch) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'obsf-bio-publication-test-'));
     t.after(() => {
         assert.equal(path.dirname(root), path.resolve(os.tmpdir()));
@@ -474,7 +502,7 @@ function fixture(t) {
         fs.rmSync(root, { recursive: true, force: true });
     });
     fs.mkdirSync(path.join(root, 'MC-物品資料庫'));
-    fs.mkdirSync(path.join(root, batch), { recursive: true });
+    fs.mkdirSync(path.join(root, batchDirectory), { recursive: true });
     git(root, 'init', '-b', 'codex/test');
     git(root, 'config', 'user.name', 'BIO test'); git(root, 'config', 'user.email', 'bio@example.invalid');
     git(root, 'config', 'core.autocrlf', 'false');
@@ -483,7 +511,7 @@ function fixture(t) {
     const records = [];
     const add = (id, filename, text, original = null, extra = {}) => {
         const previewFilename = filename + '.preview.md', targetPath = 'MC-物品資料庫/' + filename + '.md';
-        fs.writeFileSync(path.join(root, batch, previewFilename), text);
+        fs.writeFileSync(path.join(root, batchDirectory, previewFilename), text);
         if (original !== null) fs.writeFileSync(path.join(root, targetPath), original);
         const record = { identity: 'minecraft:' + id, kind: 'item', targetPath, sourcePath: original !== null ? targetPath : null,
             previewFilename, linkFilenames: [previewFilename], baselineSemantic: previewSemanticHash(text),
@@ -491,8 +519,8 @@ function fixture(t) {
             status: original !== null ? 'ADDITIVE_UPDATE' : 'NEW', approved: false, ...extra };
         records.push(record); return record;
     };
-    const manifestPath = batch + '/BIO Publication.json';
-    const save = () => fs.writeFileSync(path.join(root, manifestPath), JSON.stringify(publicationManifest(root, path.join(root, batch), records)));
+    const manifestPath = batchDirectory + '/BIO Publication.json';
+    const save = () => fs.writeFileSync(path.join(root, manifestPath), JSON.stringify(publicationManifest(root, path.join(root, batchDirectory), records)));
     return { root, records, add, save, manifestPath };
 }
 
@@ -543,18 +571,68 @@ test('publication creates linked item, drop and Tag, with a verified checkpoint 
     const actual = fs.readFileSync(path.join(f.root, 'MC-物品資料庫/活塞.md'), 'utf8');
     assert.match(actual, /\[drop:: \[\[MC-物品資料庫\/木棒\|木棒\]\]\]/);
     assert.doesNotMatch(actual, /\.preview/);
+    assert.match(actual, /^created: (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\nupdated: \1$/m);
+    const previewText = fs.readFileSync(path.join(f.root, batch, stick.previewFilename), 'utf8');
+    assert.doesNotMatch(previewText, /^(?:created|updated):/m);
     const receipt = JSON.parse(fs.readFileSync(path.join(f.root, result.receipt), 'utf8'));
     assert.equal(receipt.status, 'COMPLETE'); assert.ok(receipt.files.every(file => file.created && file.written));
+    for (const file of receipt.files) {
+        const bytes = fs.readFileSync(path.join(f.root, file.path));
+        assert.equal(file.candidateSHA256, createHash('sha256').update(bytes).digest('hex'));
+        assert.notEqual(file.reviewedCandidateSHA256, file.candidateSHA256);
+    }
+});
+
+test('archive compresses the verified batch and published drafts from the Chinese Preview folder', t => {
+    const root = '@自動化BIO Preview';
+    const f = fixture(t, root + '/batch/test');
+    centralMapping(f);
+    f.add('stick', '木棒', item('stick', '### 外部取得\n<!-- preferred -->\n- 採集：拾取。\n'));
+    f.save();
+    const publishedDraft = draft(f, 'HM_PUBLISHED', 'minecraft:stick', root);
+    assert.equal(selectPublicationManifest(f.root), f.manifestPath);
+    const scan = scanPublication(f.root, f.manifestPath);
+    assert.equal(scan.status, 'READY');
+    const publication = publishBIOBatch(f.root, f.manifestPath, { central: true, write: true });
+    const unpublished = draft(f, 'HM_UNPUBLISHED', 'minecraft:stick', root);
+    const original = fs.readFileSync(publishedDraft);
+    const plan = archivePublication(f.root, f.manifestPath);
+    assert.equal(plan.dryRun, true);
+    assert.equal(plan.standalonePreviews, 1);
+    assert.equal(fs.existsSync(path.join(f.root, plan.archive)), false);
+    fs.appendFileSync(publishedDraft, '\n發布後新增\n');
+    assert.throws(() => archivePublication(f.root, f.manifestPath, true), /在發布後已變更/);
+    fs.writeFileSync(publishedDraft, original);
+    const result = archivePublication(f.root, f.manifestPath, true);
+    assert.equal(result.dryRun, false);
+    assert.match(result.archive, /^review\/bio-published-previews\/[^/]+\.zip$/);
+    const zip = fs.readFileSync(path.join(f.root, result.archive));
+    assert.equal(zip.readUInt32LE(0), 0x04034b50);
+    for (const file of [f.manifestPath, scan.materialReport, path.relative(f.root, publishedDraft),
+        root + '/batch/test/木棒.preview.md']) {
+        assert.equal(fs.existsSync(path.join(f.root, file)), false);
+        assert.ok(zip.includes(Buffer.from(file.split(path.sep).join('/'), 'utf8')));
+    }
+    assert.ok(fs.existsSync(unpublished));
+    assert.ok(result.removedEmptyFolders.includes(root + '/batch'));
+    assert.equal(fs.existsSync(path.join(f.root, root, 'batch')), false);
+    assert.ok(fs.existsSync(path.join(f.root, root)));
+    assert.ok(fs.existsSync(path.join(f.root, publication.receipt)));
+    assert.ok(fs.existsSync(path.join(f.root, 'MC-物品資料庫/木棒.md')));
 });
 
 test('updating an existing uncommitted BIO preserves pictures and notes in both target and checkpoint', t => {
     const f = fixture(t);
-    const original = item('iron_ingot', '### 外部取得\n<!-- preferred -->\n- 採集：測試。\n\n![[image.png]]\n人工筆記\n');
+    const original = item('iron_ingot', '### 外部取得\n<!-- preferred -->\n- 採集：測試。\n\n![[image.png]]\n人工筆記\n')
+        .replace('id: IRON_INGOT\n', 'id: IRON_INGOT\ncreated: "2026-08-08 11:22:33"\nupdated: 2026-08-08 12:00:00\n');
     f.add('iron_ingot', '鐵錠', original + '\n附加說明\n', original); f.save();
     const result = publishBIOBatch(f.root, f.manifestPath, { write: true });
     assert.equal(git(f.root, 'show', result.checkpoint + ':MC-物品資料庫/鐵錠.md'), original.trim());
     const actual = fs.readFileSync(path.join(f.root, 'MC-物品資料庫/鐵錠.md'), 'utf8');
     assert.ok(actual.includes('![[image.png]]\n人工筆記'));
+    assert.match(actual, /^created: "2026-08-08 11:22:33"$/m);
+    assert.match(actual, /^updated: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/m);
+    assert.doesNotMatch(actual, /^updated: 2026-08-08 12:00:00$/m);
     assert.doesNotMatch(actual, /^#更新需人工解析$/m);
 });
 

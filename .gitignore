@@ -5,6 +5,7 @@
 /Minecraft Review Decisions.json.tmp
 /MC-自動化BIO/
 /BIO-輸出報告/
+/@自動化BIO Preview/
 
 # Review workflow regression tests are project artifacts even when a local
 # .git/info/exclude contains a broader tests/minecraft-vanilla-pipeline rule.

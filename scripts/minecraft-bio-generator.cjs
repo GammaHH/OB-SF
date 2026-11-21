@@ -15,6 +15,8 @@ const { refreshVanillaRecipeBlocks } = require("../BIO相關模組/MC解析器�
 const bioReader = require("../BIO相關模組/搜尋介面模塊/bio_reader_v4");
 const { rewriteBIOForPreview } = require("../BIO相關模組/MC解析器模塊/bio/bio_preview");
 const { publicationManifest, publishBIOBatch, scanPublication, selectPublicationManifest, standaloneManifest, previewSemanticHash, allowPreferredEdits, allowLevelEdits } = require("./lib/bio-publication.cjs");
+const { archivePublication } = require("./lib/bio-publication-archive.cjs");
+const { previewRoot } = require("./lib/bio-preview-paths.cjs");
 
 const vaultRoot = path.resolve(__dirname, "..");
 
@@ -635,11 +637,12 @@ function preview(rawTargets) {
     if (mappingErrors.length) {
         throw new Error(`已啟用的 BIO mapping 尚未完整（${mappingErrors.length}）：${mappingErrors.join("；")}`);
     }
-    const outputRoot = safeVaultPath(option("output-root", "MC-自動化BIO"));
-    if (preparePublish && outputRoot !== path.join(vaultRoot, "MC-自動化BIO")) throw new Error("發布預覽須使用 MC-自動化BIO 預設輸出目錄");
+    const customOutput = option("output-root");
+    const outputRoot = customOutput ? path.join(safeVaultPath(customOutput), "preview") : safeVaultPath(previewRoot);
+    if (preparePublish && outputRoot !== safeVaultPath(previewRoot) &&
+        outputRoot !== safeVaultPath("MC-自動化BIO/preview")) throw new Error("發布預覽須使用已支援的 Preview 目錄");
     const runDirectory = path.join(
         outputRoot,
-        "preview",
         targets.length > 1 ? "batch" : targetFolder(target),
         timestamp()
     );
@@ -982,9 +985,10 @@ function usage() {
         + "  node scripts/minecraft-bio-generator.cjs refresh-batch [--manifest=<BIO Publication.json>] [--collections] [Preview 檔名 ...] [--write]\n"
         + "  node scripts/minecraft-bio-generator.cjs refresh-batch --rename-smithing-templates [--manifest=<BIO Publication.json>] [--write]\n"
         + "  node scripts/minecraft-bio-generator.cjs preview minecraft:piston --prepare-publish\n"
-        + "  node scripts/minecraft-bio-generator.cjs allow-preferred --manifest=\"MC-自動化BIO/preview/batch/<timestamp>/BIO Publication.json\"\n"
+        + "  node scripts/minecraft-bio-generator.cjs allow-preferred --manifest=\"@自動化BIO Preview/batch/<timestamp>/BIO Publication.json\"\n"
         + "  node scripts/minecraft-bio-generator.cjs scan-publication [--manifest=<BIO Publication.json>]\n"
         + "  node scripts/minecraft-bio-generator.cjs publish [--manifest=<BIO Publication.json>] [--write]\n"
+        + "  node scripts/minecraft-bio-generator.cjs archive-publication [--manifest=<BIO Publication.json>] [--write]\n"
     );
 }
 
@@ -1047,6 +1051,11 @@ try {
         if (targets.length || hasFlag("all") || hasFlag("skip-review") || (hasFlag("write") && hasFlag("dry-run"))) throw new Error("發布參數衝突");
         const manifestPath = selectPublicationManifest(vaultRoot, option("manifest"));
         const result = publishBIOBatch(vaultRoot, manifestPath, { write: hasFlag("write"), central: true });
+        process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+    } else if (command === "archive-publication") {
+        if (targets.length || process.argv.slice(3).some(flag => flag !== "--write" && !flag.startsWith("--manifest=")))
+            throw new Error("封存只接受 --manifest 和 --write");
+        const result = archivePublication(vaultRoot, option("manifest"), hasFlag("write"));
         process.stdout.write(JSON.stringify(result, null, 2) + "\n");
     } else if (command !== "preview" || (targets.length === 0 && !hasFlag("all"))) {
         usage();

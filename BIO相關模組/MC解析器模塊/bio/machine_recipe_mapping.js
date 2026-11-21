@@ -10,7 +10,7 @@ function formalRoots(mapping) {
 
 function isFormalPath(relative, roots) {
     if (/[\\:*?<>|]/.test(relative) || relative.split('/').some(part => !part || part.startsWith('.') || /[. ]$/.test(part))) return false;
-    if (/(?:^|\/)preview\/|\.(?:preview|update-preview|formal-candidate)\.md$/i.test(relative)) return false;
+    if (relative.startsWith('@自動化BIO Preview/') || /(?:^|\/)preview\/|\.(?:preview|update-preview|formal-candidate)\.md$/i.test(relative)) return false;
     const folder = relative.split('/').slice(0, -1).join('/');
     return roots.some(root => folder === root.folder || (root.recursive && folder.startsWith(root.folder + '/')));
 }

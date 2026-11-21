@@ -1,6 +1,6 @@
 <%*
 // ============================================================
-// OB-SF | BIO Batch Review Tag Cleaner V2
+// OB-SF | BIO Batch Review Tag Cleaner V2.1
 // 通用資料夾選擇 / DRY RUN（預設）/ 正式修改 / DataviewJS 清單
 // ============================================================
 
@@ -21,6 +21,11 @@ const RAW_TAG_REGEX = /\[(?:item|drop)::\s*\\?#[a-z0-9_.-]+:[a-z0-9_./-]+/i;
 const REVIEW_TAG_REGEX = /^[ \t]*#未人工檢查[ \t]*(?:\r?\n|$)/gm;
 const HAS_REVIEW_TAG_REGEX = /^[ \t]*#未人工檢查[ \t]*$/m;
 
+// #待補充：僅根據指定的外部取得占位文字決定是否移除。
+const PENDING_TAG_REGEX = /^[ \t]*#待補充[ \t]*(?:\r?\n|$)/gm;
+const HAS_PENDING_TAG_REGEX = /^[ \t]*#待補充[ \t]*$/m;
+const UNCONFIRMED_SOURCE_TEXT = "外部取得：具體來源待人工確認。";
+
 function normalizePath(p) {
     return String(p ?? "").replace(/\\/g, "/").replace(/\/+$/g, "");
 }
@@ -40,27 +45,46 @@ function reviewBio(content) {
     const hasRawTag = RAW_TAG_REGEX.test(content);
     const qualified = invalidComments.length === 0 && !hasRawTag;
     const hasReviewTag = HAS_REVIEW_TAG_REGEX.test(content);
+    const hasPendingTag = HAS_PENDING_TAG_REGEX.test(content);
+    const hasUnconfirmedSource = content.includes(UNCONFIRMED_SOURCE_TEXT);
+    const keepPendingTag = hasPendingTag && hasUnconfirmedSource;
+    const removePendingTag = hasPendingTag && !hasUnconfirmedSource;
+
     const reasons = [];
     if (invalidComments.length) reasons.push("含其他 HTML 註解");
     if (hasRawTag) reasons.push("含未解析 Minecraft Tag");
+    if (keepPendingTag) reasons.push("外部取得來源尚待人工確認，保留 #待補充");
 
     let updated = content;
-    let action = "不需修改";
+    const actions = [];
 
+    // 舊有 #未人工檢查 規則維持不變。
     if (qualified && hasReviewTag) {
-        updated = content.replace(REVIEW_TAG_REGEX, "");
-        action = "移除 #未人工檢查";
+        updated = updated.replace(REVIEW_TAG_REGEX, "");
+        actions.push("移除 #未人工檢查");
     } else if (!qualified && !hasReviewTag && CONFIG.addMissingTag) {
-        updated = insertReviewTag(content);
-        action = "補上 #未人工檢查";
+        updated = insertReviewTag(updated);
+        actions.push("補上 #未人工檢查");
     } else if (!qualified) {
-        action = "保留 #未人工檢查";
+        actions.push("保留 #未人工檢查");
+    }
+
+    // 新規則獨立運作：沒有指定的占位文字時，只移除 #待補充 標籤行。
+    // 即使 BIO 的其他 Regex 檢查仍未通過，也不影響這個判定。
+    if (removePendingTag) {
+        updated = updated.replace(PENDING_TAG_REGEX, "");
+        actions.push("移除 #待補充");
+    } else if (keepPendingTag) {
+        actions.push("保留 #待補充");
     }
 
     return {
         qualified,
+        needsReview: !qualified || keepPendingTag,
+        removePendingTag,
+        keepPendingTag,
         reasons,
-        action,
+        action: actions.join("；") || "不需修改",
         changed: updated !== content,
         updated
     };
@@ -104,8 +128,11 @@ const files = app.vault.getMarkdownFiles()
 
 const scanned = [];
 const skipped = [];
+let scannedCount = 0;
 let qualifiedCount = 0;
 let reviewCount = 0;
+let pendingRemoveCount = 0;
+let pendingKeepCount = 0;
 
 for (const file of files) {
     const path = file.path;
@@ -124,12 +151,15 @@ for (const file of files) {
         continue;
     }
     const result = reviewBio(content);
+    scannedCount++;
 
     if (result.qualified) qualifiedCount++;
-    else reviewCount++;
+    if (result.needsReview) reviewCount++;
+    if (result.removePendingTag) pendingRemoveCount++;
+    if (result.keepPendingTag) pendingKeepCount++;
 
-    // 已不合格（即使本次不需改），或本次會修改的都列出
-    if (!result.qualified || result.changed) {
+    // 待人工確認、需要清理的 BIO 都列在報告中。
+    if (result.needsReview || result.changed) {
         scanned.push({
             file,
             path,
@@ -199,7 +229,7 @@ for (const entry of scanned) {
     reportRows.push({
         path: entry.path,
         name: entry.name,
-        group: entry.qualified ? "標籤清理" : "待人工確認",
+        group: entry.needsReview ? "待人工確認" : "標籤清理",
         status,
         reasons: entry.reasons.join("；")
     });
@@ -228,10 +258,12 @@ const report = [
     `> 模式：${mode === "dry" ? "DRY RUN" : "正式修改"}`,
     `> 資料夾：\`${folder}\``,
     "",
-    `- 成功掃描：${qualifiedCount + reviewCount}`,
+    `- 成功掃描：${scannedCount}`,
     `- 路徑失效，需重新掃描：${skipped.length}`,
-    `- 通過 Regex 初篩：${qualifiedCount}`,
-    `- 待人工確認：${reviewCount}`,
+    `- 通過原有 Regex 初篩：${qualifiedCount}`,
+    `- 待人工確認（含 #待補充）：${reviewCount}`,
+    `- #待補充 預計移除：${pendingRemoveCount}`,
+    `- #待補充 因來源未確認而保留：${pendingKeepCount}`,
     `- 偵測清單：${reportRows.length}`,
     `- 預計修改：${plannedChanges}`,
     `- 實際修改：${successfulChanges}`,
@@ -255,7 +287,7 @@ if (reportFile) {
 await app.workspace.getLeaf(true).openFile(reportFile);
 new Notice(
     `BIO 標籤初篩完成 (${mode.toUpperCase()})\n` +
-    `掃描 ${qualifiedCount + reviewCount}｜待確認 ${reviewCount}｜路徑失效 ${skipped.length}\n` +
+    `掃描 ${scannedCount}｜待確認 ${reviewCount}｜路徑失效 ${skipped.length}\n` +
     `預計修改 ${plannedChanges}｜實際修改 ${successfulChanges}`,
     10000
 );

@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
-const { publicationPath, previewSemanticHash, selectPublicationManifest, identity } = require('./bio-publication.cjs');
+const { publicationPath, insidePreview, previewSemanticHash, selectPublicationManifest, identity } = require('./bio-publication.cjs');
 const { parseFrontmatter } = require('../../BIO相關模組/MC解析器模塊/bio/bio_scanner');
 
 const slash = value => value.replaceAll('\\', '/');
@@ -9,7 +9,7 @@ const slash = value => value.replaceAll('\\', '/');
 function openBatchRefresh(root, manifestOption, requested) {
     const relative = selectPublicationManifest(root, manifestOption,
         { command: 'refresh-batch', useActive: false, includeStandalone: false });
-    const manifestPath = publicationPath(root, relative, 'MC-自動化BIO/preview');
+    const manifestPath = insidePreview(root, relative);
     const batch = slash(path.relative(root, path.dirname(manifestPath)));
     const manifestText = fs.readFileSync(manifestPath, 'utf8');
     const manifest = JSON.parse(manifestText);

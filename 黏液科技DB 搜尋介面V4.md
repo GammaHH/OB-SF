@@ -6,6 +6,7 @@ updated: 2026-11-20 23:09:13
 # BIO 搜尋介面 V4
 
 選擇目標後，可在遞歸樹切換取得路線與 Tag／擇一材料。外部取得會顯示 BIO 的來源說明。
+修改 BIO 並儲存後，按 RELOAD 可直接重讀檔案、更新搜尋清單並重算目前目標。
 
 ```dataviewjs
 // ============================================================
@@ -36,6 +37,11 @@ const reportModule = { exports: {} };
 const reportSource = await app.vault.adapter.read("BIO相關模組/搜尋介面模塊/bio_report_v4.js");
 new Function("module", reportSource)(reportModule);
 const bioReportsV4 = reportModule.exports;
+const reloadModule = { exports: {} };
+const reloadSource = await app.vault.adapter.read("BIO相關模組/搜尋介面模塊/bio_reload_v4.js");
+new Function("module", reloadSource)(reloadModule);
+const bioReloadV4 = reloadModule.exports;
+let reloadBusy = false;
 let analysisBudget = bioReportsV4.createBudget();
 let equipmentSteps = [];
 let latestReport = null;
@@ -217,7 +223,7 @@ function makeFileLink(page, text) {
 const allPages =
     dv.pages().array();
 
-const bioPages =
+let bioPages =
     allPages.filter(
         page => isBio(page)
     );
@@ -261,7 +267,7 @@ for (let page of bioPages) {
 }
 
 
-const recipeSections =
+let recipeSections =
     [...recipeSectionSet]
         .sort(
             (a, b) => {
@@ -281,7 +287,7 @@ const recipeSections =
 // 3. 取得可選資料夾
 // ============================================================
 
-const uniqueFolders =
+let uniqueFolders =
     [
         ...new Set(
             bioPages
@@ -458,6 +464,14 @@ input.style.cssText = `
 
 searchRow.appendChild(input);
 
+const reloadButton = makeButton("🔄 RELOAD");
+reloadButton.title = "直接重讀已儲存的 BIO、更新搜尋清單並重算目前目標";
+reloadButton.addEventListener("click", reloadBIO);
+searchRow.appendChild(reloadButton);
+const reloadStatus = document.createElement("div");
+reloadStatus.style.cssText = "font-size:13px;color:var(--text-muted);margin-bottom:8px";
+root.appendChild(reloadStatus);
+
 
 // ============================================================
 // 7. 製作數量
@@ -619,6 +633,9 @@ const checkboxMap =
     new Map();
 
 
+function renderFolderOptions() {
+folderContainer.replaceChildren();
+checkboxMap.clear();
 for (let folder of uniqueFolders) {
 
     let label =
@@ -696,6 +713,8 @@ for (let folder of uniqueFolders) {
         label
     );
 }
+}
+renderFolderOptions();
 
 
 function updateSelectedCount() {
@@ -817,6 +836,9 @@ function updateRecipeSummary() {
 }
 
 
+function renderRecipeOptions() {
+recipeContainer.replaceChildren();
+recipeCheckboxMap.clear();
 for (let section of recipeSections) {
 
     let label =
@@ -899,6 +921,8 @@ for (let section of recipeSections) {
         label
     );
 }
+}
+renderRecipeOptions();
 
 
 updateRecipeSummary();
@@ -1412,7 +1436,7 @@ function resolveExceptSelfCollection(groupId, owner, index) {
     const folder = owner.file.path.replace(/\/[^/]+$/, "");
     const sameFolder = candidates.filter(page => page.file.path.replace(/\/[^/]+$/, "") === folder);
     if (sameFolder.length) return sameFolder.length === 1 ? sameFolder[0] : null;
-    const formal = candidates.filter(page => !/(?:^|\/)preview\//i.test(page.file.path) &&
+    const formal = candidates.filter(page => !page.file.path.startsWith("@自動化BIO Preview/") && !/(?:^|\/)preview\//i.test(page.file.path) &&
         !/\.preview\.md$/i.test(page.file.path));
     return formal.length === 1 ? formal[0] : null;
 }
@@ -2581,6 +2605,74 @@ function buildAnalysisView(
 // 24. 執行 / 重新計算分析
 // ============================================================
 
+async function reloadBIO() {
+    if (reloadBusy || currentAnalysisBusy || exportBusy) {
+        new Notice("請等目前的重讀、分析或匯出完成後，再按 RELOAD。");
+        return;
+    }
+    reloadBusy = true;
+    reloadButton.disabled = true;
+    reloadStatus.textContent = "⏳ 正在直接重讀已儲存的 Markdown…";
+    // Invalidate exports immediately so an old report cannot be exported mid-refresh.
+    latestReport = null;
+    publishReport(null);
+    root.inert = true;
+    try {
+        const { parseYaml } = require("obsidian");
+        const catalog = await bioReloadV4.readCatalog({
+            files: app.vault.getMarkdownFiles(),
+            readText: file => app.vault.read(file), parseYaml, isBio
+        });
+        const oldFolders = new Set(uniqueFolders);
+        const oldSections = new Set(recipeSections);
+        const allFoldersSelected = selectedFolders.size === oldFolders.size;
+        const allSectionsSelected = selectedRecipeSections.size === oldSections.size;
+        bioPages = catalog.pages;
+        uniqueFolders = [...new Set(bioPages.map(page => getTopFolder(page.file.folder)).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b, "zh-Hant"));
+        recipeSections = catalog.sections.sort((a, b) =>
+            a === "常規" ? -1 : b === "常規" ? 1 : a.localeCompare(b, "zh-Hant"));
+        selectedFolders = new Set(uniqueFolders.filter(folder =>
+            selectedFolders.has(folder) || (allFoldersSelected && !oldFolders.has(folder))));
+        selectedRecipeSections = new Set(recipeSections.filter(section =>
+            selectedRecipeSections.has(section) || (allSectionsSelected && !oldSections.has(section))));
+        saveFolderSelection();
+        saveRecipeSelection();
+        renderFolderOptions();
+        renderRecipeOptions();
+        updateSelectedCount();
+        updateRecipeSummary();
+        parseCache.clear();
+        resolvedParseCache.clear();
+        analysisWarnings.clear();
+        currentTree = null;
+        analysisContainer.replaceChildren();
+        performSearch();
+        const targetPath = currentAnalysisPage?.file.path;
+        currentAnalysisPage = bioPages.find(page => page.file.path === targetPath) || null;
+        if (currentAnalysisPage) {
+            // Recipe and ingredient selections are preserved; the reader falls back
+            // when a saved selection no longer exists in the edited document.
+            const succeeded = await rebuildAnalysis(true);
+            if (!succeeded) throw new Error("BIO 已重讀，但目前目標重算失敗，請重新分析。");
+        }
+        reloadStatus.textContent = `✅ 已重讀 ${bioPages.length} 個 BIO（${new Date().toLocaleTimeString()}）` +
+            (targetPath && !currentAnalysisPage ? "；原目標已刪除或不再是 BIO，請重新選擇。" :
+                currentAnalysisPage ? "；目前目標已重算。" : "");
+    } catch (error) {
+        currentTree = null;
+        latestReport = null;
+        publishReport(null);
+        analysisContainer.replaceChildren();
+        reloadStatus.textContent = "❌ RELOAD 失敗：" + error.message;
+        console.error(error);
+    } finally {
+        root.inert = false;
+        reloadBusy = false;
+        reloadButton.disabled = false;
+    }
+}
+
 async function rebuildAnalysis(
     showLoading = false
 ) {
@@ -2675,6 +2767,8 @@ async function rebuildAnalysis(
             nextView
         );
 
+        return true;
+
     } catch (error) {
 
         new Notice(
@@ -2682,6 +2776,8 @@ async function rebuildAnalysis(
         );
 
         console.error(error);
+
+        return false;
 
     } finally {
 

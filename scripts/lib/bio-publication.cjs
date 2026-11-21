@@ -13,33 +13,37 @@ const { publicationBlockingTags, stripManagedBIOtags } = require('../../BIO相�
 const reader = require('../../BIO相關模組/搜尋介面模塊/bio_reader_v4');
 const { colorFamily } = require('../../BIO相關模組/MC解析器模塊/bio/bio_group_mapping');
 const { resolveTranslatedName } = require('../../BIO相關模組/MC解析器模塊/bio/bio_generator');
+const { previewRoot, previewRoots, rootForPreview } = require('./bio-preview-paths.cjs');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const slash = value => value.replaceAll('\\', '/');
 const withoutMD = value => value.replace(/\.md$/i, '');
-const standaloneManifest = 'MC-自動化BIO/preview/standalone/BIO Publication.json';
+const standaloneManifest = previewRoot + '/standalone/BIO Publication.json';
+const isStandaloneManifest = relative => previewRoots.some(folder => relative === folder + '/standalone/BIO Publication.json');
 const PUBLICATION_ISSUE_LIMIT = 2000;
 const standaloneGenerators = new Map([
     ['mini', 'obsf-mini-parser'],
     ['material-base', 'minecraft-bio-publication-scan']
 ]);
 
-function selectPublicationManifest(root, explicit, { command = 'scan-publication', useActive = true, includeStandalone = true } = {}) {
+function selectPublicationManifest(root, explicit, {
+    command = 'scan-publication', useActive = true, includeStandalone = true, includeSavedStandalone = false
+} = {}) {
     root = path.resolve(root);
     const select = relative => {
-        const file = inside(root, relative, 'MC-自動化BIO/preview');
+        const file = insidePreview(root, relative);
+        const local = slash(path.relative(root, file));
         if (path.basename(file) !== 'BIO Publication.json') throw new Error('請指定 BIO Publication.json');
-        if (!includeStandalone && slash(path.relative(root, file)) === standaloneManifest)
+        if (!includeStandalone && isStandaloneManifest(local))
             throw new Error('請指定既有 Vanilla 批次的 BIO Publication.json');
-        if (slash(path.relative(root, file)) !== standaloneManifest && !fs.statSync(file, { throwIfNoEntry: false })?.isFile())
+        if (local !== standaloneManifest && !fs.statSync(file, { throwIfNoEntry: false })?.isFile())
             throw new Error('找不到發布清單：' + relative);
-        return slash(path.relative(root, file));
+        return local;
     };
     if (explicit !== undefined && explicit !== null) return select(explicit);
     const mappingFile = path.join(root, RECIPE_MAPPING_FILE);
     const active = fs.existsSync(mappingFile) ? parseFrontmatter(fs.readFileSync(mappingFile, 'utf8'))?.active_preview_manifest : null;
     if (useActive && active) return select(active);
 
-    const previewRoot = inside(root, 'MC-自動化BIO/preview', 'MC-自動化BIO');
     const candidates = [];
     function visit(directory) {
         for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -47,11 +51,13 @@ function selectPublicationManifest(root, explicit, { command = 'scan-publication
             if (entry.isDirectory() && !entry.isSymbolicLink()) visit(file);
             else if (entry.isFile() && entry.name === 'BIO Publication.json') {
                 const relative = slash(path.relative(root, file));
-                if (relative !== standaloneManifest) candidates.push(relative);
+                if (!isStandaloneManifest(relative)) candidates.push(relative);
             }
         }
     }
-    if (fs.existsSync(previewRoot)) visit(previewRoot);
+    for (const folder of previewRoots.map(relative => insidePreview(root, relative))) {
+        if (fs.existsSync(folder)) visit(folder);
+    }
     candidates.sort();
     if (candidates.length === 1) return select(candidates[0]);
     if (candidates.length > 1) {
@@ -60,6 +66,12 @@ function selectPublicationManifest(root, explicit, { command = 'scan-publication
         throw new Error('找到多個 Preview 批次，' + advice + '：\n' + commands.join('\n'));
     }
     if (includeStandalone && readStandalonePreviews(root).length) return select(standaloneManifest);
+    if (includeStandalone && includeSavedStandalone) {
+        for (const folder of previewRoots) {
+            const relative = folder + '/standalone/BIO Publication.json';
+            if (fs.existsSync(insidePreview(root, relative))) return select(relative);
+        }
+    }
     throw new Error('找不到可掃描的 Preview 批次');
 }
 
@@ -73,6 +85,15 @@ function inside(root, relative, prefix) {
         cursor = path.dirname(cursor);
     }
     return absolute;
+}
+
+function insidePreview(root, relative, childFolder) {
+    const file = inside(root, relative);
+    const local = slash(path.relative(root, file));
+    const folder = rootForPreview(local);
+    if (!folder || (childFolder && !local.startsWith(folder + '/' + childFolder + '/')))
+        throw new Error('路徑不在指定的 BIO Preview 範圍：' + relative);
+    return file;
 }
 
 function identity(metadata) {
@@ -151,10 +172,10 @@ function previewSemanticHash(text, options = {}) {
 
 function allowPreferredEdits(root, manifestRelative) {
     root = path.resolve(root);
-    const manifestPath = inside(root, manifestRelative, 'MC-自動化BIO/preview');
+    const manifestPath = insidePreview(root, manifestRelative);
     const bytes = fs.readFileSync(manifestPath), manifest = JSON.parse(bytes.toString('utf8'));
     if (manifest.kind !== 'obsf-bio-publication' || manifest.schemaVersion !== 1 || !Array.isArray(manifest.entries) || !manifest.entries.length) throw new Error('不是完整的 BIO Publication.json');
-    const batchDirectory = inside(root, manifest.batchDirectory, 'MC-自動化BIO/preview');
+    const batchDirectory = insidePreview(root, manifest.batchDirectory);
     if (path.dirname(manifestPath) !== batchDirectory) throw new Error('發布清單與批次不一致');
     if (manifest.inputFingerprint !== inputFingerprint(root)) throw new Error('來源／決策／Mapping 已變更，請重新產生預覽');
     let upgraded = 0;
@@ -196,10 +217,10 @@ function allowPreferredEdits(root, manifestRelative) {
 // accepted as proof. Preferred edits are permitted only if already signed so.
 function allowLevelEdits(root, manifestRelative) {
     root = path.resolve(root);
-    const manifestPath = inside(root, manifestRelative, 'MC-自動化BIO/preview');
+    const manifestPath = insidePreview(root, manifestRelative);
     const bytes = fs.readFileSync(manifestPath), manifest = JSON.parse(bytes.toString('utf8'));
     if (manifest.kind !== 'obsf-bio-publication' || manifest.schemaVersion !== 1 || !Array.isArray(manifest.entries) || !manifest.entries.length) throw new Error('不是完整的 BIO Publication.json');
-    const batchDirectory = inside(root, manifest.batchDirectory, 'MC-自動化BIO/preview');
+    const batchDirectory = insidePreview(root, manifest.batchDirectory);
     if (path.dirname(manifestPath) !== batchDirectory) throw new Error('發布清單與批次不一致');
     if (manifest.inputFingerprint !== inputFingerprint(root)) throw new Error('來源／決策／Mapping 已變更，請重新產生預覽');
     const absent = Symbol('absent-level');
@@ -309,14 +330,30 @@ function frontmatterLine(text, key) {
     return null;
 }
 
-function preserveUpdatedField(original, candidate) {
-    const sourceLine = frontmatterLine(original, 'updated'), candidateLine = frontmatterLine(candidate, 'updated');
-    if (!sourceLine && !candidateLine) return candidate;
+function preserveTimestampField(original, candidate, field, { keepCandidateIfMissing = false } = {}) {
+    const sourceLine = frontmatterLine(original, field), candidateLine = frontmatterLine(candidate, field);
+    if (!sourceLine && (!candidateLine || keepCandidateIfMissing)) return candidate;
     const newline = candidate.includes('\r\n') ? '\r\n' : '\n';
     const lines = candidate.split(/\r?\n/);
-    const updated = sourceLine ? original.split(/\r?\n/)[sourceLine - 1] : null;
-    if (candidateLine) lines.splice(candidateLine - 1, 1, ...(updated ? [updated] : []));
-    else if (updated) lines.splice(lines.indexOf('---', 1), 0, updated);
+    const timestamp = sourceLine ? original.split(/\r?\n/)[sourceLine - 1] : null;
+    if (candidateLine) lines.splice(candidateLine - 1, 1, ...(timestamp ? [timestamp] : []));
+    else if (timestamp) lines.splice(lines.indexOf('---', 1), 0, timestamp);
+    return lines.join(newline);
+}
+
+function stampPublicationTimestamps(text, timestamp) {
+    const newline = text.includes('\r\n') ? '\r\n' : '\n';
+    const lines = text.split(/\r?\n/);
+    const created = frontmatterLine(text, 'created');
+    const updated = frontmatterLine(text, 'updated');
+    const missing = [];
+    if (updated) lines[updated - 1] = 'updated: ' + timestamp;
+    else missing.push('updated: ' + timestamp);
+    if (!parseFrontmatter(text)?.created) {
+        if (created) lines[created - 1] = 'created: ' + timestamp;
+        else missing.unshift('created: ' + timestamp);
+    }
+    lines.splice(lines.indexOf('---', 1), 0, ...missing);
     return lines.join(newline);
 }
 
@@ -430,11 +467,11 @@ function retainsContent(original, candidate, rules, resolveName = () => null, op
 
 function preparePublication(root, manifestRelative, options = {}) {
     root = path.resolve(root);
-    const manifestPath = inside(root, manifestRelative, 'MC-自動化BIO/preview');
+    const manifestPath = insidePreview(root, manifestRelative);
     const manifestBytes = fs.readFileSync(manifestPath);
     const manifest = JSON.parse(manifestBytes.toString('utf8'));
     if (manifest.kind !== 'obsf-bio-publication' || manifest.schemaVersion !== 1 || !Array.isArray(manifest.entries) || (!manifest.entries.length && !options.central)) throw new Error('不是完整的 BIO Publication.json');
-    const batchDirectory = inside(root, manifest.batchDirectory, 'MC-自動化BIO/preview');
+    const batchDirectory = insidePreview(root, manifest.batchDirectory);
     if (path.dirname(manifestPath) !== batchDirectory) throw new Error('發布清單與批次路徑不一致');
     const currentInput = inputFingerprint(root);
     if (manifest.inputFingerprint !== currentInput && !options.central) throw new Error('來源／決策／Mapping 已變更，請重新產生整批預覽');
@@ -487,7 +524,7 @@ function preparePublication(root, manifestRelative, options = {}) {
             if (options.skipReview) { skipped.push(entry); continue; }
             if (!options.central) throw new Error('REVIEW 尚未確認：' + entry.identity + '；請驗收後設 approved=true，或使用 --skip-review');
         }
-        const preview = entry.draftSource ? inside(root, entry.draftPath, 'MC-自動化BIO/preview/' + entry.draftSource)
+        const preview = entry.draftSource ? insidePreview(root, entry.draftPath, entry.draftSource)
             : inside(root, slash(path.relative(root, path.resolve(batchDirectory, entry.previewFilename))), manifest.batchDirectory);
         const text = fs.readFileSync(preview, 'utf8'), metadata = parseFrontmatter(text);
         const previewId = entry.draftSource && metadata?.type?.startsWith('sf-') ? 'sf:' + metadata.id : identity(metadata);
@@ -570,7 +607,7 @@ function preparePublication(root, manifestRelative, options = {}) {
             }
             for (const choice of [ingredient, ...(ingredient.choices || [])]) {
                 const name = slash(String(choice.name || ''));
-                if (/(?:^|\/)preview\/|\.preview(?:\.md)?$/i.test(name)) throw new Error('未轉換的預覽連結：' + name);
+                if (rootForPreview(name) || /(?:^|\/)preview\/|\.preview(?:\.md)?$/i.test(name)) throw new Error('未轉換的預覽連結：' + name);
                 const known = names.get(withoutMD(name));
                 const resolved = known?.size === 1 ? [...known][0] : null;
                 if (skipped.some(value => (!value.sourcePath || value.kind !== 'item') &&
@@ -579,7 +616,8 @@ function preparePublication(root, manifestRelative, options = {}) {
         }
         if (entry.sourcePath) {
             const original = entry.source.toString('utf8');
-            if (options.central) text = preserveUpdatedField(original, text);
+            text = preserveTimestampField(original, text, 'created', { keepCandidateIfMissing: true });
+            if (options.central) text = preserveTimestampField(original, text, 'updated');
             entry.candidateSHA256 = hash(text);
             const resolveName = name => { const ids = names.get(withoutMD(slash(name))); return ids?.size === 1 ? [...ids][0] : null; };
             const start = preservationIssues.length, previewPath = slash(path.relative(root, entry.previewPath));
@@ -604,13 +642,15 @@ function preparePublication(root, manifestRelative, options = {}) {
 
 function materialReportPath(root, manifestPath) {
     const batch = path.dirname(manifestPath);
-    return inside(root, slash(path.relative(root, path.join(path.dirname(batch),
-        path.basename(batch) + ' - 材料審核.md'))), 'MC-自動化BIO/preview');
+    return insidePreview(root, slash(path.relative(root, path.join(path.dirname(batch),
+        path.basename(batch) + ' - 材料審核.md'))));
 }
 
+const hiddenPreservationApproval = /^<!-- obsf:approved-missing-content ([a-f0-9]{64}) -->[ \t]*$/gm;
+
 function readPreviewApprovals(markdown) {
-    return new Set([...markdown.matchAll(/^- \[[xX]\] [^\r\n]*<!-- obsf:accept-(?:preview|raw-id) ([a-f0-9]{64}) -->[ \t]*$/gm)]
-        .map(match => match[1]));
+    const checkedRows = markdown.matchAll(/^- \[[xX]\] [^\r\n]*<!-- obsf:accept-(?:preview|raw-id) ([a-f0-9]{64}) -->[ \t]*$/gm);
+    return new Set([...checkedRows, ...markdown.matchAll(hiddenPreservationApproval)].map(match => match[1]));
 }
 
 const editableIssues = new Set(['PREVIEW_CONTENT_MISSING', 'YAML_DIFF', 'REVIEW_REQUIRED']);
@@ -733,7 +773,7 @@ function readMaterialDecisions(markdown) {
 }
 
 function createSelectedMaterialBases(root, rows, decisions, plan) {
-    const draftFolder = 'MC-自動化BIO/preview/material-base';
+    const draftFolder = rootForPreview(slash(path.relative(root, plan.manifestPath))) + '/material-base';
     const entries = [];
     const selected = rows.filter(row => {
         const decision = decisions.get(row.id);
@@ -744,7 +784,7 @@ function createSelectedMaterialBases(root, rows, decisions, plan) {
     const selectedTargets = new Set();
     for (const row of selected) {
         const target = 'MC-物品資料庫/' + row.label + '.md';
-        const file = inside(root, draftFolder + '/' + row.id.slice('minecraft:'.length) + '.preview.md', 'MC-自動化BIO/preview');
+        const file = insidePreview(root, draftFolder + '/' + row.label + '.preview.md', 'material-base');
         const formalPath = inside(root, target, 'MC-物品資料庫');
         if (fs.existsSync(formalPath) || existing.has(row.id) || selectedTargets.has(target.toLowerCase()) ||
             plan.entries.some(entry => entry.targetPath.toLowerCase() === target.toLowerCase() || entry.identity === row.id))
@@ -807,8 +847,8 @@ function completeStandalonePreviews(plan) {
 
 function scanPublication(root, manifestRelative, { lookupVanilla, issueLimit = PUBLICATION_ISSUE_LIMIT } = {}) {
     root = path.resolve(root);
-    const manifest = inside(root, manifestRelative, 'MC-自動化BIO/preview');
-    const report = inside(root, slash(path.relative(root, manifest)) + '.review.json', 'MC-自動化BIO/preview');
+    const manifest = insidePreview(root, manifestRelative);
+    const report = insidePreview(root, slash(path.relative(root, manifest)) + '.review.json');
     const materialReport = materialReportPath(root, manifest);
     const oldMaterialReport = fs.existsSync(materialReport) ? fs.readFileSync(materialReport, 'utf8') : '';
     const decisions = readMaterialDecisions(oldMaterialReport);
@@ -841,9 +881,11 @@ function scanPublication(root, manifestRelative, { lookupVanilla, issueLimit = P
         const noteLink = (file, line) => {
             const label = display(file) + (line ? ':' + line : '');
             if (!/\.md$/i.test(file) || /[\[\]#|\r\n]/.test(file) || !fs.existsSync(path.join(root, file))) return label;
-            return '[[' + slash(file) + '|' + display(path.basename(file)) + ']]' + (line ? ':' + line : '');
+            const target = slash(file).replace(/\.md$/i, '');
+            return '[[' + target + '|' + display(path.basename(file)) + ']]' + (line ? ':' + line : '');
         };
-        const lines = ['# 材料審核', '', '勾選可確認為外部取得的原版材料，在勾選框下、「引用」上方每行填一種取得方式。重跑 SCAN 建立 Base 預覽，第一條為首選。', '',
+        const summary = ['READY', 'REVIEW', 'BLOCKED'].map(key => result.counts[key].toLocaleString('en-US') + ' ' + key).join('、');
+        const lines = ['**' + summary + '**', '', '# 材料審核', '', '勾選可確認為外部取得的原版材料，在勾選框下、「引用」上方每行填一種取得方式。重跑 SCAN 建立 Base 預覽，第一條為首選。', '',
             '「需人工處理」的勾選框只記錄處理進度。SCAN 每次都會核對材料 Preview 或正式 BIO。', ''];
         if (result.issueLimitReached)
             lines.push('> 已找到 ' + result.issueLimitReached + ' 項待處理問題，掃描提前停止。處理後重掃，完成整批驗證後才能發布。', '');
@@ -864,7 +906,13 @@ function scanPublication(root, manifestRelative, { lookupVanilla, issueLimit = P
         if (!materialRows.length) lines.push('- 無待處理材料');
         if (basePreviews.length) lines.push('', ...basePreviews.map(file => '- 已建立 `' + file + '`'));
         if (completedPreviews.length) lines.push('', ...completedPreviews.map(file => '- 已補欄位 ' + noteLink(file)));
-        const allIssues = [...result.diagnostics, ...result.approvedIssues];
+        const hiddenApprovals = new Set(result.approvedIssues
+            .filter(issue => issue.code === 'PREVIEW_CONTENT_MISSING').map(issue => issue.approvalKey));
+        if (result.issueLimitReached) {
+            for (const [, key] of oldMaterialReport.matchAll(hiddenPreservationApproval)) hiddenApprovals.add(key);
+        }
+        const allIssues = [...result.diagnostics,
+            ...result.approvedIssues.filter(issue => issue.code !== 'PREVIEW_CONTENT_MISSING')];
         const rawReviews = new Map(allIssues.filter(issue => issue.code === 'RAW_ID_REVIEW').map(issue => [issue.approvalKey, issue]));
         if (rawReviews.size) {
             lines.push('', '## 保留原始材料 ID', '', '目前找不到對應 BIO。勾選後重跑 SCAN，即可確認按原始 ID 發布。', '');
@@ -886,11 +934,14 @@ function scanPublication(root, manifestRelative, { lookupVanilla, issueLimit = P
                 const checkbox = checkKey ? (checked ? '[x] ' : '[ ] ') : '';
                 const marker = checkKey ? ' <!-- obsf:' + (progressKey ? 'tag-progress' : 'accept-preview') + ' ' + checkKey + ' -->' : '';
                 const source = issue.sourcePath ? '（正式檔 ' + noteLink(issue.sourcePath, issue.sourceLine) + '）' : '';
-                lines.push('- ' + checkbox + '[' + issue.code + '] ' + noteLink(issue.path || '', issue.line) +
+                lines.push('- ' + checkbox + '[' + issue.code + '] ' + noteLink(issue.previewPath || issue.path || '', issue.line) +
                     ' · ' + display(issue.message) + source + marker);
                 if (issue.code === 'AMBIGUOUS_MATERIAL')
                     lines.push(...issue.matches.map(file => '  - 候選 BIO · ' + noteLink(file)));
             }
+        }
+        if (hiddenApprovals.size) {
+            lines.push('', ...[...hiddenApprovals].map(key => '<!-- obsf:approved-missing-content ' + key + ' -->'));
         }
         const temporaryMaterial = materialReport + '.' + randomUUID() + '.tmp';
         try {
@@ -964,14 +1015,23 @@ function publishBIOBatch(root, manifestRelative, options = {}) {
     const lock = fs.openSync(lockPath, 'wx');
     let receiptPath, receipt;
     try {
+        const publishedAt = new Date();
+        const timestamp = new Date(publishedAt.getTime() - publishedAt.getTimezoneOffset() * 60000)
+            .toISOString().slice(0, 19).replace('T', ' ');
+        const writes = changed.map(entry => {
+            const text = stampPublicationTimestamps(entry.text, timestamp);
+            return { entry, text, sha256: hash(text) };
+        });
         const point = checkpointPublication(plan.root, changed);
         const receiptDirectory = path.join(plan.root, 'review', 'bio-publications');
         fs.mkdirSync(receiptDirectory, { recursive: true });
-        receiptPath = path.join(receiptDirectory, new Date().toISOString().replace(/[:.]/g, '-') + '-' + randomUUID() + '.json');
+        receiptPath = path.join(receiptDirectory, publishedAt.toISOString().replace(/[:.]/g, '-') + '-' + randomUUID() + '.json');
         receipt = { ...point, manifestPath: manifestRelative, manifestSHA256: plan.manifestSHA256, status: 'WRITING',
-            skipped: plan.skipped.map(value => value.identity), files: changed.map(entry => ({ path: entry.targetPath, created: !entry.sourcePath,
-                sourceSHA256: entry.sourceSHA256 || null, candidateSHA256: entry.candidateSHA256, written: false,
-                draftPath: entry.draftPath, previewSHA256: entry.previewSHA256 })) };
+            skipped: plan.skipped.map(value => value.identity), files: writes.map(({ entry, sha256 }) => ({ path: entry.targetPath, created: !entry.sourcePath,
+                sourceSHA256: entry.sourceSHA256 || null, reviewedCandidateSHA256: entry.candidateSHA256, candidateSHA256: sha256, written: false,
+                draftPath: entry.draftPath, previewSHA256: entry.previewSHA256 })),
+            unchanged: plan.entries.filter(entry => !entry.changed).map(entry => ({ path: entry.targetPath, draftPath: entry.draftPath,
+                candidateSHA256: entry.candidateSHA256, previewSHA256: entry.previewSHA256 })) };
         fs.writeFileSync(receiptPath, JSON.stringify(receipt, null, 2), { flag: 'wx' });
         // Revalidate the whole snapshot after the checkpoint and before the first write.
         const fresh = preparePublication(root, manifestRelative, options);
@@ -979,8 +1039,8 @@ function publishBIOBatch(root, manifestRelative, options = {}) {
         if (fresh.manifestSHA256 !== plan.manifestSHA256 || fresh.entries.length !== plan.entries.length || fresh.entries.some((entry, index) =>
             entry.sourceSHA256 !== plan.entries[index]?.sourceSHA256 || entry.previewSHA256 !== plan.entries[index]?.previewSHA256 ||
             entry.candidateSHA256 !== plan.entries[index]?.candidateSHA256)) throw new Error('建立還原點期間正式 BIO 或預覽已變更');
-        for (let index = 0; index < changed.length; index++) {
-            const entry = changed[index];
+        for (let index = 0; index < writes.length; index++) {
+            const { entry, text, sha256 } = writes[index];
             inside(plan.root, entry.targetPath, entry.draftSource ? undefined : 'MC-物品資料庫');
             if (entry.sourcePath && hash(fs.readFileSync(entry.path)) !== entry.sourceSHA256) throw new Error('原 BIO 已變更：' + entry.targetPath);
             if (!entry.sourcePath && fs.existsSync(entry.path)) throw new Error('新 BIO 已被建立：' + entry.targetPath);
@@ -988,14 +1048,14 @@ function publishBIOBatch(root, manifestRelative, options = {}) {
             const temporaryPath = path.join(path.dirname(entry.path), '.bio-publish-' + randomUUID() + '.tmp');
             try {
                 const descriptor = fs.openSync(temporaryPath, 'wx');
-                try { fs.writeFileSync(descriptor, entry.text); fs.fsyncSync(descriptor); }
+                try { fs.writeFileSync(descriptor, text); fs.fsyncSync(descriptor); }
                 finally { fs.closeSync(descriptor); }
                 if (entry.sourcePath) {
                     if (hash(fs.readFileSync(entry.path)) !== entry.sourceSHA256) throw new Error('替換前原 BIO 已變更：' + entry.targetPath);
                     fs.renameSync(temporaryPath, entry.path);
                 } else fs.linkSync(temporaryPath, entry.path); // exclusive creation, never clobber a new arrival
             } finally { if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath); }
-            if (hash(fs.readFileSync(entry.path)) !== entry.candidateSHA256) throw new Error('寫回驗證失敗：' + entry.targetPath);
+            if (hash(fs.readFileSync(entry.path)) !== sha256) throw new Error('寫回驗證失敗：' + entry.targetPath);
             receipt.files[index].written = true;
             fs.writeFileSync(receiptPath, JSON.stringify(receipt, null, 2));
         }
@@ -1012,4 +1072,4 @@ function publishBIOBatch(root, manifestRelative, options = {}) {
     } finally { fs.closeSync(lock); fs.unlinkSync(lockPath); }
 }
 
-module.exports = { publicationManifest, preparePublication, publishBIOBatch, scanPublication, selectPublicationManifest, standaloneManifest, formalizePreview, inputFingerprint, identity, retainsContent, previewSemanticHash, allowPreferredEdits, allowLevelEdits, parseBIOLevel, publicationPath: inside };
+module.exports = { publicationManifest, preparePublication, publishBIOBatch, scanPublication, selectPublicationManifest, standaloneManifest, isStandaloneManifest, formalizePreview, inputFingerprint, identity, retainsContent, previewSemanticHash, allowPreferredEdits, allowLevelEdits, parseBIOLevel, publicationPath: inside, insidePreview };
