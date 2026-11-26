@@ -316,7 +316,7 @@ Route safety 使用 monotone fixed-point rank，並針對每條 candidate route 
 
 ### Obsidian Base Material Review
 
-正式人工流程不要求使用者主要透過 `--base-items`。`base_material_review.js` 會由 target dependency graph 建立 `Minecraft Base Material Review.md`：
+正式人工流程不要求使用者主要透過 `--base-items`。`base_material_review.js` 會由 target dependency graph 建立 `BIO Base Material Review.md`：
 
 - frontmatter 記錄 `schemaVersion`、`target`、`sourceFingerprint`。
 - cycle group 與 path 由 route-level blocking cycles 產生。
@@ -358,13 +358,13 @@ node scripts/minecraft-review.cjs scan
 node scripts/minecraft-review.cjs next
 ```
 
-`scan` 以 in-memory Normalized Registry 與 BIO Scanner 建立 generation-planning scope：預設掃描 Registry 中尚無正式 MC BIO 的 result items，並保留目前已開啟的開發 Review target。只有 dependency planning 實際遇到 route cycle、multiple recipe、tag 或 alternative 的 target 才進入 `Minecraft Review Queue.md`；合法 branch 本身不會被 Raw Parser 分類為錯誤。
+`scan` 以 in-memory Normalized Registry 與 BIO Scanner 建立 generation-planning scope：預設掃描 Registry 中尚無正式 MC BIO 的 result items，並保留目前已開啟的開發 Review target。只有 dependency planning 實際遇到 route cycle、multiple recipe、tag 或 alternative 的 target 才進入 `BIO Review Queue.md`；合法 branch 本身不會被 Raw Parser 分類為錯誤。
 
 全量 scan 使用固定小批次隔離 process（預設 25 targets／batch、每個 worker 1 GiB V8 heap）；每批結束即釋放 dependency graph。若某批失敗會自動二分定位到具體 target，不以提高單一 process heap 掩蓋不受控的 graph 累積。診斷時可用 `--scan-batch-size=N`（1–100）調整批次，不改變結果順序。
 
-`next` 取得下一個 `PENDING` target，並載入根目錄固定工作檔 `Minecraft Base Material Review.md`／`Minecraft Recipe Review.md`。Queue targets 使用穩定 item ID 排序；切換 target 前，上一個 target 的完整 Review snapshot 會寫入 `Minecraft Review Decisions.json`，因此 Checkbox、Locked decisions 與人工備註不會因根目錄工作檔切換而遺失。
+`next` 取得下一個 `PENDING` target，並載入根目錄固定工作檔 `BIO Base Material Review.md`／`BIO Recipe Review.md`。Queue targets 使用穩定 item ID 排序；切換 target 前，上一個 target 的完整 Review snapshot 會寫入 `BIO Review Decisions.json`，因此 Checkbox、Locked decisions 與人工備註不會因根目錄工作檔切換而遺失。
 
-`Minecraft Review Decisions.json` 是機器讀寫的唯一 source-of-truth。Registry 以 target ID 為 key，保存 `sourceFingerprint`、結構化 `lockedBaseDecisions`／`lockedAmbiguityDecisions`，以及可無損還原人工備註的完整 Base／Recipe Review snapshot。每次更新先寫入並驗證 temporary JSON，再保留上一版為 `Minecraft Review Decisions.json.previous`，最後才替換正式檔案。`Minecraft Review Decisions.md` 只是 Obsidian 可讀的小型 target 摘要，不再包含大型 JSON；既有 `Minecraft Reviews/minecraft__*/` 只作一次性 migration source，之後不再建立新的 target 資料夾。
+`BIO Review Decisions.json` 是機器讀寫的唯一 source-of-truth。Registry 以 target ID 為 key，保存 `sourceFingerprint`、結構化 `lockedBaseDecisions`／`lockedAmbiguityDecisions`，以及可無損還原人工備註的完整 Base／Recipe Review snapshot。每次更新先寫入並驗證 temporary JSON，再保留上一版為 `BIO Review Decisions.json.previous`，最後才替換正式檔案。`BIO Review Decisions.md` 只是 Obsidian 可讀的小型 target 摘要，不再包含大型 JSON；既有 `Minecraft Reviews/minecraft__*/` 只作一次性 migration source，之後不再建立新的 target 資料夾。
 
 舊版大型 Markdown Registry 必須先遷移；命令會先在 `review/registry-migration-backups/` 建立 timestamped 完整備份、驗證 JSON round-trip，成功後才把根目錄 Markdown 改成小型摘要：
 
@@ -425,7 +425,7 @@ node scripts/minecraft-review.cjs start minecraft:piston
 node scripts/minecraft-review.cjs recalculate minecraft:piston
 ```
 
-Queue state 存在 ignored `review/minecraft-review-queue.json`；Obsidian 摘要為 `Minecraft Review Queue.md`，其中 Current Review 固定連到根目錄兩份工作檔。所有命令只做 Planning／Review，不會啟動 BIO Generator。`--dry-run` 不會切換根目錄工作檔；若要求的 target 不是目前 active target，會明確停止而不覆寫內容。
+Queue state 存在 ignored `review/minecraft-review-queue.json`；Obsidian 摘要為 `BIO Review Queue.md`，其中 Current Review 固定連到根目錄兩份工作檔。所有命令只做 Planning／Review，不會啟動 BIO Generator。`--dry-run` 不會切換根目錄工作檔；若要求的 target 不是目前 active target，會明確停止而不覆寫內容。
 
 ## Route-aware Recipe Ambiguity Review
 
@@ -466,7 +466,7 @@ node scripts/minecraft-recipe-review.cjs recalculate minecraft:piston
 node scripts/minecraft-recipe-review.cjs recalculate minecraft:piston --dry-run
 ```
 
-CLI 先讀取並驗證 `Minecraft Base Material Review.md`，將勾選結果作為 traversal boundaries。Base material 以下的 recipes 與 ambiguities 不會展開。
+CLI 先讀取並驗證 `BIO Base Material Review.md`，將勾選結果作為 traversal boundaries。Base material 以下的 recipes 與 ambiguities 不會展開。
 
 Machine-readable readiness 同時要求：
 
@@ -483,7 +483,7 @@ planning cycles = 0
 
 `createTagBIOMappingDraft(dependencyResult)` 只掃描實際 graph 的 `tagBranches`。每列使用 `kind: "minecraft:item_tag"`，與普通 `minecraft:item` identity 分開；未知 BIO ID、中文名與 filename 保持空白，`generate` 預設為 `false`。
 
-目前人工草稿見 `Minecraft Tag BIO Mapping Draft.md`。`Representative Item ID` 只供 deterministic dependency preview 使用，不會把 Tag 改寫成普通 item，也不會刪除 Tag branch。統一 `recalculate` 會把尚未 mapping 的 Tag choice 寫入這份全域草稿；已存在且仍有效的 mapping 會在其他 targets 重用。BIO ID、中文名稱與 filename 不會由程式猜測。`generate=true` 只允許 Generator 建立 Tag BIO preview，不會覆寫正式 BIO。
+目前人工草稿見 `BIO Collection Mapping Draft.md`。`Representative Item ID` 只供 deterministic dependency preview 使用，不會把 Tag 改寫成普通 item，也不會刪除 Tag branch。統一 `recalculate` 會把尚未 mapping 的 Tag choice 寫入這份全域草稿；已存在且仍有效的 mapping 會在其他 targets 重用。BIO ID、中文名稱與 filename 不會由程式猜測。`generate=true` 只允許 Generator 建立 Tag BIO preview，不會覆寫正式 BIO。
 
 ## BIO Scanner
 
@@ -553,7 +553,7 @@ Generator 直接使用同一個 Node process 內的 Normalized Item Registry，�
 
 V3 不直接讀取 Decision Registry。Generator 將決策編譯進 BIO：`base_material: true` 會在 V3 建立虛擬「外部取得」路線，`<!-- preferred -->` 決定第一次展開的配方。V3 當次人工切換仍優先，不會刪除其他 routes。
 
-Tag BIO preview 由 `Minecraft Tag BIO Mapping Draft.md` 控制。中文名稱必填，filename 留空時沿用中文名稱，BIO ID 留空時沿用 Tag path 的大寫；representative 必須有效，且 `generate=true` 才會產生。當次用到且啟用的 mapping 若有 ERROR（例如缺名稱或代表物無效），Generator 在建立 preview 目錄前停止。未啟用的列可繼續作為草稿；當次使用到的 tags 會摘要到 preview 目錄內的 `Tag BIO Name Review.md`。
+Tag BIO preview 由 `BIO Collection Mapping Draft.md` 控制。中文名稱必填，filename 留空時沿用中文名稱，BIO ID 留空時沿用 Tag path 的大寫；representative 必須有效，且 `generate=true` 才會產生。當次用到且啟用的 mapping 若有 ERROR（例如缺名稱或代表物無效），Generator 在建立 preview 目錄前停止。未啟用的列可繼續作為草稿；當次使用到的 tags 會摘要到 preview 目錄內的 `Tag BIO Name Review.md`。
 
 Normalized Registry 保留 Minecraft ID，不在 parser 階段套用中文。Generator 讀取 `參考資料/Minecraft/zh_tw.json`：物品／方塊以 `item.*`／`block.*` 查找，名稱優先沿用現有 BIO。Tag 與衍生集合名稱由人工 mapping 提供，無法用單一物品翻譯推算。CLI 產生比較 preview；既有 BIO 可由 Templater 在人工確認與 Git 還原點驗證後套用。
 
@@ -644,7 +644,7 @@ Mini Parser 另讀取同檔的 Machine Dictionary 與 Provider Headings，每次
 - Tag 和 alternatives 的下拉每次選一個候選，切換後重新計算產量、需求量與最終材料。
 - 舊 BIO 的 Machine、qty、output、Base YAML，以及 qty-free Tag 代表列仍可讀取。
 - 配方的 result components 保留，用於區分可疑燉湯等效果不同的路線。
-- 路線下的 `- [note:: 說明]` 會附加到配方樹、Mermaid、製作教程與輸出檔案。多方塊結構使用 `Machine:: 無/手動`，並以 NOTE 提供搭建說明。
+- 路線下的 `- [note:: 說明]` 會附加到配方樹、Mermaid、製作教程與輸出檔案。多方塊結構使用 `Machine:: 無/從背包合成`，並以 NOTE 提供搭建說明。
 - 循環、缺少 BIO 和無效候選資料會顯示診斷。
 
 Generator 對已連結到 Tag BIO 的材料，只輸出材料連結和需求數量。候選集中在 Tag BIO 的逐行 item 列中，由 preferred 決定預設值，V4 沿文件連結展開。舊版 Tag 成員表和獨立代表列仍可讀取。Tag BIO 尚未建立時，以及配方特有的 alternatives，暫以 `<!-- obsf:choices {...} -->` 保存確切候選範圍。
@@ -671,7 +671,7 @@ Templater 設定與操作：
 
 輸出腳本為 `BIO engine/export_report_v4.js`，模板呼叫 `tp.user.export_report_v4(tp)`。PDF 透過桌面 Obsidian 的 Electron 隱藏列印視窗產生，列印版使用縮排依賴樹與可列印 Checklist。若目前 Obsidian 無法建立列印視窗，腳本會回報錯誤，可改選 JSON。PDF 的真實桌面輸出仍需手動驗證。
 
-染色 alternatives 的衍生群組名稱由 `Minecraft BIO Group Mapping Draft.md` 維護，當次摘要為 `Derived BIO Group Name Review.md`。可疑的燉湯不依 result item 去重；不同 `result.components` 仍是不同效果 route。
+染色 alternatives 的衍生群組名稱由 `BIO Collection Mapping Draft.md` 維護，當次摘要為 `Derived BIO Group Name Review.md`。可疑的燉湯不依 result item 去重；不同 `result.components` 仍是不同效果 route。
 
 ## Deferred Optimizations
 

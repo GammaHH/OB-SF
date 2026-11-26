@@ -2,7 +2,7 @@
 created: 2026-11-12
 updated: 2026-11-20 23:09:13
 ---
-
+- 終界
 # BIO 搜尋介面 V4
 
 選擇目標後，可在遞歸樹切換取得路線與 Tag／擇一材料。外部取得會顯示 BIO 的來源說明。
@@ -1802,7 +1802,7 @@ function recordEquipmentStep(page, recipe, required, batches, index, complete, d
     if (recipe.tagRepresentative) return;
     equipmentSteps.push({
         name: page.file.name, path: page.file.path, routeKey: recipe.key,
-        machine: recipe.machine || "無/手動", output: recipe.output,
+        machine: recipe.machine || "無/從背包合成", output: recipe.output,
         notes: recipe.notes || [],
         depth, parents: parent ? [parent] : [],
         batches, required, materials: equipmentMaterials(recipe, batches, index),
@@ -3103,8 +3103,8 @@ function renderMaterialTable(
 // 解析機器建造成本
 // ============================================================
 
-async function registerMachine(machineName, index, depth = 0, tutorialDepth = 0, parent = "") {
-    if (!machineName || ["無/手動", "手動/無", "外部取得"].includes(String(machineName).trim())) return true;
+async function registerMachine(machineName, index, depth = 0, tutorialDepth = 0, parent = "", dependencyTrail = []) {
+    if (bioReaderV4.isManualMachine(machineName)) return true;
     const page = resolveBio(machineName, index);
     if (page && processedMachines.has(page.file.path)) {
         for (const step of equipmentSteps) {
@@ -3115,7 +3115,12 @@ async function registerMachine(machineName, index, depth = 0, tutorialDepth = 0,
         return true;
     }
     if (page && processingMachines.has(page.file.path)) {
-        analysisWarnings.set("machine-cycle:" + page.file.path, "設備建造遇到循環：" + page.file.path);
+        const first = dependencyTrail.indexOf(page.file.path);
+        const cycle = [...dependencyTrail.slice(first < 0 ? 0 : first), page.file.path];
+        const source = dependencyTrail.at(-1);
+        analysisWarnings.set("machine-cycle:" + JSON.stringify(cycle),
+            "設備建造遇到循環：" + cycle.join(" → ") +
+            (source ? "（請檢查 " + source + " 的生產設備設定）" : ""));
         return false;
     }
     const permit = await admitExpansion(depth);
@@ -3130,6 +3135,7 @@ async function registerMachine(machineName, index, depth = 0, tutorialDepth = 0,
         return false;
     }
     processingMachines.add(key);
+    const nextTrail = [...dependencyTrail, page.file.path];
     const entry = { name: page.file.name, page, status: "需建造" };
     machineList.set(key, entry);
     try {
@@ -3140,7 +3146,7 @@ async function registerMachine(machineName, index, depth = 0, tutorialDepth = 0,
         if (recipe.external) { entry.status = recipe.sourceText; return true; }
         let complete = true;
         const batches = Math.ceil(1 / recipe.output);
-        if (recipe.machine) complete = await registerMachine(recipe.machine, index, depth + 1, tutorialDepth + 1, page.file.name);
+        if (recipe.machine) complete = await registerMachine(recipe.machine, index, depth + 1, tutorialDepth + 1, page.file.name, nextTrail);
         for (const ingredient of recipe.ingredients) {
             const next = analysisBudget.check(depth + 1);
             if (!next.allowed) {
@@ -3156,7 +3162,7 @@ async function registerMachine(machineName, index, depth = 0, tutorialDepth = 0,
                 addLeafTo(machineLeafTotals, "unresolved:" + normalize(ingredient.name),
                     ingredient.name, ingredient.type, required, null, "未建立 / 範圍外");
                 complete = false;
-            } else if (!await expandMachineMaterial(material, required, index, [], depth + 1, tutorialDepth + 1, page.file.name)) complete = false;
+            } else if (!await expandMachineMaterial(material, required, index, [], depth + 1, tutorialDepth + 1, page.file.name, nextTrail)) complete = false;
         }
         recordEquipmentStep(page, recipe, 1, batches, index, complete, tutorialDepth, parent);
         if (!complete) entry.status = "需先確認設備材料";
@@ -3167,7 +3173,7 @@ async function registerMachine(machineName, index, depth = 0, tutorialDepth = 0,
     }
 }
 
-async function expandMachineMaterial(page, requiredQty, index, stack = [], depth = stack.length, tutorialDepth = 0, parent = "") {
+async function expandMachineMaterial(page, requiredQty, index, stack = [], depth = stack.length, tutorialDepth = 0, parent = "", dependencyTrail = []) {
     const permit = await admitExpansion(depth, requiredQty);
     if (!permit.allowed) {
         analysisWarnings.set("limit:" + page.file.path, permit.reason);
@@ -3182,7 +3188,8 @@ async function expandMachineMaterial(page, requiredQty, index, stack = [], depth
         return !parsed.exclusionFailures;
     }
     let complete = true;
-    if (recipe.machine) complete = await registerMachine(recipe.machine, index, depth + 1, tutorialDepth + 1, page.file.name);
+    const nextTrail = [...dependencyTrail, page.file.path];
+    if (recipe.machine) complete = await registerMachine(recipe.machine, index, depth + 1, tutorialDepth + 1, page.file.name, nextTrail);
     const batches = recipe.tagRepresentative ? requiredQty : Math.ceil(requiredQty / recipe.output);
     const nextStack = [...stack, page.file.path];
     for (const ingredient of recipe.ingredients) {
@@ -3202,9 +3209,9 @@ async function expandMachineMaterial(page, requiredQty, index, stack = [], depth
             complete = false;
         } else if (dependencyWouldCycle(target, nextStack, index)) {
             analysisWarnings.set("machine-material-cycle:" + target.file.path,
-                "設備材料遇到循環：" + [...nextStack, target.file.path].join(" → "));
+                "設備材料遇到循環：" + [...nextTrail, target.file.path].join(" → "));
             complete = false;
-        } else if (!await expandMachineMaterial(target, required, index, nextStack, depth + 1, tutorialDepth + 1, parent)) complete = false;
+        } else if (!await expandMachineMaterial(target, required, index, nextStack, depth + 1, tutorialDepth + 1, parent, nextTrail)) complete = false;
     }
     recordEquipmentStep(page, recipe, requiredQty, batches, index, complete, tutorialDepth, parent);
     return complete;

@@ -17,6 +17,8 @@ updated: 2026-11-04 15:49
 
 > 程式負責建立資料骨架，人負責補上實際遊玩經驗。
 
+目前的通用入口是 [[OB-CLI]] 模板與 [OB-CLI 操作手冊](OB-CLI%20操作手冊.md)。Minecraft 與 Slimefun Parser 透過標準化資料接入同一套 Review／Preview／集中發布流程；Slimefun V1 邊界與驗收狀態見 [MASTER NOTE](OB-SF%20Slimefun4%20Java%20Parser%20MASTER%20NOTE.md)。
+
 ---
 
 ## 核心概念

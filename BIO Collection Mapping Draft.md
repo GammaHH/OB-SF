@@ -1,12 +1,14 @@
 ---
-type: mc-tag-bio-mapping-draft
-target: minecraft:piston
-generated_from: dependency-graph
-updated: 2026-11-09 15:31
-created: 2026-08-21 16:00
+type: bio-collection-mapping
+schemaVersion: 1
 ---
 
-# Minecraft Item Tag BIO Mapping Draft
+# BIO Collection Mapping Draft
+
+單一集合設定入口。原生 Tag 與衍生 Group 保持不同身分，分表編輯，共用 Generator 與 Review。舊兩份 Mapping 僅保留歷史，程式優先讀取本檔。
+
+
+## 原生 Tag（Minecraft source adapter）
 
 本表記錄 dependency graph 使用到的 item tags。`Tag ID` 是 `minecraft:item_tag` identity，不是普通 Minecraft item ID。`generate=true` 只允許 BIO Generator 建立 preview；不會覆寫正式 BIO。
 
@@ -43,3 +45,17 @@ created: 2026-08-21 16:00
 | #minecraft:stone_tool_materials     |          |          |           | false    | minecraft:cobblestone  |                                                      |
 | #minecraft:wooden_tool_materials    |          | 任意木材     |           | false    | minecraft:oak_planks   | 成員一致時共用 minecraft:planks，不另建重複 BIO                   |
 | #minecraft:coals                    |          |          |           | false    | minecraft:coal         |                                                      |
+
+
+
+## 衍生 Group（OB-SF 共用）
+
+> 這些是 OB-SF 為了統合 alternatives 建立的衍生群組，不是 Minecraft item tag。
+> 請人工填寫中文名稱與 filename；只有 `generate=true` 會產生 Tag-like BIO preview。
+
+| Group ID                  | BIO ID      | 中文名稱 | filename | generate | Representative Item ID  | note                                   |
+| ------------------------- | ----------- | ---- | -------- | -------- | ----------------------- | -------------------------------------- |
+| obsf:color_family/wool    | ANY_WOOL    | 任意羊毛 |          | true     | minecraft:white_wool    | 顯示用統合名稱；實際連結使用 Decision Registry 的代表材料 |
+| obsf:color_family/bed     | ANY_BED     | 任意床  |          | true     | minecraft:white_bed     | 待人工命名                                  |
+| obsf:color_family/carpet  | ANY_CARPET  | 任意地毯 |          | true     | minecraft:white_carpet  | 待人工命名                                  |
+| obsf:color_family/harness | ANY_HARNESS | 任意鞍具 |          | true     | minecraft:white_harness | 待人工命名                                  |

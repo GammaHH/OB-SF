@@ -105,7 +105,7 @@ function renderReviewQueueMarkdown(queue) {
         `scanScope: ${queue.scanScope}`,
         "---",
         "",
-        "# Minecraft Decision Review Queue",
+        "# BIO Decision Review Queue",
         "",
         `- Scanned Targets: ${queue.stats.scannedTargets}`,
         `- Existing BIO: ${queue.stats.existingBIO}`,
@@ -119,8 +119,8 @@ function renderReviewQueueMarkdown(queue) {
     if (current) {
         lines.push(
             `- Target: \`${current.target}\``,
-            "- [[Minecraft Base Material Review]]",
-            "- [[Minecraft Recipe Review]]"
+            "- [[BIO Base Material Review]]",
+            "- [[BIO Recipe Review]]"
         );
     } else {
         lines.push("- 無；執行 `node scripts/minecraft-review.cjs next`");

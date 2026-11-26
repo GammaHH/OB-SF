@@ -29,7 +29,7 @@ function archivePublication(root, manifestOption, write = false) {
         receipt.files.some(file => file.written !== true)) throw new Error('發布收據未確認整批完成');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     if (manifest.batchDirectory !== batch || !Array.isArray(manifest.entries) ||
-        (!manifest.entries.length && (!isStandaloneManifest(manifestRelative) || !receipt.files.length)))
+        (!manifest.entries.length && ((!isStandaloneManifest(manifestRelative) && !/^[a-f0-9]{64}$/.test(manifest.normalizedSourceSHA256 || '')) || !receipt.files.length)))
         throw new Error('發布清單與批次不一致');
     const byTarget = new Map(manifest.entries.map(entry => [entry.targetPath, entry]));
     const reviewed = [...receipt.files, ...(receipt.unchanged || [])];
@@ -94,7 +94,9 @@ function archivePublication(root, manifestOption, write = false) {
             return move ? path.join(move.to, path.relative(move.from, file)) : file;
         });
         const compression = spawnSync(process.platform === 'win32' ? 'powershell.exe' : 'pwsh',
-            ['-NoProfile', '-NonInteractive', '-File', path.join(__dirname, 'bio-preview-zip.ps1'),
+            // The ZIP helper is a local unsigned .ps1. Scope this setting to
+            // this child only; never modify machine/user execution policy.
+            ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', path.join(__dirname, 'bio-preview-zip.ps1'),
                 '-SourceFolder', staging, '-ArchiveFile', temporaryZip,
                 '-ExcludedEntry', batch + '/' + path.basename(lock)],
             { cwd: root, encoding: 'utf8', windowsHide: true });

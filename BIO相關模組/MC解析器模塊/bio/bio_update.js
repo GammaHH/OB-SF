@@ -4,7 +4,7 @@ const { parseFrontmatter } = require("./bio_scanner");
 const { isManagedBIOtag, normalizeTag, parseTagList, rebuildManagedBIOtags } = require("./bio_tags");
 const { normalizeMachineRecipeSections } = require("./machine_recipe_mapping");
 const { normalizeBIOOutput } = require("./bio_output");
-const BIO_UPDATE_MERGE_VERSION = 5;
+const BIO_UPDATE_MERGE_VERSION = 6;
 
 function stable(value) {
     if (Array.isArray(value)) return value.map(stable);
@@ -249,84 +249,6 @@ function insertRoute(original, block, newline, providerFallback) {
         (provider && !group ? "##### " + provider + newline + newline : "") +
         (block.preferred ? "<!-- preferred -->" + newline : "") + block.text.replace(/\r?\n/g, newline) + newline + newline;
     return text.slice(0, at) + fragment + text.slice(at);
-}
-
-function refreshVanillaRecipeBlocks(original, generated) {
-    const newline = original.includes("\r\n") ? "\r\n" : "\n";
-    const collect = text => {
-        const groups = new Map();
-        const titles = headings(text);
-        const root = titles.find(heading => heading.level === 1 && heading.title === "合成/取得");
-        if (!root) return groups;
-        const end = titles.find(heading => heading.level === 1 && heading.start > root.start)?.start ?? text.length;
-        for (const block of generatedRoutes(text)) {
-            if (block.external || block.provider !== "Minecraft 原版" || block.start < root.body || block.start >= end) continue;
-            const recipeText = text.slice(block.contentStart, block.recipeEnd).trimEnd();
-            const route = reader.parseBIO("### " + block.section + "\n" + recipeText).recipes[0];
-            if (!route?.machine || !recipeText || block.unsafeSpan)
-                throw new Error("原版配方混有無法安全更新的內容：" + block.section);
-            const key = JSON.stringify([block.section, route.machine]);
-            if (!groups.has(key)) groups.set(key, []);
-            groups.get(key).push({ ...block, text: recipeText, route });
-        }
-        return groups;
-    };
-    const oldGroups = collect(original), newGroups = collect(generated);
-    const patches = [], additions = [];
-    const generatedNote = /^(?:處理時間 |烹調時間|經驗值[ ：]|材料角色：|繼承輸入物品 Components：|可以存入物品$|補充資訊（|成品資訊（|效果：|效果補充資訊：)/;
-    const signature = route => JSON.stringify([route.output, route.ingredients.map(ingredient =>
-        [ingredient.label || ingredient.name, ingredient.qty])]);
-    const withManualNotes = (block, notes) => [block.text, ...notes
-        .filter(note => !generatedNote.test(note) && !block.route.notes?.includes(note))
-        .map(note => "\t- [note:: " + note + "]")].join("\n");
-    const render = block => ((block.preferred ? "<!-- preferred -->" + newline : "") +
-        block.text.replace(/\r?\n/g, newline) + newline);
-    for (const [key, old] of oldGroups) {
-        let replacementKey = key;
-        if (!newGroups.has(key)) {
-            const machine = old[0].route.machine;
-            const matches = [...newGroups].filter(([, blocks]) => blocks[0].route.machine === machine);
-            const groupsForMachine = [...oldGroups.values()].filter(blocks => blocks[0].route.machine === machine);
-            if (matches.length !== 1 || groupsForMachine.length !== 1) continue;
-            replacementKey = matches[0][0];
-        }
-        const incoming = newGroups.get(replacementKey);
-        newGroups.delete(replacementKey);
-        const moved = replacementKey !== key;
-        const remaining = new Set(incoming);
-        const pairs = old.map(block => {
-            const replacement = [...remaining].find(next => signature(next.route) === signature(block.route));
-            remaining.delete(replacement);
-            return { block, replacement };
-        });
-        for (const pair of pairs) {
-            if (pair.replacement) continue;
-            pair.replacement = [...remaining][0];
-            remaining.delete(pair.replacement);
-        }
-        const preferred = pairs.find(pair => pair.block.preferred);
-        if (preferred && old.length === 1 && incoming.length > 1)
-            preferred.replacement = incoming.find(block => block.preferred) || preferred.replacement;
-        if (preferred && !preferred.replacement)
-            throw new Error("更新時無法保留原本的首選配方：" + preferred.block.route.machine);
-        const assigned = new Set(pairs.map(pair => pair.replacement));
-        for (const [index, { block, replacement }] of pairs.entries()) {
-            const notes = block.route.notes || [];
-            if (!replacement && notes.some(note => !generatedNote.test(note)))
-                throw new Error("舊路線含人工 NOTE，請先審查：" + block.route.machine);
-            const blocks = replacement ? [{ ...replacement, text: withManualNotes(replacement, notes), preferred: block.preferred }] : [];
-            if (index === pairs.length - 1)
-                for (const extra of incoming.filter(next => !assigned.has(next))) blocks.push({ ...extra, preferred: false });
-            if (moved) additions.push(...blocks);
-            patches.push({ start: block.start, end: block.recipeEnd, text: moved ? "" : blocks.map(render).join("") });
-        }
-    }
-    for (const blocks of newGroups.values()) additions.push(...blocks.map(block => ({ ...block, preferred: false })));
-    let updated = original;
-    for (const { start, end, text } of patches.sort((a, b) => b.start - a.start))
-        updated = updated.slice(0, start) + text + updated.slice(end);
-    for (const block of additions) updated = insertRoute(updated, block, newline, block.provider);
-    return updated;
 }
 
 function groupExisting(original, routes, oldKeys, newKeys, options, newline, diagnostics) {
@@ -600,5 +522,91 @@ function planBIOUpdate(existingText, generatedText, options = {}) {
         quarantinedRoutes: quarantined };
 }
 
-module.exports = { planBIOUpdate, metadataIsAdditive, BIO_UPDATE_MERGE_VERSION,
+function planVanillaIncrementalUpdate(original, generated, { resolveName, migrateOutput = false } = {}) {
+    const metadata = parseFrontmatter(original);
+    const incomingMetadata = parseFrontmatter(generated);
+    const id = value => String(value?.minecraft_id || value?.id || '').toLowerCase().replace(/^minecraft:/, '');
+    const diagnostics = [];
+    const report = (code, message, details = {}) => diagnostics.push({ code, message, ...details });
+    const blocked = () => ({ status: 'REVIEW', candidate: original, additions: [], diagnostics });
+    if (!id(metadata) || id(metadata) !== id(incomingMetadata) ||
+        reader.isTagBIO(metadata) || reader.isTagBIO(incomingMetadata)) {
+        report('BIO_IDENTITY_MISMATCH', '正式 BIO 與來源的物品身分不一致');
+        return blocked();
+    }
+    const prior = reader.parseBIO(original, { ...metadata, base_material: false });
+    const incoming = reader.parseBIO(generated, { ...incomingMetadata, base_material: false });
+    if (prior.diagnostics.length || incoming.diagnostics.length || !incoming.recipes.length) {
+        diagnostics.push(...prior.diagnostics, ...incoming.diagnostics);
+        report('BIO_ROUTE_UNPARSED', '原有路線或新來源未完整解析，請檢查配方');
+        return blocked();
+    }
+    const key = route => JSON.stringify([route.provider, route.external ? route.sourceText : routeKeys(route, resolveName).exact]);
+    const current = new Set(prior.recipes.map(key));
+    const seen = new Set(current);
+    const parsedBlocks = generatedRoutes(generated).map(block => ({
+        block, parsed: reader.parseBIO('### ' + block.section + '\n' +
+            (block.provider ? '##### ' + block.provider + '\n' : '') + block.text)
+    }));
+    if (parsedBlocks.length !== incoming.recipes.length || parsedBlocks.some(({ parsed }) =>
+        parsed.diagnostics.length || parsed.recipes.length !== 1) ||
+        parsedBlocks.some(({ parsed }, index) => key(parsed.recipes[0]) !== key(incoming.recipes[index]))) {
+        report('BIO_ROUTE_BLOCK_MISMATCH', '無法確認新來源的配方區塊，保留原稿');
+        return blocked();
+    }
+    const additions = [];
+    const incomingKeys = new Set(incoming.recipes.map(key));
+    for (const route of prior.recipes) {
+        if (route.provider !== 'Minecraft 原版' || incomingKeys.has(key(route))) continue;
+        report('EXISTING_ROUTE_NOT_IN_SOURCE', '新版來源缺少相同的原版路線。原有路線保留，供人工確認是否變更或退役。',
+            { existing: route });
+    }
+    for (const { block, parsed } of parsedBlocks) {
+        const route = parsed.recipes[0];
+        const routeKey = key(route);
+        if (seen.has(routeKey)) continue;
+        if (route.external && prior.recipes.some(candidate => candidate.external) && /待人工確認|待補充/.test(route.sourceText)) continue;
+        if (!route.external && prior.recipes.some(candidate => !candidate.external && !candidate.provider &&
+            routeKeys(candidate, resolveName).exact === routeKeys(route, resolveName).exact)) {
+            report('EXISTING_ROUTE_PROVIDER_UNCONFIRMED', '有配方語意相同的既有路線，但未標示 Provider。請人工確認來源。',
+                { incoming: route });
+            continue;
+        }
+        seen.add(routeKey);
+        additions.push(block);
+    }
+    let candidate = original;
+    if (additions.length) {
+        const newline = original.includes('\r\n') ? '\r\n' : '\n';
+        const titles = headings(original);
+        const root = titles.find(heading => heading.level === 1 && heading.title === '合成/取得');
+        const at = root ? titles.find(heading => heading.level === 1 && heading.start > root.start)?.start ?? original.length : original.length;
+        const appended = additions.map(block => ['### ' + block.section,
+            ...(block.provider ? ['##### ' + block.provider] : []), block.text].join('\n\n')).join('\n\n');
+        candidate = original.slice(0, at) + newline + newline + (!root ? '# 合成/取得' + newline + newline : '') +
+            appended.replace(/\r?\n/g, newline) + newline + newline + original.slice(at);
+        if (migrateOutput) candidate = normalizeBIOOutput(candidate).text;
+        const result = reader.parseBIO(candidate, { ...metadata, base_material: false });
+        const baseline = prior.recipes.map(route => [key(route), route.preferred]);
+        const retained = result.recipes.slice(0, baseline.length).map(route => [key(route), route.preferred]);
+        if (result.diagnostics.length || JSON.stringify(retained) !== JSON.stringify(baseline) ||
+            result.recipes.length !== baseline.length + additions.length ||
+            result.preferredMarkers !== prior.preferredMarkers) {
+            report('EXISTING_DEFAULT_AT_RISK', '追加後無法確認原路線順序與 Preferred，保留原稿');
+            return blocked();
+        }
+        if (!result.explicitPreferred && result.recipes.length > 1)
+            report('PREFERRED_SELECTION_REQUIRED', '更新候選有多條路線，請人工指定 Preferred');
+    }
+    if (prior.preferredMarkers > 1 || prior.preferredMarkers > prior.explicitPreferred)
+        report('EXISTING_PREFERRED_REQUIRES_REVIEW', '既有 Preferred 重複或未對應有效路線，請人工確認');
+    return { status: diagnostics.length || additions.length ? 'REVIEW' : 'UNCHANGED',
+        candidate, diagnostics, additions: additions.map(({ section, provider }) => ({ section, provider })) };
+}
+
+function refreshVanillaRecipeBlocks(original, generated, options) {
+    return planVanillaIncrementalUpdate(original, generated, options).candidate;
+}
+
+module.exports = { planBIOUpdate, planVanillaIncrementalUpdate, metadataIsAdditive, BIO_UPDATE_MERGE_VERSION, routeKeys,
     routeIsLegalSpecialization, extractLegacyRecipeReviews, refreshVanillaRecipeBlocks };

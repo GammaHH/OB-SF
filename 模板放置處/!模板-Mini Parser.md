@@ -43,7 +43,7 @@ const positiveInt = value => /^\d+$/.test(String(value).trim()) && Number(value)
 const cleanId = value => String(value || "").trim();
 const mcId = value => { const raw = String(value).trim().toLowerCase(); return raw.startsWith("minecraft:") ? raw : `minecraft:${raw}`; };
 const escapeWikilink = value => String(value).replace(/[\[\]|]/g, "").replace(/\r?\n/g, " ");
-const plainMachine = value => !value || value === "無/手動" ? "無/手動" : String(value);
+const plainMachine = value => !value || value === "無/從背包合成" ? "無/從背包合成" : String(value);
 
 // 0. Mini Parser 建立待審核的單一 Preview。
 const mode = await tp.system.suggester(
@@ -254,7 +254,7 @@ function materialLine(mat, member = false) {
 }
 
 // 3. 解析結果（共用資料模型）
-const result = { materials: [], machine: "無/手動", machinePath: null,
+const result = { materials: [], machine: "無/從背包合成", machinePath: null,
     output: 1, explicitOutput: false, level: "", group: "", aliases: [],
     energy: null, tickRate: null, capacity: null, sourcePath: "" };
 function addMaterial(id, qty, source = "unknown", selectedPath = null) {
@@ -296,7 +296,7 @@ function parseJava(sourceText, id) {
 function parseJavaRecipe(src) {
     result.group = src.match(/itemGroups\.([\w]+)/)?.[1] || "";
     const machineId = src.match(/RecipeType\.([A-Za-z0-9_]+)/)?.[1];
-    result.machine = machineId ? (MACHINE_DICT[machineId] || machineId) : "無/手動";
+    result.machine = machineId ? (MACHINE_DICT[machineId] || machineId) : "無/從背包合成";
     if (machineId && !MACHINE_DICT[machineId]) warnings.push(`未知設備類型：${machineId}`);
     const recipe = src.match(/new\s+ItemStack\s*\[\s*\]\s*\{([\s\S]*?)\}/);
     if (!recipe) { warnings.push("找不到 ItemStack[] 固定配方；請人工確認"); return; }
@@ -339,7 +339,7 @@ function parseYamlRecipe(src) {
         }
     }
     const mt = src.match(/^\s+recipe_type:\s*['"]?([A-Za-z0-9_]+)['"]?/m)?.[1];
-    result.machine = mt ? (MACHINE_DICT[mt] || mt) : "無/手動";
+    result.machine = mt ? (MACHINE_DICT[mt] || mt) : "無/從背包合成";
     if (mt && !MACHINE_DICT[mt]) warnings.push(`未知設備類型：${mt}`);
     const per = src.match(/^\s+per:\s*(\d+(?:\.\d+)?)\s*$/m)?.[1];
     const ticks = src.match(/^\s+tickRate:\s*(\d+(?:\.\d+)?)\s*$/m)?.[1];
@@ -464,7 +464,7 @@ if (tagMode) {
 } else {
     // 手動模式：選設備，再選既有 BIO 或輸入新 ID。
     const machineChoice = await tp.system.suggester(
-        ["🔧 無/手動", "📎 從現有 BIO 選擇設備", "✏️ 手動輸入設備名稱或 ID", ...new Set(Object.values(MACHINE_DICT))],
+        ["🔧 無/從背包合成", "📎 從現有 BIO 選擇設備", "✏️ 手動輸入設備名稱或 ID", ...new Set(Object.values(MACHINE_DICT))],
         ["NONE", "EXISTING", "CUSTOM", ...new Set(Object.values(MACHINE_DICT))], false, "選擇生產設備"
     );
     if (machineChoice == null) { cancel(); return; }
@@ -477,8 +477,8 @@ if (tagMode) {
     } else if (machineChoice === "CUSTOM") {
         const typed = await tp.system.prompt("輸入設備名稱或 ID：");
         if (typed === null) { cancel(); return; }
-        result.machine = typed.trim() || "無/手動";
-    } else result.machine = machineChoice === "NONE" ? "無/手動" : machineChoice;
+        result.machine = typed.trim() || "無/從背包合成";
+    } else result.machine = machineChoice === "NONE" ? "無/從背包合成" : machineChoice;
 
     if (!(await promptAndAddMaterials())) return;
     if (!result.materials.length) warnings.push("手動配方沒有材料；待人工補充");
@@ -541,7 +541,7 @@ const providerId = providers.get(sourceProvider)?.id || "";
 // 6. 格式化 BIO（各模式一律保留每條 output）
 let machineText = plainMachine(result.machine);
 if (result.machinePath) machineText = `[[${result.machinePath}|${escapeWikilink(result.machine)}]]`;
-else if (machineText !== "無/手動") {
+else if (machineText !== "無/從背包合成") {
     // 機器名稱只是顯示標籤；唯一對應同名正式 BIO 時才建立 wikilink。
     const options = formal.filter(x => !x.collection && x.name === machineText);
     if (options.length === 1) machineText = `[[${options[0].path}|${escapeWikilink(options[0].name)}]]`;
@@ -618,9 +618,11 @@ while (true) {
 }
 if (!confirmed) return;
 // 使用獨立路徑，不覆蓋其他同 ID Preview，交由集中 SCAN 報告重複。
-const previewRoot = "@自動化BIO Preview/mini";
+const workspaceModule = { exports: {} };
+new Function('module', await app.vault.adapter.read('BIO相關模組/搜尋介面模塊/bio_workspace.js'))(workspaceModule);
+const previewRoot = workspaceModule.exports.miniPreviewRoot;
 try {
-    for (const folder of ["@自動化BIO Preview", previewRoot]) {
+    for (const folder of [workspaceModule.exports.previewRoot, previewRoot]) {
         if (!app.vault.getAbstractFileByPath(folder)) await app.vault.createFolder(folder);
     }
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");

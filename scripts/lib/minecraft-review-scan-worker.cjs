@@ -2,6 +2,7 @@
 
 const path = require("node:path");
 const fs = require("node:fs");
+const { workspaceName, collectionTexts } = require('./bio-workspace.cjs');
 const { createMinecraftVanillaRuntime } = require("./minecraft-vanilla-runtime.cjs");
 const { readReviewDecisionStore } = require("./review-decision-store.cjs");
 const vanilla = require("../../BIO相關模組/MC解析器模塊");
@@ -85,11 +86,9 @@ function main() {
     const fingerprint = vanilla.dependencies.computeNormalizedRegistryFingerprint(
         runtime.pipeline.itemRegistry
     );
-    const mappingPath = path.join(vaultRoot, "Minecraft Tag BIO Mapping Draft.md");
-    const parsedTagMappings = fs.existsSync(mappingPath)
-        ? vanilla.bio.parseTagBIOMappingMarkdown(
-            fs.readFileSync(mappingPath, "utf8")
-        )
+    const collections = collectionTexts(vaultRoot);
+    const parsedTagMappings = collections.tags
+        ? vanilla.bio.parseTagBIOMappingMarkdown(collections.tags)
         : { mappings: new Map(), diagnostics: [] };
     const mappingErrors = parsedTagMappings.diagnostics.filter(entry =>
         entry.severity === "ERROR"
@@ -98,10 +97,10 @@ function main() {
         throw new Error(`Tag mapping 無效：${mappingErrors[0].message}`);
     }
     const decisionRegistry = readReviewDecisionStore({
-        jsonPath: path.join(vaultRoot, "Minecraft Review Decisions.json"),
+        jsonPath: path.join(vaultRoot, workspaceName(vaultRoot, 'decisions')),
         legacyMarkdownPath: path.join(
             vaultRoot,
-            "Minecraft Review Decisions.md"
+            workspaceName(vaultRoot, 'decisionSummary')
         )
     }).registry;
     const globalDecisionIndex =
