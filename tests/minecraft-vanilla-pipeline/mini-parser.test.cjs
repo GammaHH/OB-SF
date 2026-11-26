@@ -47,7 +47,6 @@ async function runMini(options = {}) {
                 read: async name => {
                     reads.push(name);
                     if (name === 'BIO相關模組/MC解析器模塊/bio/machine_recipe_mapping.js') return fs.readFileSync(path.join(root, name), 'utf8');
-                    if (name === 'BIO相關模組/搜尋介面模塊/bio_workspace.js') return fs.readFileSync(path.join(root, name), 'utf8');
                     if (name === RECIPE_MAPPING_FILE) return options.mappingText ?? mapping();
                     if (name === '參考資料/Minecraft/zh_tw.json') return JSON.stringify({ 'item.minecraft.iron_ingot': '鐵錠' });
                     if (name === rawFile) return raw;
@@ -111,7 +110,7 @@ test('Mini Parser creates only a Preview with explicit provider, chosen section 
     const value = await runMini({ section: '熔煉體系', note: '操作備註' });
     assert.equal(value.writes.length, 1, value.notices.join('\n'));
     const { path, content } = value.writes[0];
-    assert.match(path, /^@自動化BIO Preview\/mini\/.*\.preview\.md$/);
+    assert.match(path, /^MC-自動化BIO\/preview\/mini\/.*\.preview\.md$/);
     assert.match(content, /^generated_by: obsf-mini-parser$/m);
     assert.match(content, /^#未人工檢查\n#需攻略補充$/m);
     assert.match(content, /preview_source: mini/);

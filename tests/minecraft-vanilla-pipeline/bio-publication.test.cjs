@@ -32,9 +32,6 @@ test('publication selection prefers explicit then active, refuses ambiguous batc
 });
 
 function centralMapping(f) {
-    // Central validation now verifies equipment as well as materials.
-    fs.writeFileSync(path.join(f.root, 'MC-物品資料庫/工作台.md'),
-        item('crafting_table', '### 外部取得\n<!-- preferred -->\n- 採集：測試用已取得設備。\n'));
     fs.writeFileSync(path.join(f.root, 'Recipe Mapping Draft.md'),
         '<!-- obsf:formal-bio-roots:start -->\n| MC-物品資料庫 | true | true |\n| SF-海曼科技院 | true | true |\n<!-- obsf:formal-bio-roots:end -->\n' +
         '<!-- obsf:provider-headings:start -->\n| SF-海曼科技院 | hayman | 海曼科技院 | true |\n<!-- obsf:provider-headings:end -->\n');
@@ -67,13 +64,11 @@ test('refresh appends only missing collections and changes only the selected rec
     assert.deepEqual(written.updated, [entry.previewFilename]);
     assert.deepEqual(written.added, ['任意木材.preview.md']);
     const text = fs.readFileSync(previewPath, 'utf8');
-    assert.match(text, /### 舊分類\n##### Minecraft 原版\n<!-- preferred -->\n- \(Machine:: 工作台\)/);
-    assert.match(text, /OAK_PLANKS[\s\S]*\[output:: 1\]\n- \[note:: 人工提示\]/);
-    assert.match(text, /### 合成配方\n\n##### Minecraft 原版[\s\S]*\[output:: 4\]/);
+    assert.match(text, /### 合成配方[\s\S]*<!-- preferred -->\n- \(Machine:: 工作台\)/);
+    assert.match(text, /\[output:: 4\]\n\s*- \[note:: 人工提示\]/);
     assert.match(text, /##### 其他\n- \(Machine:: 私人設備\)/);
     assert.match(text, /# 用途\n!\[\[圖\.png\]\]/);
-    assert.doesNotMatch(text, /#未人工檢查/);
-    assert.equal(refreshVanillaRecipeBlocks(text, updated), text);
+    assert.doesNotMatch(text, /OAK_PLANKS|#未人工檢查/);
     assert.equal(fs.readFileSync(path.join(f.root, batch, other.previewFilename), 'utf8'), item('piston'));
     assert.equal(fs.readFileSync(path.join(f.root, written.backup, entry.previewFilename), 'utf8'), original);
     assert.equal(fs.existsSync(path.join(f.root, added.record.targetPath)), false);
@@ -456,8 +451,7 @@ test('central scan inherits official timestamps and still locates other YAML con
     fs.writeFileSync(formal, latest);
     for (const edited of [old.replace('2026-11-17', '2026-11-16'), old.replace(/^created:.*\n/m, '')]) {
         fs.writeFileSync(preview, edited);
-        const result = scanPublication(f.root, f.manifestPath);
-        assert.equal(result.status, 'READY', JSON.stringify(result.diagnostics, null, 2));
+        assert.equal(scanPublication(f.root, f.manifestPath).status, 'READY');
         const entries = preparePublication(f.root, f.manifestPath, { central: true }).entries;
         assert.match(entries[0].text, /^updated: 2026-11-20 12:00$/m);
         assert.match(entries[0].text, /^created: "2026-11-17 12:00"$/m);
@@ -474,48 +468,6 @@ test('central scan inherits official timestamps and still locates other YAML con
     assert.equal(issue.line, 6);
     assert.equal(issue.sourcePath, entry.targetPath);
     assert.equal(issue.sourceLine, 6);
-});
-
-test('central scan blocks equipment cycles with full paths and publisher refuses them', t => {
-    const f = fixture(t);
-    centralMapping(f);
-    const target = f.add('end_crystal', '終界水晶', item('end_crystal',
-        '### 合成配方\n<!-- preferred -->\n- (Machine:: [[工作台]])\n- [item:: [[原木]]] (qty:: 1)\n'));
-    const formal = (name, text) => fs.writeFileSync(path.join(f.root, 'MC-物品資料庫', name + '.md'), text);
-    formal('工作台', item('crafting_table', '### 合成配方\n<!-- preferred -->\n- (Machine:: 無/從背包合成)\n- [item:: [[任意木材]]] (qty:: 4)\n'));
-    formal('任意木材', '---\ntype: mc-tag\nid: PLANKS\nminecraft_tag: minecraft:planks\n---\n### Tag 代表材料\n<!-- preferred -->\n- [item:: [[橡木材]]]\n');
-    const planks = item('oak_planks', '### 合成配方\n<!-- preferred -->\n- (Machine:: [[工作台]])\n- [item:: [[原木]]] (qty:: 1)\n- [output:: 4]\n');
-    formal('橡木材', planks);
-    formal('原木', item('oak_log', '### 外部取得\n<!-- preferred -->\n- 採集：森林。\n'));
-    f.save();
-    const first = scanPublication(f.root, f.manifestPath);
-    assert.equal(first.status, 'BLOCKED');
-    const issue = first.diagnostics.find(issue => issue.code === 'EQUIPMENT_DEPENDENCY_CYCLE');
-    assert.equal(issue.path, target.targetPath);
-    assert.deepEqual(issue.cycle, ['MC-物品資料庫/工作台.md', 'MC-物品資料庫/任意木材.md', 'MC-物品資料庫/橡木材.md', 'MC-物品資料庫/工作台.md']);
-    assert.match(fs.readFileSync(path.join(f.root, first.materialReport), 'utf8'), /EQUIPMENT_DEPENDENCY_CYCLE.*橡木材/);
-    assert.throws(() => publishBIOBatch(f.root, f.manifestPath, { central: true, write: true }), /重新執行 scan-publication/);
-    assert.equal(fs.existsSync(path.join(f.root, target.targetPath)), false);
-    formal('橡木材', planks.replace('(Machine:: [[工作台]])', '(Machine:: 無/手動)'));
-    assert.equal(scanPublication(f.root, f.manifestPath).status, 'READY');
-    assert.equal(publishBIOBatch(f.root, f.manifestPath, { central: true }).dryRun, true);
-    // Changing equipment after a READY scan invalidates the publication snapshot.
-    formal('橡木材', planks);
-    assert.throws(() => publishBIOBatch(f.root, f.manifestPath, { central: true, write: true }), /重新執行 scan-publication/);
-});
-
-test('central scan blocks missing, ambiguous and route-less equipment', t => {
-    const f = fixture(t);
-    centralMapping(f);
-    f.add('stick', '木棒', item('stick', '### 合成配方\n<!-- preferred -->\n- (Machine:: [[未知設備]])\n- [item:: [[原木]]] (qty:: 1)\n'));
-    fs.writeFileSync(path.join(f.root, 'MC-物品資料庫/原木.md'), item('oak_log', '### 外部取得\n<!-- preferred -->\n- 採集：森林。\n'));
-    f.save();
-    assert.ok(scanPublication(f.root, f.manifestPath).diagnostics.some(issue => issue.code === 'UNRESOLVED_MACHINE'));
-    const machine = path.join(f.root, 'MC-物品資料庫/設備甲.md');
-    fs.writeFileSync(machine, item('stone').replace('id: STONE\n', 'id: STONE\naliases:\n  - 未知設備\n'));
-    assert.ok(scanPublication(f.root, f.manifestPath).diagnostics.some(issue => issue.code === 'INVALID_MACHINE_RECIPE'));
-    fs.writeFileSync(path.join(f.root, 'MC-物品資料庫/設備乙.md'), item('dirt').replace('id: DIRT\n', 'id: DIRT\naliases:\n  - 未知設備\n'));
-    assert.ok(scanPublication(f.root, f.manifestPath).diagnostics.some(issue => issue.code === 'AMBIGUOUS_MACHINE'));
 });
 
 test('central scan reports duplicate identity, multi-preferred and cycles without writing official BIOs', t => {

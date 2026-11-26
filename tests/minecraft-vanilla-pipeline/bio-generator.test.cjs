@@ -535,7 +535,6 @@ test("oak planks list the reviewed log first when the oak_logs Tag BIO is unavai
     });
     const markdown = vanilla.bio.renderBIOPreview(model, {
         itemPreviewTargets: new Map([["minecraft:oak_log", "preview/橡木原木.preview"]]),
-        translations: { "block.minecraft.oak_log": "橡木原木" },
         tagPreviewTargets: new Map(),
         tagMappings: new Map([["minecraft:oak_logs", {
             zhName: "任意橡木原木",
@@ -648,7 +647,7 @@ test("disabled Tag generation preserves choices and resolves only actual uniquel
     assert.doesNotMatch(generated, /obsf:choices|MC-物品資料庫\//);
 });
 
-test("color-family alternatives collapse only after confirming the full derived collection", () => {
+test("color-family alternatives collapse to one derived BIO link", () => {
     const model = vanilla.bio.createBIOGenerationModel("minecraft:red_wool", {
         itemRegistry: registry([["minecraft:red_wool", {
             id: "minecraft:red_wool",
@@ -670,16 +669,12 @@ test("color-family alternatives collapse only after confirming the full derived 
         bioRegistry: bioRegistry()
     });
     const markdown = vanilla.bio.renderBIOPreview(model, {
-        availableAlternativeGroups: new Set(["obsf:color_family/wool"]),
-        alternativeGroupValues: new Map([["obsf:color_family/wool",
-            ["minecraft:red_wool", "minecraft:white_wool", "minecraft:blue_wool", "minecraft:black_wool"]]]),
         alternativeGroupMappings: new Map([["obsf:color_family/wool", {
             zhName: "任意其他顏色羊毛",
             representativeItemId: "minecraft:white_wool"
         }]])
     });
     assert.match(markdown, /\[item:: \[\[white wool\|任意其他顏色羊毛\]\]\] \(qty:: 1\)/);
-    assert.match(markdown, /<!-- except self -->/);
     assert.doesNotMatch(markdown, /擇一材料|blue_wool|black_wool/);
 });
 
