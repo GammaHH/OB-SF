@@ -4,6 +4,12 @@ updated: 2026-11-04 15:49
 ---
 # OB-SF — Slimefun Obsidian Database
 
+## 快速開始
+
+1. 將專案資料夾開成 Obsidian Vault，啟用 Templater 和 Dataview，並在 Dataview 設定中啟用 JavaScript 查詢。
+2. 開啟 [黏液科技DB 搜尋介面 V4](<黏液科技DB 搜尋介面V4.md>)，選擇資料夾與取得方式後，依檔名、物品 ID 或別名搜尋，再展開配方。
+3. 編輯 Slimefun 條目可從 [Mini Parser](<模板放置處/!模板-Mini Parser.md>) 開始。生成或更新 Minecraft 原版 BIO 前，請先看 [BIO 產生流程](BIO產生流程.md)，產生並檢查預覽後再發布。
+
 一套以 **Obsidian** 為核心建立的 Slimefun 配方資料庫系統。
 
 本項目的主要目標，是利用 **Templater、JavaScript、Regex 與 DataviewJS**，
@@ -27,7 +33,6 @@ type: sf-item
 id: MIXED_METAL_INGOT
 aliases:
   - MIXED_METAL_INGOT
-output: 1
 ---
 ````
 
@@ -158,7 +163,9 @@ Slimefun 的物品通常具有大量巢狀配方：
 
 ---
 
-## V3 多配方系統
+## V4 多配方系統
+
+V4 以選定路線的 `[output:: N]` 計算批數。路線未填時按每批 1 個計算，舊筆記的 YAML `output` 不參與計算。符合目前範圍且有合法候選的 Tag／替代材料可以擇一切換。
 
 部分物品可能存在多種取得方式，例如：
 
@@ -177,7 +184,7 @@ Slimefun 的物品通常具有大量巢狀配方：
 └─ 磨石
 ```
 
-最新開發的 V3 支援在 **遞歸配方樹中直接切換配方路線**。
+搜尋介面支援在 **遞歸配方樹中直接切換配方路線**。
 
 每一條配方也可以擁有自己獨立的：
 
@@ -317,14 +324,16 @@ Obsidian
 
 ---
 
-## Project Status
+## 專案現況
+
+Slimefun Java／Addon YAML 由 Templater 產生 Markdown BIO。Minecraft 原版 Recipe、Tag 與語言 JSON 先在記憶體中正規化，再解析依賴、產生審核與 BIO 預覽，最後依發布流程寫入正式筆記。Normalized JSON、Tag Registry 與 Manifest 可作為診斷產物。V4 從 Vault 的 Markdown BIO 讀取配方。實作與資料契約見 [Vanilla Parser README](<Vanilla Parser README.md>)。
 
 目前仍在持續開發與擴充。
 
-已完成的主要系統包括：
+目前提供的功能包括：
 
 * BIO 自動建立
-* Java / YAML / JSON 配方解析
+* 特定 Slimefun Java／Addon YAML 格式與 Minecraft 原版 Recipe JSON 解析
 * Alias 連結
 * GEO Resource 解析
 * 多科技資料庫搜尋
@@ -336,5 +345,5 @@ Obsidian
 * Recipe-level Output
 * 純文字結果輸出
 
-更多插件與特殊配方格式仍會持續加入解析支援。歡迎交流討論
+特殊配方解析與早期筆記的 BIO 格式遷移仍在進行。分析若遇到缺少 BIO、無可用配方或達到分析上限，請依診斷確認材料與設備需求是否完整。
 
