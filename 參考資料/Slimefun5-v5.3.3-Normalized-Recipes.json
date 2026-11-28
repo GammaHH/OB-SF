@@ -1,0 +1,486 @@
+{
+  "schema": "OB-SF Normalized Recipe V1",
+  "schemaVersion": 1,
+  "provider_id": "slimefun5",
+  "source": {
+    "repository": "https://github.com/Slimefun5/Slimefun5",
+    "ref": "v5.3.3",
+    "commit": "3d284a62778991708f69274e4830c464e4aa8589",
+    "scope": "首批樣本的靜態路線。設備相容性及其他取得方式尚未全面盤點。"
+  },
+  "translationSource": {
+    "file": "配方翻譯對照.md",
+    "locale": "zh-TW",
+    "reviewIdsByItemId": {
+      "slimefun:BATTERY": "663e4b1d45f58857ca88",
+      "slimefun:CARBON": "7bc5642246436272790d",
+      "slimefun:STEEL_INGOT": "c4003c1e175f6accbcbe",
+      "slimefun:CARBON_PRESS": "87aba51cbae5c2cd0b18",
+      "slimefun:CARBON_PRESS_2": "6f32a0deafd7848e91a6",
+      "slimefun:CARBON_PRESS_3": "112c4646216283f20e47",
+      "slimefun:COMPRESSOR": "41485d00ba894305b517",
+      "slimefun:COPPER_INGOT": "70e8c6acc2bb3e6dd0fe",
+      "slimefun:ENHANCED_CRAFTING_TABLE": "bd972cb6dd4f6eba18d9",
+      "slimefun:IRON_DUST": "ff46a2b9295c3cfb55f6",
+      "slimefun:SMELTERY": "329f808106563a8a94c4",
+      "slimefun:SULFATE": "75715a72ef504d8de803",
+      "slimefun:ZINC_INGOT": "ee019cdc0ead3d2463b2"
+    }
+  },
+  "items": [
+    {
+      "id": "slimefun:BATTERY",
+      "actualId": "BATTERY",
+      "name": "Battery",
+      "localizedName": "電池",
+      "recipes": [
+        {
+          "recipeId": "battery-enhanced-crafting-table",
+          "sourceType": "ENHANCED_CRAFTING_TABLE",
+          "machineId": "slimefun:ENHANCED_CRAFTING_TABLE",
+          "machineName": "進階合成臺",
+          "recipeKind": "registration",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 1,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:redstone",
+              "qty": 1,
+              "name": "紅石"
+            },
+            {
+              "kind": "item",
+              "id": "slimefun:ZINC_INGOT",
+              "qty": 2,
+              "name": "鋅錠"
+            },
+            {
+              "kind": "item",
+              "id": "slimefun:SULFATE",
+              "qty": 2,
+              "name": "硫酸鹽"
+            },
+            {
+              "kind": "item",
+              "id": "slimefun:COPPER_INGOT",
+              "qty": 2,
+              "name": "銅錠"
+            }
+          ],
+          "slots": [
+            null,
+            {
+              "id": "minecraft:redstone",
+              "qty": 1
+            },
+            null,
+            {
+              "id": "slimefun:ZINC_INGOT",
+              "qty": 1
+            },
+            {
+              "id": "slimefun:SULFATE",
+              "qty": 1
+            },
+            {
+              "id": "slimefun:COPPER_INGOT",
+              "qty": 1
+            },
+            {
+              "id": "slimefun:ZINC_INGOT",
+              "qty": 1
+            },
+            {
+              "id": "slimefun:SULFATE",
+              "qty": 1
+            },
+            {
+              "id": "slimefun:COPPER_INGOT",
+              "qty": 1
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+            "line": 431
+          },
+          "warnings": [
+            "保留原始九格位置。設備譯名依物品 ID 採「進階合成臺」。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slimefun:CARBON",
+      "actualId": "CARBON",
+      "name": "Carbon",
+      "localizedName": "碳",
+      "recipes": [
+        {
+          "recipeId": "carbon-compressor-coal",
+          "sourceType": "COMPRESSOR",
+          "machineId": "slimefun:COMPRESSOR",
+          "machineName": "壓縮機",
+          "recipeKind": "registration",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 1,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal",
+              "qty": 8,
+              "name": "煤炭"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal",
+              "qty": 8
+            },
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+            "line": 622
+          },
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        },
+        {
+          "recipeId": "carbon-compressor-coal-block",
+          "sourceType": "COMPRESSOR",
+          "machineId": "slimefun:COMPRESSOR",
+          "machineName": "壓縮機",
+          "recipeKind": "machine-default",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 9,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal_block",
+              "qty": 8,
+              "name": "煤炭方塊"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal_block",
+              "qty": 8
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/multiblocks/Compressor.java",
+            "line": 48
+          },
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        },
+        {
+          "recipeId": "carbon-carbon-press-coal",
+          "sourceType": "CARBON_PRESS",
+          "machineId": "slimefun:CARBON_PRESS",
+          "machineName": "碳壓縮機",
+          "recipeKind": "machine-default",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 1,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal",
+              "qty": 8,
+              "name": "煤炭"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal",
+              "qty": 8
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/electric/machines/CarbonPress.java",
+            "line": 29
+          },
+          "additionalSources": [
+            {
+              "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+              "line": 2601
+            }
+          ],
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        },
+        {
+          "recipeId": "carbon-carbon-press-coal-block",
+          "sourceType": "CARBON_PRESS",
+          "machineId": "slimefun:CARBON_PRESS",
+          "machineName": "碳壓縮機",
+          "recipeKind": "machine-default",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 9,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal_block",
+              "qty": 8,
+              "name": "煤炭方塊"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal_block",
+              "qty": 8
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/electric/machines/CarbonPress.java",
+            "line": 30
+          },
+          "additionalSources": [
+            {
+              "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+              "line": 2601
+            }
+          ],
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        },
+        {
+          "recipeId": "carbon-carbon-press-2-coal",
+          "sourceType": "CARBON_PRESS",
+          "machineId": "slimefun:CARBON_PRESS_2",
+          "machineName": "碳壓縮機 - II",
+          "recipeKind": "machine-default",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 1,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal",
+              "qty": 8,
+              "name": "煤炭"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal",
+              "qty": 8
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/electric/machines/CarbonPress.java",
+            "line": 29
+          },
+          "additionalSources": [
+            {
+              "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+              "line": 2608
+            }
+          ],
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        },
+        {
+          "recipeId": "carbon-carbon-press-2-coal-block",
+          "sourceType": "CARBON_PRESS",
+          "machineId": "slimefun:CARBON_PRESS_2",
+          "machineName": "碳壓縮機 - II",
+          "recipeKind": "machine-default",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 9,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal_block",
+              "qty": 8,
+              "name": "煤炭方塊"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal_block",
+              "qty": 8
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/electric/machines/CarbonPress.java",
+            "line": 30
+          },
+          "additionalSources": [
+            {
+              "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+              "line": 2608
+            }
+          ],
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        },
+        {
+          "recipeId": "carbon-carbon-press-3-coal",
+          "sourceType": "CARBON_PRESS",
+          "machineId": "slimefun:CARBON_PRESS_3",
+          "machineName": "碳壓縮機 - III",
+          "recipeKind": "machine-default",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 1,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal",
+              "qty": 8,
+              "name": "煤炭"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal",
+              "qty": 8
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/electric/machines/CarbonPress.java",
+            "line": 29
+          },
+          "additionalSources": [
+            {
+              "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+              "line": 2615
+            }
+          ],
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        },
+        {
+          "recipeId": "carbon-carbon-press-3-coal-block",
+          "sourceType": "CARBON_PRESS",
+          "machineId": "slimefun:CARBON_PRESS_3",
+          "machineName": "碳壓縮機 - III",
+          "recipeKind": "machine-default",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 9,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "minecraft:coal_block",
+              "qty": 8,
+              "name": "煤炭方塊"
+            }
+          ],
+          "slots": [
+            {
+              "id": "minecraft:coal_block",
+              "qty": 8
+            }
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/electric/machines/CarbonPress.java",
+            "line": 30
+          },
+          "additionalSources": [
+            {
+              "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+              "line": 2615
+            }
+          ],
+          "warnings": [
+            "資料來自固定註冊配方，尚未經遊戲實測。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slimefun:STEEL_INGOT",
+      "actualId": "STEEL_INGOT",
+      "name": "Steel Ingot",
+      "localizedName": "鋼錠",
+      "recipes": [
+        {
+          "recipeId": "steel-ingot-smeltery",
+          "sourceType": "SMELTERY",
+          "machineId": "slimefun:SMELTERY",
+          "machineName": "冶煉爐",
+          "recipeKind": "registration",
+          "layout": "unknown",
+          "status": "REVIEW",
+          "output": 1,
+          "ingredients": [
+            {
+              "kind": "item",
+              "id": "slimefun:IRON_DUST",
+              "qty": 1,
+              "name": "鐵粉"
+            },
+            {
+              "kind": "item",
+              "id": "slimefun:CARBON",
+              "qty": 1,
+              "name": "碳"
+            },
+            {
+              "kind": "item",
+              "id": "minecraft:iron_ingot",
+              "qty": 1,
+              "name": "鐵錠"
+            }
+          ],
+          "slots": [
+            {
+              "id": "slimefun:IRON_DUST",
+              "qty": 1
+            },
+            {
+              "id": "slimefun:CARBON",
+              "qty": 1
+            },
+            {
+              "id": "minecraft:iron_ingot",
+              "qty": 1
+            },
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "source": {
+            "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/setup/SlimefunItemSetup.java",
+            "line": 486
+          },
+          "additionalSources": [
+            {
+              "file": "core/src/main/java/io/github/thebusybiscuit/slimefun5/implementation/items/misc/AlloyIngot.java",
+              "line": 25
+            }
+          ],
+          "warnings": [
+            "原始註冊陣列包含空格位，實際冶煉爐擺法及其他冶煉設備相容性待核對。"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 ---
 type: minecraft-machine-recipe-mapping
 schemaVersion: 1
-updated: 2026-11-20 22:13:19
+updated: 2026-11-23 00:39:38
 created: 2026-11-15 16:08:59
 active_preview_manifest:
 ---
@@ -127,21 +127,21 @@ Java 的 `RecipeType.ENHANCED_CRAFTING_TABLE`、YAML 的 `recipe_type: ENHANCED_
 
 <!-- obsf:machine-dictionary:start -->
 
-| machine_id | machine | enabled |
-| --- | --- | --- |
-| ENHANCED_CRAFTING_TABLE | 強化工作台 | true |
-| MAGIC_WORKBENCH | 魔法工作台 | true |
-| ARMOR_FORGE | 護甲鍛造台 | true |
-| SMELTERY | 冶煉爐 | true |
-| ORE_CRUSHER | 碎礦機 | true |
-| ORE_WASHER | 洗礦機 | true |
-| COMPRESSOR | 壓縮機 | true |
-| JUICER | 榨汁機 | true |
-| ANCIENT_ALTAR | 遠古祭壇 | true |
-| PRESSURE_CHAMBER | 壓力艙 | true |
-| GRIND_STONE | 磨石 | true |
-| GOLD_PAN | 淘金盤 | true |
-| HEATED_PRESSURE_CHAMBER | 加熱壓力艙 | true |
+| machine_id              | machine | enabled |
+| ----------------------- | ------- | ------- |
+| ENHANCED_CRAFTING_TABLE | 進階工作台   | true    |
+| MAGIC_WORKBENCH         | 魔法工作台   | true    |
+| ARMOR_FORGE             | 護甲鍛造台   | true    |
+| SMELTERY                | 冶煉爐     | true    |
+| ORE_CRUSHER             | 碎礦機     | true    |
+| ORE_WASHER              | 洗礦機     | true    |
+| COMPRESSOR              | 壓縮機     | true    |
+| JUICER                  | 榨汁機     | true    |
+| ANCIENT_ALTAR           | 遠古祭壇    | true    |
+| PRESSURE_CHAMBER        | 加壓艙     | true    |
+| GRIND_STONE             | 磨石      | true    |
+| GOLD_PAN                | 淘金盤     | true    |
+| HEATED_PRESSURE_CHAMBER | 加熱壓力艙   | true    |
 <!-- obsf:machine-dictionary:end -->
 
 > 增加設備時範例：`| CUSTOM_CRAFTING_TABLE | 自訂合成台 | true |`。手動模式的設備選單也會自動加入啟用的名稱；Java / YAML 則使用原始 ID 查表。每次執行 Mini Parser 都會重新讀取本檔，無須重啟 Obsidian。
