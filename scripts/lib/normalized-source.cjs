@@ -41,14 +41,16 @@ function renderNormalizedReview(registry, existing = {}) {
     for (const item of registry.items) {
         const prior = existing[item.id]?.fingerprint === registry.fingerprint ? existing[item.id] : {};
         lines.push('<!-- obsf:normalized-item ' + token(item.id) + ' -->', '## ' + item.id,
-            '- 中文名稱：' + (prior.name || ''), '- 正式資料夾：' + (prior.folder || ''),
+            '- 中文名稱：' + (prior.name || item.localizedName || ''), '- 正式資料夾：' + (prior.folder || ''),
             '- 外部取得說明：' + (prior.obtainment || ''),
             '- [' + (prior.external ? 'x' : ' ') + '] 改採人工確認的外部取得 <!-- obsf:normalized-external -->');
         for (const recipe of item.recipes) {
             lines.push('- [' + (prior.recipeId === recipe.recipeId && !prior.external ? 'x' : ' ') + '] `' + recipe.recipeId + '` ' +
                 recipe.sourceType + ' → ' + recipe.output + ' <!-- obsf:normalized-recipe ' + recipe.recipeId + ' -->',
                 '  - 狀態：' + (recipe.status || 'OK') + '；layout：' + (recipe.layout || '來源未提供'),
-                '  - 材料：' + recipe.ingredients.map(value => value.id + ' ×' + value.qty).join('、'),
+                ...(recipe.machineName ? ['  - 設備：' + recipe.machineName + '（' + recipe.machineId + '）'] : []),
+                '  - 材料：' + recipe.ingredients.map(value =>
+                    (value.name ? value.name + '（' + value.id + '）' : value.id) + ' ×' + value.qty).join('、'),
                 '  - 來源：' + (recipe.source?.file || recipe.meta?.sourceFile || '') + ':' + (recipe.source?.line || ''),
                 '  - 提醒：' + (recipe.warnings || []).join('；'));
         }

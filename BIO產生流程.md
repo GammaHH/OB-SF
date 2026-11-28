@@ -1,7 +1,10 @@
 ---
-updated: 2026-11-21 17:55:06
+updated: 2026-11-21 23:55:42
 created: 2026-11-16 02:21:06
 ---
+cd 'D:\SF5-Translation'
+.\Convert-SF5.ps1
+
 # 解析來源
 
 - 目前有兩種方式
@@ -23,7 +26,7 @@ created: 2026-11-16 02:21:06
 	1. [[BIO Base Material Review]]
 	2. [[BIO Collection Mapping Draft]]：Tag／Group 合併設定入口，保留不同身分
 	3. [[BIO Recipe Review]]
-	4. [[BIO Review Decisions]]，活躍及歷史人工決策目前共用 `BIO Review Decisions.json`。生命週期見 [[OB-SF Decision Registry 生命週期與 BIO 更新架構]]。
+	4. [[BIO Review Decisions]]，活躍及歷史人工決策目前共用 `BIO Review Decisions.json`
 	5. [[BIO Review Queue]]（狀態顯示）
 	6. [[Recipe Mapping Draft]]（Provider／Machine／分類／正式目錄）
 - 建立該 BATCH 的 METADATA 與 `<!-- preferred -->` 路徑

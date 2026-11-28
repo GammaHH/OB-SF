@@ -12,37 +12,4 @@
 /BIO-輸出報告/
 /@自動化BIO Preview/
 
-# Review workflow regression tests are project artifacts even when a local
-# .git/info/exclude contains a broader tests/minecraft-vanilla-pipeline rule.
-!tests/
-!tests/minecraft-vanilla-pipeline/
-tests/minecraft-vanilla-pipeline/*
-!tests/minecraft-vanilla-pipeline/base-material-review.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-generator.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-preview-batch.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-inventory.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-update.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-apply.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-tags.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-output.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-preview-links.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-publication.test.cjs
-!tests/minecraft-vanilla-pipeline/machine-recipe-mapping.test.cjs
-!tests/minecraft-vanilla-pipeline/mini-parser.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-reader-v4.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-report-v4.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-export-v4.test.cjs
-!tests/minecraft-vanilla-pipeline/file-write-retry.test.cjs
-!tests/minecraft-vanilla-pipeline/manifest-status.test.cjs
-!tests/minecraft-vanilla-pipeline/vanilla-pipeline.test.cjs
-!tests/minecraft-vanilla-pipeline/smoke-all-raw.cjs
-!tests/minecraft-vanilla-pipeline/recipe-review.test.cjs
-!tests/minecraft-vanilla-pipeline/review-decision-store.test.cjs
-!tests/minecraft-vanilla-pipeline/slimefun-parser.test.cjs
-!tests/minecraft-vanilla-pipeline/normalized-pipeline.test.cjs
-!tests/minecraft-vanilla-pipeline/foreground-command.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-dependency-check.test.cjs
-!tests/minecraft-vanilla-pipeline/bio-recovery.test.cjs
-!tests/fixtures/
-!tests/fixtures/slimefun-v1/
-!tests/fixtures/slimefun-v1/SlimefunFixture.java
+/tests/
